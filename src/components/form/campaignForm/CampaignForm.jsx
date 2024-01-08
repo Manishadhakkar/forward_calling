@@ -28,7 +28,7 @@ import Loader from "../../Loader/Loader";
 import { getAllCompanyRequest } from "../../../pages/auth/users/service/users.request";
 import { compareArrays } from "../../../utility/utilty";
 import "./styles.css";
-import FreeSolo from "../../dropdown/SearchableDropdown";
+import NumberDropdown from "../../dropdown/SearchableDropdown";
 
 const CampaignForm = (props) => {
   const {
@@ -51,8 +51,8 @@ const CampaignForm = (props) => {
   ];
 
   const format_list = [
-    { id: 1, label: "(###) #### ### ###", value: 1 },
-    { id: 2, label: "(##) ### ### ####", value: 2 },
+    { id: 1, label: "(###) #### ### ###", value: "(###) #### ### ###" },
+    { id: 2, label: "(##) ### ### ####", value: "(##) ### ### ####" },
   ];
   const calls_types = [
     { id: 1, label: "Send target", value: 1 },
@@ -277,29 +277,15 @@ const CampaignForm = (props) => {
 
   const handleSubmitForm = (e) => {
     e.preventDefault();
-    const campaignMemberData = campaignTarget?.map((ele) => ({
-      target_id: ele.id,
-      weightage: ele.weightage,
-      priority: ele.priority,
-      did_number_id: tfnNo.value,
-      company_id:
-        company_id === "0" ? parseInt(companyId.value) : parseInt(company_id),
-    }));
-    const target_id = campaignTarget?.map((item) => item.id);
     const did_value = tfnList?.find((no) => no.label == tfnNo.value);
-
     const data = {
       name: name.value,
       description: description.value,
+      did_number_format: numberFormat.value,
+      
       did_number_id: did_value?.value,
-      target_id: target_id,
       connection_timeout: timeout.value,
-      sameDiff_buyer: callsType.value,
-      ivr_id: selectIvr.value ? parseInt(selectIvr.value) : null,
-      recording: isRecording === true ? 1 : 0,
-      company_id:
-        company_id === "0" ? parseInt(companyId.value) : parseInt(company_id),
-      campaignMemberData: campaignMemberData,
+      recording: isRecording === true ? 1 : 0
     };
     handleFormData(data);
   };
@@ -328,7 +314,7 @@ const CampaignForm = (props) => {
           color={colors.form[100]}
           className="contentResponsiveHeight"
         >
-          {clickedBtn === "edit" && (
+          {/* {clickedBtn === "edit" && (
             <Grid container>
               <Grid item xs={4} md={2}>
                 <Typography gutterBottom variant="body1" component="div">
@@ -360,9 +346,9 @@ const CampaignForm = (props) => {
               </Grid>
               <Grid item xs={0} md={6}></Grid>
             </Grid>
-          )}
+          )} */}
           <Grid container spacing={1}>
-            {company_id === "0" && (
+            {/* {company_id === "0" && (
               <Grid item xs={12} md={6}>
                 <FormTextDropdown
                   Value={companyId.value}
@@ -373,7 +359,7 @@ const CampaignForm = (props) => {
                   Options={companyList}
                 />
               </Grid>
-            )}
+            )} */}
             <Grid item xs={12} md={6}>
               <FormTextField
                 type="alpha"
@@ -397,6 +383,31 @@ const CampaignForm = (props) => {
               />
             </Grid>
             <Grid item xs={12} md={6}>
+              <FormTextDropdown
+                Value={numberFormat.value}
+                onSelect={handleChangeFormat}
+                placeholder={"Select one"}
+                label={"Number Format"}
+                CustomErrorLine={"Choose one"}
+                multiSelect={false}
+                Required={false}
+                disable={false}
+                Options={format_list}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <NumberDropdown
+                format_type={numberFormat.value}
+                Value={tfnNo.value}
+                Options={tfnList}
+                onSelect={handleChangeTFN}
+                label={"TFN Number"}
+                CustomErrorLine={"Choose one"}
+                Required={false}
+                disable={false}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
               <FormTextField
                 type="num"
                 placeholder={"Enter connection time out"}
@@ -407,45 +418,21 @@ const CampaignForm = (props) => {
                 CustomErrorLine={"Enter proper description"}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
-              <FormTextDropdown
-                Value={numberFormat.value}
-                onSelect={handleChangeFormat}
-                placeholder={"Select one"}
-                label={"Number Format" + " *"}
-                CustomErrorLine={"Choose one"}
-                multiSelect={false}
-                Required={true}
-                disable={false}
-                Options={format_list}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FreeSolo
-                Value={tfnNo.value}
-                Options={tfnList}
-                onSelect={handleChangeTFN}
-                label={"TFN Number *"}
-                CustomErrorLine={"Choose one"}
-                Required={false}
-                disable={false}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <FormTextDropdown
                 Value={callsType.value}
                 onSelect={handleChangeCallsType}
                 placeholder={"Select one"}
-                label={"Send duplicate calls to" + " *"}
+                label={"Route Previously Connected Calls"}
                 CustomErrorLine={"Choose one"}
                 multiSelect={false}
-                Required={true}
+                Required={false}
                 disable={false}
                 Options={calls_types}
               />
-            </Grid>
+            </Grid> */}
 
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <FormTextDropdown
                 Value={selectIvr.value}
                 onSelect={handleChangeIvr}
@@ -457,7 +444,7 @@ const CampaignForm = (props) => {
                 disable={false}
                 Options={ivr_list}
               />
-            </Grid>
+            </Grid> */}
             {/* {company_id !== "0" && <Grid item xs={0} md={6}></Grid>} */}
             <Grid item xs={6} md={3}>
               <InputLabel
@@ -475,7 +462,7 @@ const CampaignForm = (props) => {
               />
             </Grid>
             {/* <Grid item xs={0} md={6}></Grid> */}
-            {clickedBtn === "edit" && (
+            {/* {clickedBtn === "edit" && (
               <SelectAllTransferList
                 targetList={targetList}
                 setTargetList={setTargetList}
@@ -490,7 +477,7 @@ const CampaignForm = (props) => {
                   data={campaignTarget}
                 />
               </Grid>
-            )}
+            )} */}
           </Grid>
         </CardContent>
         <CardActions sx={{ justifyContent: "space-between", mr: 2, ml: 1 }}>

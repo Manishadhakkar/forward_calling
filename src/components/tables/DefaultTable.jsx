@@ -7,6 +7,7 @@ import Switch from "@mui/material/Switch";
 import { tokens } from "../../assets/color/theme";
 import "./styles.css";
 import {
+  MdAssignmentInd,
   MdDeleteForever,
   MdMotionPhotosOn,
   MdMotionPhotosPause,
@@ -27,6 +28,8 @@ const DefaultTable = (props) => {
     isDeletable,
     isStatusChangable,
     isPlayPause,
+    isAssignable,
+    handleAssignChangable,
   } = props;
 
   const theme = useTheme();
@@ -60,6 +63,10 @@ const DefaultTable = (props) => {
   const handleChangePlayPause = (ele) => {
     handlePlayPause(ele);
   };
+
+  const handleChangeAssign = (ele)=>{
+    handleAssignChangable(ele.id)
+  }
 
   return (
     <MaterialReactTable
@@ -153,6 +160,18 @@ const DefaultTable = (props) => {
                 ) : (
                   <MdOutlineSettingsBackupRestore color={colors.blue[100]} />
                 )}
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {isAssignable && (
+            <Tooltip
+              arrow
+              placement="right"
+              title={"Assign to"}
+            >
+              <IconButton onClick={() => handleChangeAssign(row.original)}>
+                <MdAssignmentInd />
               </IconButton>
             </Tooltip>
           )}

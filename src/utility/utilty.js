@@ -39,3 +39,20 @@ const isAuthorizedFunc = (funcCode) => {
   }
 };
 export { isAuthorizedFunc };
+
+
+export const convertFormatNumber = (inputNumber, format_type) => {
+  const numberString = inputNumber.toString();
+  let result = "";
+  let patternIndex = 0;
+  for (let i = 0; i < format_type.length; i++) {
+    const currentChar = format_type[i];
+    if (currentChar === "#") {
+      result += numberString[patternIndex] || "";
+      patternIndex++;
+    } else {
+      result += currentChar;
+    }
+  }
+  return result;
+};

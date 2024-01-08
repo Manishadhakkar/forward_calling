@@ -392,21 +392,30 @@ const Campaign = () => {
       });
   };
 
+  const handleChangeAssignTo = (value) => {
+    openAddModal();
+    handleSelectBtn("assign");
+  };
+
   const selectModal = () => {
-    return (
-      <CampaignForm
-        handleFormData={
-          clickedBtn === "add" ? handleAddCampaign : handleUpdateCampaign
-        }
-        onHandleClose={handleModalClose}
-        clickedBtn={clickedBtn}
-        initialValue={clickedBtn === "edit" ? currentType : {}}
-        errorMessage={errorMessage}
-        setErrorMessage={setErrorMessage}
-        targetColumn={targetColumn}
-        company_id={company_id}
-      />
-    );
+    if (clickedBtn === "add") {
+      return (
+        <CampaignForm
+          handleFormData={
+            clickedBtn === "add" ? handleAddCampaign : handleUpdateCampaign
+          }
+          onHandleClose={handleModalClose}
+          clickedBtn={clickedBtn}
+          initialValue={clickedBtn === "edit" ? currentType : {}}
+          errorMessage={errorMessage}
+          setErrorMessage={setErrorMessage}
+          targetColumn={targetColumn}
+          company_id={company_id}
+        />
+      );
+    } else if (clickedBtn === "assign") {
+      return <h2>Assign Modal</h2>;
+    }
   };
 
   return (
@@ -490,6 +499,8 @@ const Campaign = () => {
               isEditable={isAuthorizedFunc(UPDATE_CAMPAIGN)}
               isDeletable={false}
               isStatusChangable={isAuthorizedFunc(STATUS_CAMPAIGN)}
+              isAssignable={true}
+              handleAssignChangable={handleChangeAssignTo}
             />
             <Pagination
               style={{
