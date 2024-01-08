@@ -1,0 +1,29 @@
+.page-not-found-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+
+  /* position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; */
+}
+.not-found-image, p {
+  max-width: 100%;
+  max-height: 100%;
+
+  /* width: 100%;
+  height: auto; */
+  z-index: 1;
+}
+
+
+.centered-button {
+  position: absolute;
+  z-index: 2;
+  background-color: aqua;
+  border-radius: 5%;
+  color: rgb(246, 63, 63);
+}

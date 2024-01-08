@@ -1,0 +1,30 @@
+{
+    "SIGNIN.HEADER.LABEL" : "Sign In",
+    "SIGNIN.EMAIL.LABEL": "Email",
+    "SIGNIN.EMAIL.PLACEHOLDER": "Enter Email",
+    "SIGNIN.EMAIL.ERROR": "Please enter a valid email",
+
+    "SIGNIN.PASSWORD.LABEL": "Password",
+    "SIGNIN.PASSWORD.PLACEHOLDER": "Enter Password",
+    "SIGNIN.PASSWORD.ERROR": "Please enter a valid password",
+
+    "SIGNIN.SUBMIT.LABEL" : "Login",
+
+    "SIGNUP.FORGOT.HYPERTEXT": "Forgot Password?",
+    "FORGET.HYPERTEXT": "Don't have an account? Register Now",
+
+    "WEBSITE.LABEL": "Textricks",
+
+
+    "LOGIN.EMAIL.ERROR": "Email",
+    "LOGIN.PASSWORD.EROR": "Password",    
+
+
+
+    "TEXTFIELD.ERR_BLANK": "Required",
+
+    "HEADER.TITLE": "Hello world",
+
+    "FOOTER.WEBSITE.RIGHTS": "All Rights Reserved By ",
+    "FOOTER.WEBSITE.LABEL": "Textricks."
+}

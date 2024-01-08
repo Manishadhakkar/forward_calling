@@ -1,0 +1,26 @@
+button {
+  outline: none !important;
+  border: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.forget_left_grid {
+  background-image: url("../../../../assets/images/OtpBanner_image.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+.forgetpassword_box {
+  display: "flex";
+  flex-direction: "column";
+  align-items: "center";
+  width: "70%";
+}
+@media (max-width: 991px) {
+  .forgetpassword_box {
+    width: "90%";
+  }
+}

@@ -1,0 +1,15 @@
+.formResponsiveHeight {
+    width: 100%;
+    max-height: 60vh;
+    padding-top: 6px;
+    overflow-y: auto;
+    scrollbar-width: "1px";
+    padding-right: 2px;
+    padding-left: 2px;
+
+  }
+  .error_msg {
+    color: red;
+    font-weight: 300;
+    padding: 0 16px;
+  }

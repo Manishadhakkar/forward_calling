@@ -1,0 +1,32 @@
+button {
+  outline: none !important;
+  border: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.login_left_grid {
+  background-image: url("../../../../assets/images/Login_banner.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  height: auto;
+}
+
+.login_right_box {
+  width: 60%;
+}
+
+@media (max-width: 991px) {
+  .login_right_box {
+    width: 90%;
+  }
+}
+
+.signup_div {
+  position: fixed;
+  bottom: 0;
+}

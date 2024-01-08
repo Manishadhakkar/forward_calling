@@ -1,0 +1,56 @@
+/* .loader-container {
+    position: fixed;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    background-color: #000;
+    z-index: 999;
+  } */
+  /* .loader-container .spinner {
+    animation: rotate 2s linear infinite;
+    z-index: 2147483647;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -25px 0 0 -25px;
+    width: 50px;
+    height: 50px;
+  } */
+
+
+
+  .loader-container {
+    z-index: 999999;
+    display: inline-block;
+    width: auto;
+    line-height: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    height: 100%;
+}
+/* Empty div */
+
+.loader-backdrop{
+  position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0.5;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+ 
+  
