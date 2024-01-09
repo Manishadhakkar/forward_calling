@@ -8,8 +8,6 @@ export default function FreeSolo(props) {
     label, Options, Value, CustomErrorLine, Required, disable, onSelect
   } = props;
 
-  const theme = useTheme();
-
   const [selectValue, setSelectValue] = useState({
     value: "",
     error: false,
@@ -65,6 +63,7 @@ export default function FreeSolo(props) {
   return (
     <FormControl fullWidth size="small" margin="normal">
       <Autocomplete
+        autoComplete={true}
         value={Value ? Value : selectValue.value}
         onSelect={handleSelect}
         onBlur={handleChangeBlur}

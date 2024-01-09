@@ -8,9 +8,6 @@ import { convertFormatNumber } from "../../utility/utilty";
 
 const TextMaskCustom = React.forwardRef(function TextMaskCustom(props, ref) {
   const { onChange,format_type, ...other } = props;
-
-  console.log(other)
-
   return (
     <IMaskInput
       {...other}
@@ -109,6 +106,7 @@ export default function NumberDropdown(props) {
   return (
     <FormControl fullWidth size="small" margin="normal">
       <Autocomplete
+        autoComplete="on"
         disabled={disable}
         onSelect={handleSelect}
         onBlur={handleChangeBlur}

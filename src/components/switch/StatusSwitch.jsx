@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
-import { IconButton, useTheme } from "@mui/material";
+import {  useTheme } from "@mui/material";
 import { tokens } from "../../assets/color/theme";
 
 const StatusSwitch = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [checked, setChecked] = useState(true);
 
   const RedChip = styled(Switch)(({ theme }) => ({
     "& .MuiSwitch-switchBase.Mui-checked": {

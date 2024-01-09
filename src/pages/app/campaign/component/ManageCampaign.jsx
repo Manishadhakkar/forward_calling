@@ -21,15 +21,11 @@ import {
   styled,
   tableCellClasses,
   Button,
-  TextField,
   InputBase,
   Tooltip,
   Zoom,
-  Input,
-  CardContent,
-  Card,
   CardActions,
-  FormControl,
+  Alert,
 } from "@mui/material";
 import { TbAssembly, TbBrandCampaignmonitor, TbHome2 } from "react-icons/tb";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
@@ -38,39 +34,47 @@ import { MdDeleteForever, MdExpandMore } from "react-icons/md";
 import { FcCallTransfer } from "react-icons/fc";
 import {
   getAllActiveNumber,
-  getAllCompanyRequest,
   getAllTargetReq,
   getCampaignByIdRequest,
+  updateCampaignRequest,
 } from "../service/campaign.request";
 import Loader from "../../../../components/Loader/Loader";
 import { PiCopySimpleThin } from "react-icons/pi";
 import FormTextDropdown from "../../../../components/dropdown/FormTextDropdown";
 import FormTextField from "../../../../components/textfield/FormTextField";
-import FreeSolo from "../../../../components/dropdown/SearchableDropdown";
+import NumberDropdown from "../../../../components/dropdown/SearchableDropdown";
 import SwitchCall from "../../../../components/chip/SwichCall";
 import { useLocation, useNavigate } from "react-router-dom";
-import QuantityInput from "../../../../components/textfield/numberField";
 import { SiWebmoney } from "react-icons/si";
 import { FaMobileRetro } from "react-icons/fa6";
 import { FaCircle } from "react-icons/fa";
 import "./styles.css";
-import axios from "axios";
+import RemoveIcon from "@mui/icons-material/Remove";
+import AddIcon from "@mui/icons-material/Add";
 
-import io from "socket.io-client";
+const blue = {
+  100: "#daecff",
+  200: "#b6daff",
+  300: "#66b2ff",
+  400: "#3399ff",
+  500: "#007fff",
+  600: "#0072e5",
+  700: "#0059B2",
+  800: "#004c99",
+};
 
-const socket = io('http://139.84.169.123/portalforwarding/backend/public/api/countries');
-
-// const user = JSON.parse(localStorage.getItem("user"));
-// let headers = {
-//   "Content-Type": "application/json",
-// };
-// headers["Authorization"] = `Bearer ${user.token}`;
-// const socket = io(
-//   "http://139.84.169.123/portalforwarding/backend/public/api/target/active",
-//   {
-//     headers,
-//   }
-// );
+const grey = {
+  50: "#F3F6F9",
+  100: "#E5EAF2",
+  200: "#DAE2ED",
+  300: "#C7D0DD",
+  400: "#B0B8C4",
+  500: "#9DA8B7",
+  600: "#6B7A90",
+  700: "#434D5B",
+  800: "#303740",
+  900: "#1C2025",
+};
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -91,6 +95,74 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const StyledInput = styled("input")(
+  ({ theme }) => `
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-weight: 200;
+  line-height: 0.5;
+  color: ${theme.palette.mode === "dark" ? grey[300] : grey[900]};
+  background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
+  border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]};
+  box-shadow: 0px 2px 4px ${
+    theme.palette.mode === "dark" ? "rgba(0,0,0, 0.5)" : "rgba(0,0,0, 0.05)"
+  };
+  border-radius: 8px;
+  margin: 0 5px;
+  padding: 5px 6px;
+  outline: 0;
+  min-width: 0;
+  width: 2.5rem;
+  text-align: center;
+  &:hover {
+    border-color: ${blue[400]};
+  }
+  &:focus {
+    border-color: ${blue[400]};
+    box-shadow: 0 0 0 3px ${
+      theme.palette.mode === "dark" ? blue[700] : blue[200]
+    };
+  }
+  &:focus-visible {
+    outline: 0;
+  }
+`
+);
+
+const StyledButton = styled("button")(
+  ({ theme }) => `
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.5rem;
+  box-sizing: border-box;
+  line-height: 1.5;
+  border: 1px solid;
+  border-radius: 999px;
+  border-color: ${theme.palette.mode === "dark" ? grey[800] : grey[200]};
+  background: ${theme.palette.mode === "dark" ? grey[900] : grey[50]};
+  color: ${theme.palette.mode === "dark" ? grey[200] : grey[900]};
+  width: 25px;
+  height: 25px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 120ms;
+
+  &:hover {
+    cursor: pointer;
+    background: ${theme.palette.mode === "dark" ? blue[700] : blue[500]};
+    border-color: ${theme.palette.mode === "dark" ? blue[500] : blue[400]};
+    color: ${grey[50]};
+  }
+
+  &:focus-visible {
+    outline: 0;
+  }
+`
+);
+
 const paths = [
   {
     name: "Dashboard",
@@ -108,87 +180,44 @@ const paths = [
   },
 ];
 
-const fakeData = [
-  {
-    destination: "+18001500501",
-    id: 1,
-    name: "Air Deal1",
-    status: 2,
-    type: "Number",
-  },
-  {
-    destination: "+18001500502",
-    id: 2,
-    name: "Air Deal2",
-    status: 0,
-    type: "Number",
-  },
-  {
-    destination: "+18001500503",
-    id: 3,
-    name: "Air Deal3",
-    status: 1,
-    type: "Number",
-  },
-];
-
 const UpdateCampaign = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
-  const getId = JSON.parse(localStorage.getItem("user"));
-  const company_id = getId.user_data.company_id;
-  //////////////////////////////////
-
-  // useEffect(() => {
-  //   socket.on("message", (incomingTargets) => {
-  //     console.log("New Target", incomingTargets);
-  //   });
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
-
-  /////////////////
-
   const [expanded, setExpanded] = useState("panel1");
+  const [message, setMessage] = useState("");
 
-  const [rows, setRows] = useState(fakeData);
   const [searchTargetData, setSearchTargetData] = useState([]);
   const [searchCampaignData, setSearchCampaignData] = useState([]);
 
   const [searchTargetParams, setSearchTargetParams] = useState("");
   const [searchCampaignParams, setSearchCampaignParams] = useState("");
+  const [errorMessage, setErrorMessage] = useState();
 
   const [initialValue, setInitValue] = useState({});
 
   const campaign_id = location?.state?.campaign_id;
 
-  const ivr_list = [
-    { label: "IVR 1", value: "IVR 1" },
-    { label: "IVR 2", value: "IVR 2" },
-  ];
   const format_list = [
-    { id: 1, label: "(###) #### ### ###", value: 1 },
-    { id: 2, label: "(##) ### ### ####", value: 2 },
+    { id: 1, label: "(###) #### ### ###", value: "(###) #### ### ###" },
+    { id: 2, label: "(##) ### ### ####", value: "(##) ### ### ####" },
   ];
   const calls_types = [
-    { id: 1, label: "Send target", value: 1 },
-    { id: 2, label: "Different target", value: 2 },
-    { id: 3, label: "Different target", value: 3 },
+    { id: 1, label: "Same target", value: "Same target" },
+    { id: 2, label: "Different target", value: "Different target" },
+    { id: 3, label: "Random", value: "Random" },
   ];
 
-  const [open, setOpen] = useState(false);
-  const [isLoader, setIsLoader] = useState(false);
-
-  const [companyList, setCompanyList] = useState([]);
-  const [companyId, setCompanyId] = useState({
-    value: "",
-    error: false,
-    success: false,
+  const [snackbarOpen, setSnackbarOpen] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "right",
   });
+  const [barVariant, setBarVariant] = useState("");
+
+  const [openClip, setOpenClip] = useState(false);
+  const [isLoader, setIsLoader] = useState(false);
 
   const [randomId, setRandomId] = useState({
     value: "",
@@ -219,12 +248,6 @@ const UpdateCampaign = () => {
     success: false,
   });
 
-  const [selectIvr, setSelectIvr] = useState({
-    value: "",
-    error: false,
-    success: false,
-  });
-
   const [callsType, setCallsType] = useState({
     value: null,
     error: false,
@@ -244,13 +267,18 @@ const UpdateCampaign = () => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [isSilent, setIsSilent] = useState(false);
   const [dialAttempt, setDialAttempt] = useState(null);
-  const [numValue, setNumValue] = useState();
 
   const [targetList, setTargetList] = useState([]);
   const [campaignTarget, setCampaignTarget] = useState([]);
 
-  const [prevData, setPrevData] = useState([]);
-  const [renderTimes, setRenderTimes] = useState(0);
+  const { vertical, horizontal, open } = snackbarOpen;
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen({ ...snackbarOpen, open: false });
+  };
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
@@ -311,25 +339,6 @@ const UpdateCampaign = () => {
       });
   }, []);
 
-  useEffect(() => {
-    getAllCompanyRequest()
-      .then((res) => {
-        const result = res.data?.data?.data?.map((ele) => {
-          return {
-            value: ele.id,
-            label: ele.company_name,
-          };
-        });
-        setCompanyList(result);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  const handleChangeCompany = (value) => {
-    setCompanyId(value);
-  };
   const handleChangeName = (value) => {
     setName(value);
   };
@@ -346,6 +355,7 @@ const UpdateCampaign = () => {
     setIsStrict(value);
   };
   const handleChangeRecord = (value) => {
+    console.log(isRecording, value);
     setIsRecording(value);
   };
   const handleChangeDuplicateCalls = (value) => {
@@ -357,10 +367,6 @@ const UpdateCampaign = () => {
   const handleChangeSilentCall = (value) => {
     setIsSilent(value);
   };
-  const handleChangeDialAttempt = (value) => {
-    setDialAttempt(value);
-  };
-
   const handleChangeCallsType = (value) => {
     setCallsType(value);
   };
@@ -373,29 +379,26 @@ const UpdateCampaign = () => {
       getCampaignByIdRequest(campaign_id)
         .then((res) => {
           setInitValue(res.data.data[0]);
-          const tfn_name = tfnList.find(
-            (item) => item.value === res.data.data[0]?.did_number_id
-          );
-          const init_targets_list =
-            res.data.data[0]?.campaign_members &&
-            res.data.data[0].campaign_members.map((ele) => ({
-              id: parseInt(ele.target_id),
-              name: ele.target_name,
-              weightage: ele.weightage,
-              priorities: ele.priority,
-            }));
-
-          setCompanyId({ value: res.data.data[0]?.company_id });
           setRandomId({ value: res.data.data[0]?.campaign_random_id });
           setName({ value: res.data.data[0]?.name });
           setDescription({ value: res.data.data[0]?.description });
+          setNumberFormat({ value: res.data.data[0]?.did_number_format });
           setTimeout({ value: res.data.data[0]?.connection_timeout });
-          setTFNNo({ value: tfn_name?.label });
-          setSelectIvr({ value: res.data.data[0]?.ivr?.id });
-          // setCallsType({ value: res.data.data[0].name });
-          // setNumberFormat({ value: res.data.data[0].name });
-          setIsRecording({ value: res.data.data[0].isRecording });
-          // setCampaignTarget(init_targets_list);
+          setTFNNo({
+            value: res.data.data[0]?.number?.did_number,
+          });
+          setIsRecording(res.data.data[0].recording !== 1 ? false : true);
+
+          setCallsType({
+            value: res.data?.data[0]?.route_previously_connected_calls,
+          });
+          setIsStrict(res.data.data[0]?.strict !== 1 ? false : true);
+          setIsDuplicatesCalls(
+            res.data.data[0]?.anonymous_duplicate_call !== 1 ? false : true
+          );
+          setIsWaiting(res.data.data[0]?.call_waiting !== 1 ? false : true);
+          setIsSilent(res.data.data[0]?.trim_silence !== 1 ? false : true);
+          setDialAttempt(res.data.data[0]?.dial_attempt_target);
         })
         .catch((err) => {
           console.log(err);
@@ -454,7 +457,7 @@ const UpdateCampaign = () => {
   //   });
 
   const handleClick = () => {
-    setOpen(true);
+    setOpenClip(true);
     navigator.clipboard.writeText(randomId.value);
   };
 
@@ -472,30 +475,129 @@ const UpdateCampaign = () => {
     setCampaignTarget(filter_campaign_targets);
   };
 
-  const handleChangePriority = (value) => {
-    console.log(value)
-    // let change_priority_data = campaignTarget?.map((ele) => {
-    //   return {
-    //     ...ele,
-    //     priority: ele.id === id ? value : null,
-    //   };
-    // });
-    // setCampaignTarget(change_priority_data);
+  const handleChangePriority = (e, id) => {
+    setCampaignTarget((prevData) =>
+      prevData.map((item) =>
+        item.id === id ? { ...item, priority: parseInt(e.target.value) } : item
+      )
+    );
   };
 
-  const handleChangeWeightage = (value, id) => {
-    let change_weightage_data = campaignTarget?.map((ele) => {
-      return {
-        ...ele,
-        weightage: ele.id === id ? value : null,
-      };
-    });
-    setCampaignTarget(change_weightage_data);
+  const handleDecrementPriority = (id) => {
+    setCampaignTarget((prevData) =>
+      prevData.map((item) =>
+        item.id === id
+          ? { ...item, priority: parseInt(item.priority) - 1 }
+          : item
+      )
+    );
+  };
+
+  const handleIncrementPriority = (id) => {
+    setCampaignTarget((prevData) =>
+      prevData.map((item) =>
+        item.id === id
+          ? { ...item, priority: parseInt(item.priority) + 1 }
+          : item
+      )
+    );
+  };
+
+  const handleDecrementWeightage = (id) => {
+    setCampaignTarget((prevData) =>
+      prevData.map((item) =>
+        item.id === id
+          ? { ...item, weightage: parseInt(item.weightage) - 1 }
+          : item
+      )
+    );
+  };
+
+  const handleIncrementWeightage = (id) => {
+    setCampaignTarget((prevData) =>
+      prevData.map((item) =>
+        item.id === id
+          ? { ...item, weightage: parseInt(item.weightage) + 1 }
+          : item
+      )
+    );
+  };
+
+  const handleChangeWeightage = (e, id) => {
+    setCampaignTarget((prevData) =>
+      prevData.map((item) =>
+        item.id === id ? { ...item, weightage: parseInt(e.target.value) } : item
+      )
+    );
+  };
+
+  const handleChangeAttempt = (e) => {
+    e.preventDefault();
+    setDialAttempt(e.target.value);
+  };
+
+  const handleDecrementAttempt = (e) => {
+    e.preventDefault();
+    setDialAttempt((prevValue) => prevValue - 1);
+  };
+
+  const handleInrementAttempt = (e) => {
+    e.preventDefault();
+    setDialAttempt((prevValue) => prevValue + 1);
+  };
+
+  const handleUpdateCampaign = (e) => {
+    e.preventDefault();
+    const did_value = tfnList?.find((no) => no.label == tfnNo.value);
+    const data = {
+      data: {
+        name: name.value,
+        description: description.value,
+        did_number_format: numberFormat.value,
+        did_number_id: did_value?.value,
+        connection_timeout: timeout.value?.toString(),
+        recording: isRecording === true ? 1 : 0,
+        route_previously_connected_calls: callsType.value,
+        strict:
+          callsType.value !== "Same target" ? (isStrict === true ? 1 : 0) : 0,
+        anonymous_duplicate_call: isDuplicatesCalls === true ? 1 : 0,
+        call_waiting: isRecording === true ? (isWaiting === true ? 1 : 0) : 0,
+        trim_silence: isRecording === true ? (isSilent === true ? 1 : 0) : 0,
+        dial_attempt_target: dialAttempt,
+      },
+      id: initialValue.id,
+    };
+    setIsLoader(true);
+    updateCampaignRequest(data)
+      .then((res) => {
+        setIsLoader(false);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+      })
+      .catch((err) => {
+        setIsLoader(false);
+        setErrorMessage(err.message);
+      });
   };
 
   return (
     <>
       {isLoader && <Loader />}
+      <Snackbar
+        open={open}
+        anchorOrigin={{ vertical, horizontal }}
+        autoHideDuration={3000}
+        onClose={handleClose}
+      >
+        <Alert
+          onClose={handleClose}
+          severity={barVariant}
+          sx={{ width: "100%" }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
       <Box
         sx={{
           "& .rs-pagination-group": {
@@ -572,8 +674,8 @@ const UpdateCampaign = () => {
                               horizontal: "center",
                             }}
                             autoHideDuration={2000}
-                            onClose={() => setOpen(false)}
-                            open={open}
+                            onClose={() => setOpenClip(false)}
+                            open={openClip}
                           />
                         </Typography>
                       </Grid>
@@ -581,18 +683,6 @@ const UpdateCampaign = () => {
                   </Grid>
                 </Grid>
                 <Grid container spacing={1}>
-                  {company_id === "0" && (
-                    <Grid item xs={12} md={6}>
-                      <FormTextDropdown
-                        Value={companyId.value}
-                        onSelect={handleChangeCompany}
-                        label={"Company *"}
-                        CustomErrorLine={"Choose one"}
-                        Required={true}
-                        Options={companyList}
-                      />
-                    </Grid>
-                  )}
                   <Grid item xs={12} md={6}>
                     <FormTextField
                       type="alpha"
@@ -616,17 +706,6 @@ const UpdateCampaign = () => {
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <FormTextField
-                      type="num"
-                      placeholder={"Enter connection time out"}
-                      label={"Connection timeout"}
-                      Value={timeout.value}
-                      onChangeText={handleChangeTimeout}
-                      Required={false}
-                      CustomErrorLine={"Enter proper description"}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
                     <FormTextDropdown
                       Value={numberFormat.value}
                       onSelect={handleChangeFormat}
@@ -640,14 +719,26 @@ const UpdateCampaign = () => {
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <FreeSolo
+                    <NumberDropdown
+                      format_type={numberFormat.value}
                       Value={tfnNo.value}
                       Options={tfnList}
                       onSelect={handleChangeTFN}
-                      label={"TFN Number *"}
+                      label={"TFN Number"}
                       CustomErrorLine={"Choose one"}
                       Required={false}
                       disable={false}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <FormTextField
+                      type="num"
+                      placeholder={"Enter connection time out"}
+                      label={"Connection timeout"}
+                      Value={timeout.value}
+                      onChangeText={handleChangeTimeout}
+                      Required={false}
+                      CustomErrorLine={"Enter proper description"}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
@@ -663,8 +754,21 @@ const UpdateCampaign = () => {
                       Options={calls_types}
                     />
                   </Grid>
-                  <Grid xs={0} md={6} />
-                  {callsType.value !== 1 && (
+                  <Grid item xs={6} md={3}>
+                    <InputLabel
+                      id="demo-select-small-label"
+                      sx={{ color: colors.btn[100], marginTop: 1 }}
+                    >
+                      Call Recording
+                    </InputLabel>
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    <SwitchCall
+                      isChecked={isRecording}
+                      handleSwitch={handleChangeRecord}
+                    />
+                  </Grid>
+                  {callsType.value !== "Same target" && (
                     <>
                       <Grid item xs={6} md={3}>
                         <InputLabel
@@ -696,21 +800,8 @@ const UpdateCampaign = () => {
                       handleSwitch={handleChangeDuplicateCalls}
                     />
                   </Grid>
-                  <Grid item xs={6} md={3}>
-                    <InputLabel
-                      id="demo-select-small-label"
-                      sx={{ color: colors.btn[100], marginTop: 1 }}
-                    >
-                      Call Recording
-                    </InputLabel>
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <SwitchCall
-                      isChecked={isRecording}
-                      handleSwitch={handleChangeRecord}
-                    />
-                  </Grid>
-                  {isRecording && (
+
+                  {isRecording === true && (
                     <>
                       <Grid item xs={6} md={3}>
                         <InputLabel
@@ -728,7 +819,7 @@ const UpdateCampaign = () => {
                       </Grid>
                     </>
                   )}
-                  {isRecording && (
+                  {isRecording === true && (
                     <>
                       <Grid item xs={6} md={3}>
                         <InputLabel
@@ -755,12 +846,34 @@ const UpdateCampaign = () => {
                     </InputLabel>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    <QuantityInput
-                      min={0}
-                      max={100}
-                      value= {dialAttempt}
-                      setValue={setDialAttempt}
-                    />
+                    <Box
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <StyledButton
+                        onClick={(e) => {
+                          handleDecrementAttempt(e);
+                        }}
+                      >
+                        <RemoveIcon fontSize="small" />
+                      </StyledButton>
+                      <StyledInput
+                        value={dialAttempt}
+                        onChange={(e) => handleChangeAttempt(e)}
+                        type="number"
+                        min="0"
+                        max={999}
+                        onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"
+                      />
+                      <StyledButton
+                        onClick={(e) => {
+                          handleInrementAttempt(e);
+                        }}
+                      >
+                        <AddIcon fontSize="small" />
+                      </StyledButton>
+                    </Box>
                   </Grid>
                 </Grid>
               </AccordionDetails>
@@ -782,7 +895,9 @@ const UpdateCampaign = () => {
                 <Button
                   size="medium"
                   type="submit"
-                  onClick={() => {}}
+                  onClick={(e) => {
+                    handleUpdateCampaign(e);
+                  }}
                   sx={{ backgroundColor: colors.greenAccent[500] }}
                   variant="contained"
                 >
@@ -870,7 +985,7 @@ const UpdateCampaign = () => {
                                         arrow
                                         title={row.name}
                                       >
-                                        {row.name}
+                                        <span>{row.name}</span>
                                       </Tooltip>
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
@@ -901,7 +1016,7 @@ const UpdateCampaign = () => {
                                         arrow
                                         placement="right-start"
                                       >
-                                        {row.destination}
+                                        <span>{row.destination}</span>
                                       </Tooltip>
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
@@ -1042,7 +1157,7 @@ const UpdateCampaign = () => {
                                         arrow
                                         title={row.name}
                                       >
-                                        {row.name}
+                                        <span> {row.name}</span>
                                       </Tooltip>
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
@@ -1071,29 +1186,70 @@ const UpdateCampaign = () => {
                                         TransitionComponent={Zoom}
                                         title={row.destination}
                                       >
-                                        {row.destination}
+                                        <span> {row.destination}</span>
                                       </Tooltip>
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
-                                      <QuantityInput
-                                        numValue={row.priority}
-                                        // onChangeValue={(val) =>
-                                        //   handleChangePriority(val, row.id)
-                                        // }
-                                        // setNumValue={handleChangePriority(val, row.id)}
-                                        min={1}
-                                        max={99}
-                                      />
+                                      <Box
+                                        display="flex"
+                                        justifyContent="center"
+                                        alignItems="center"
+                                      >
+                                        <StyledButton
+                                          onClick={() =>
+                                            handleDecrementPriority(row.id)
+                                          }
+                                        >
+                                          <RemoveIcon fontSize="small" />
+                                        </StyledButton>
+                                        <StyledInput
+                                          value={row.priority}
+                                          onChange={(e) =>
+                                            handleChangePriority(e, row.id)
+                                          }
+                                          type="number"
+                                          min={0}
+                                          max={999}
+                                        />
+                                        <StyledButton
+                                          onClick={() =>
+                                            handleIncrementPriority(row.id)
+                                          }
+                                        >
+                                          <AddIcon fontSize="small" />
+                                        </StyledButton>
+                                      </Box>
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
-                                      <QuantityInput
-                                        value={row.weightage}
-                                        // onChangeValue={(val) =>
-                                        //   handleChangeWeightage(val, row)
-                                        // }
-                                        min={1}
-                                        max={99}
-                                      />
+                                      <Box
+                                        display="flex"
+                                        justifyContent="center"
+                                        alignItems="center"
+                                      >
+                                        <StyledButton
+                                          onClick={() =>
+                                            handleDecrementWeightage(row.id)
+                                          }
+                                        >
+                                          <RemoveIcon fontSize="small" />
+                                        </StyledButton>
+                                        <StyledInput
+                                          value={row.weightage}
+                                          onChange={(e) =>
+                                            handleChangeWeightage(e, row.id)
+                                          }
+                                          min="0"
+                                          type="number"
+                                          onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"
+                                        />
+                                        <StyledButton
+                                          onClick={() =>
+                                            handleIncrementWeightage(row.id)
+                                          }
+                                        >
+                                          <AddIcon fontSize="small" />
+                                        </StyledButton>
+                                      </Box>
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
                                       <Tooltip

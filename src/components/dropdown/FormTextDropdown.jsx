@@ -199,7 +199,7 @@ const FormTextDropdown = (props) => {
         </Select>
       ) : (
         <Select
-          autoComplete={true}          
+          autoComplete="on"        
           error={error ? true : false}
           labelId="demo-simple-select-helper-label"
           value={Value ? Value : selectValue.value}
