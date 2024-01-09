@@ -282,10 +282,10 @@ const CampaignForm = (props) => {
       name: name.value,
       description: description.value,
       did_number_format: numberFormat.value,
-      
+
       did_number_id: did_value?.value,
       connection_timeout: timeout.value,
-      recording: isRecording === true ? 1 : 0
+      recording: isRecording === true ? 1 : 0,
     };
     handleFormData(data);
   };

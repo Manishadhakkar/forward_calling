@@ -56,6 +56,22 @@ import { FaCircle } from "react-icons/fa";
 import "./styles.css";
 import axios from "axios";
 
+import io from "socket.io-client";
+
+const socket = io('http://139.84.169.123/portalforwarding/backend/public/api/countries');
+
+// const user = JSON.parse(localStorage.getItem("user"));
+// let headers = {
+//   "Content-Type": "application/json",
+// };
+// headers["Authorization"] = `Bearer ${user.token}`;
+// const socket = io(
+//   "http://139.84.169.123/portalforwarding/backend/public/api/target/active",
+//   {
+//     headers,
+//   }
+// );
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -124,6 +140,18 @@ const UpdateCampaign = () => {
 
   const getId = JSON.parse(localStorage.getItem("user"));
   const company_id = getId.user_data.company_id;
+  //////////////////////////////////
+
+  // useEffect(() => {
+  //   socket.on("message", (incomingTargets) => {
+  //     console.log("New Target", incomingTargets);
+  //   });
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
+
+  /////////////////
 
   const [expanded, setExpanded] = useState("panel1");
 
@@ -216,6 +244,7 @@ const UpdateCampaign = () => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [isSilent, setIsSilent] = useState(false);
   const [dialAttempt, setDialAttempt] = useState(null);
+  const [numValue, setNumValue] = useState();
 
   const [targetList, setTargetList] = useState([]);
   const [campaignTarget, setCampaignTarget] = useState([]);
@@ -443,14 +472,15 @@ const UpdateCampaign = () => {
     setCampaignTarget(filter_campaign_targets);
   };
 
-  const handleChangePriority = (value, id) => {
-    let change_priority_data = campaignTarget?.map((ele) => {
-      return {
-        ...ele,
-        priority: ele.id === id ? value : null,
-      };
-    });
-    setCampaignTarget(change_priority_data);
+  const handleChangePriority = (value) => {
+    console.log(value)
+    // let change_priority_data = campaignTarget?.map((ele) => {
+    //   return {
+    //     ...ele,
+    //     priority: ele.id === id ? value : null,
+    //   };
+    // });
+    // setCampaignTarget(change_priority_data);
   };
 
   const handleChangeWeightage = (value, id) => {
@@ -728,8 +758,8 @@ const UpdateCampaign = () => {
                     <QuantityInput
                       min={0}
                       max={100}
-                      value={dialAttempt}
-                      onChangeValue={(val) => handleChangeDialAttempt(val)}
+                      value= {dialAttempt}
+                      setValue={setDialAttempt}
                     />
                   </Grid>
                 </Grid>
@@ -1046,10 +1076,11 @@ const UpdateCampaign = () => {
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
                                       <QuantityInput
-                                        value={row.priority}
-                                        onChangeValue={(val) =>
-                                          handleChangePriority(val, row.id)
-                                        }
+                                        numValue={row.priority}
+                                        // onChangeValue={(val) =>
+                                        //   handleChangePriority(val, row.id)
+                                        // }
+                                        // setNumValue={handleChangePriority(val, row.id)}
                                         min={1}
                                         max={99}
                                       />
@@ -1057,9 +1088,9 @@ const UpdateCampaign = () => {
                                     <StyledTableCell align="center">
                                       <QuantityInput
                                         value={row.weightage}
-                                        onChangeValue={(val) =>
-                                          handleChangeWeightage(val, row)
-                                        }
+                                        // onChangeValue={(val) =>
+                                        //   handleChangeWeightage(val, row)
+                                        // }
                                         min={1}
                                         max={99}
                                       />

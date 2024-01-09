@@ -65,7 +65,7 @@ const DefaultTable = (props) => {
   };
 
   const handleChangeAssign = (ele)=>{
-    handleAssignChangable(ele.id)
+    handleAssignChangable(ele)
   }
 
   return (

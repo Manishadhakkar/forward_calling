@@ -1,15 +1,27 @@
 import * as React from 'react';
 import { Unstable_NumberInput as BaseNumberInput } from '@mui/base/Unstable_NumberInput';
 import { styled } from '@mui/system';
-import { FaPlusCircle, FaMinusCircle } from "react-icons/fa";
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
 
+const QuantityInput = ({
+  ariaLabel,
+  min = 1,
+  max = 99,
+  numValue,
+  setNumValue
+}) => {
 
-const NumberInput = React.forwardRef(function CustomNumberInput(props, ref) {
-  const { handleChangeValue, value } = props;
+  const handleIncrement = () => {
+    const newValue = Math.min(numValue + 1, max);
+    setNumValue(newValue);
+  };
 
-  const handleChangeText = (e) => {
-    handleChangeValue(e.target.value)
-  }
+  const handleDecrement = () => {
+    const newValue = Math.max(numValue - 1, min);
+    setNumValue(newValue);
+  };
+
   return (
     <BaseNumberInput
       slots={{
@@ -20,56 +32,21 @@ const NumberInput = React.forwardRef(function CustomNumberInput(props, ref) {
       }}
       slotProps={{
         incrementButton: {
-          children: <FaPlusCircle fontSize="small" />,
+          onClick: handleIncrement,
+          children: <AddIcon fontSize="small" />,
           className: 'increment',
         },
         decrementButton: {
-          children: <FaMinusCircle fontSize="small" />,
+          onClick: handleDecrement,
+          children: <RemoveIcon fontSize="small" />,
         },
       }}
-      {...props}
-      ref={ref}
-      value={value}
-      onChange={handleChangeText}
+      aria-label={ariaLabel}
+      min={min}
+      max={max}
+      value={numValue}
     />
   );
-});
-
-export default function QuantityInput(props) {
-  const { onChangeValue, value , min, max } = props;
-
-  const handleChangeVal = (val) => {
-    onChangeValue(val)
-  }
-  return <NumberInput
-    aria-label="Quantity Input" min={min} max={max}
-    handleChangeValue={handleChangeVal}
-    value={value}
-  />;
-}
-
-const blue = {
-  100: '#daecff',
-  200: '#b6daff',
-  300: '#66b2ff',
-  400: '#3399ff',
-  500: '#007fff',
-  600: '#0072e5',
-  700: '#0059B2',
-  800: '#004c99',
-};
-
-const grey = {
-  50: '#F3F6F9',
-  100: '#E5EAF2',
-  200: '#DAE2ED',
-  300: '#C7D0DD',
-  400: '#B0B8C4',
-  500: '#9DA8B7',
-  600: '#6B7A90',
-  700: '#434D5B',
-  800: '#303740',
-  900: '#1C2025',
 };
 
 const StyledInputRoot = styled('div')(
@@ -152,3 +129,29 @@ const StyledButton = styled('button')(
   }
 `,
 );
+
+const blue = {
+  100: '#daecff',
+  200: '#b6daff',
+  300: '#66b2ff',
+  400: '#3399ff',
+  500: '#007fff',
+  600: '#0072e5',
+  700: '#0059B2',
+  800: '#004c99',
+};
+
+const grey = {
+  50: '#F3F6F9',
+  100: '#E5EAF2',
+  200: '#DAE2ED',
+  300: '#C7D0DD',
+  400: '#B0B8C4',
+  500: '#9DA8B7',
+  600: '#6B7A90',
+  700: '#434D5B',
+  800: '#303740',
+  900: '#1C2025',
+};
+
+export default QuantityInput;

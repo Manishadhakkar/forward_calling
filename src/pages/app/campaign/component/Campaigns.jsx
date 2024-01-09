@@ -15,6 +15,7 @@ import DefaultTable from "../../../../components/tables/DefaultTable";
 import Copyright from "../../../../components/footer/Footer";
 import Loader from "../../../../components/Loader/Loader";
 import {
+  assignCompanyReq,
   createCampRequest,
   getAllCampaignRequest,
   getCampaignByIdRequest,
@@ -28,6 +29,7 @@ import {
 } from "../../../../utility/constant";
 import { isAuthorizedFunc } from "../../../../utility/utilty";
 import { useNavigate } from "react-router-dom";
+import AssignForm from "../../../../components/form/campaignForm/AssignForm";
 
 const paths = [
   {
@@ -68,10 +70,13 @@ const Campaign = () => {
   });
   const [barVariant, setBarVariant] = useState("");
   const [timer, setTimer] = useState(0);
+
+  const [campaignId, setCampaignId] = useState("");
+
   const { vertical, horizontal, open } = snackbarOpen;
   const colors = tokens(theme.palette.mode);
 
-  const columns = useMemo(
+  const companyColumn = useMemo(
     () => [
       {
         accessorKey: "name",
@@ -104,6 +109,21 @@ const Campaign = () => {
         },
       },
       {
+        accessorKey: "connection_timeout",
+        header: "Timeout",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        size: 100,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
         accessorKey: "recording",
         header: "Recording",
         enableColumnDragging: false,
@@ -119,7 +139,6 @@ const Campaign = () => {
           align: "left",
         },
       },
-
       {
         accessorKey: "status",
         header: "Status",
@@ -139,6 +158,120 @@ const Campaign = () => {
     ],
     []
   );
+
+  const adminColumn = useMemo(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Name",
+        size: 50,
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
+        accessorKey: "description",
+        header: "Description",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        size: 70,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
+        accessorKey: "number.did_number",
+        header: "TFN Number",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        size: 100,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
+        accessorKey: "connection_timeout",
+        header: "Timeout",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        size: 30,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
+        accessorKey: "recording",
+        header: "Recording",
+        enableColumnDragging: false,
+        enableGlobalFilter: false,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        size: 20,
+        Cell: ({ cell }) => <RecordChip value={cell.getValue()} />,
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+      },
+      {
+        accessorKey: "company.company_name",
+        header: "Assign to",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        size: 50,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        size: 30,
+        enableColumnDragging: false,
+        enableGlobalFilter: false,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        Cell: ({ cell }) => <StatusChip value={cell.getValue()} />,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+    ],
+    []
+  );
+
   const targetColumn = useMemo(
     () => [
       {
@@ -370,6 +503,24 @@ const Campaign = () => {
         setErrorMessage(err.message);
       });
   };
+
+  const handleAssignCompany = (value) => {
+    setLoader(true);
+    assignCompanyReq(value)
+      .then((res) => {
+        getAllCampaigns(activePage, limit);
+        setLoader(false);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setIsOpen(false);
+      })
+      .catch((err) => {
+        setLoader(false);
+        setErrorMessage(err.message);
+      });
+  };
+
   const handleUpdateCampaign = (value) => {
     setLoader(true);
     const reqData = {
@@ -392,7 +543,9 @@ const Campaign = () => {
       });
   };
 
-  const handleChangeAssignTo = (value) => {
+  const handleChangeAssignTo = (data) => {
+    setCampaignId(data.id);
+    setCurrentType(data);
     openAddModal();
     handleSelectBtn("assign");
   };
@@ -413,8 +566,18 @@ const Campaign = () => {
           company_id={company_id}
         />
       );
-    } else if (clickedBtn === "assign") {
-      return <h2>Assign Modal</h2>;
+    } else {
+      return (
+        <AssignForm
+          errorMessage={errorMessage}
+          setErrorMessage={setErrorMessage}
+          campaignId={campaignId}
+          onHandleClose={handleModalClose}
+          handleFormData={handleAssignCompany}
+          clickedBtn={clickedBtn}
+          initialValue={currentType}
+        />
+      );
     }
   };
 
@@ -453,7 +616,10 @@ const Campaign = () => {
       >
         <Breadcrumb pathList={paths} />
         <Box>
-          <Modal modal_width={"50%"} isOpen={isOpen}>
+          <Modal
+            modal_width={clickedBtn === "add" ? "50%" : "30%"}
+            isOpen={isOpen}
+          >
             {selectModal()}
           </Modal>
           <Box
@@ -492,7 +658,7 @@ const Campaign = () => {
             <DefaultTable
               isLoading={isLoader}
               data={rows}
-              column={columns}
+              column={company_id === "0" ? adminColumn : companyColumn}
               handleEditAction={handleChangeEdit}
               handleStatusAction={handleStatusChange}
               isSearchable={true}

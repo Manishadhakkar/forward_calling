@@ -52,3 +52,11 @@ export const getAllCompanyRequest = () => {
     url: `/company`,
   });
 };
+
+export const assignCompanyReq = (body) => {
+  return axios({
+    method: "POST",
+    url: "/campaign/assignTo",
+    data: body,
+  });
+};
