@@ -4,9 +4,7 @@ import {
   Button,
   Chip,
   Grid,
-  IconButton,
   Paper,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -18,33 +16,29 @@ import {
   tableCellClasses,
   useTheme,
 } from "@mui/material";
-import { TbHome2, TbShoppingCartDiscount } from "react-icons/tb";
+import { TbHome2 } from "react-icons/tb";
 import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
 import { tokens } from "../../../../assets/color/theme";
-import { FormModal as Modal } from "../../../../components/modal/FormModal";
 import Copyright from "../../../../components/footer/Footer";
 import Loader from "../../../../components/Loader/Loader";
 import {
+  MdKeyboardArrowRight,
   MdOutlineDeleteForever,
   MdOutlinePriceChange,
-  MdPhone,
 } from "react-icons/md";
-import { getAllCountriesReq } from "../service/purchaseNumber.request";
+import {
+  addToCartReq,
+  getAllCountriesReq,
+  getAllSearchNumbersReq,
+  getCartListReq,
+  removeCartItemReq,
+} from "../service/purchaseNumber.request";
 import FormTextDropdown from "../../../../components/dropdown/FormTextDropdown";
 import { TiTick } from "react-icons/ti";
-import { FcDeleteRow } from "react-icons/fc";
-
-const fakeData = [
-  { id: 1, name: "18001500811", price: 25 },
-  { id: 2, name: "18001500822", price: 35 },
-  { id: 3, name: "18001500833", price: 45 },
-  { id: 4, name: "18001500844", price: 55 },
-  { id: 5, name: "18001500855", price: 65 },
-  { id: 6, name: "18001500866", price: 75 },
-  { id: 7, name: "18001500877", price: 85 },
-];
+import FormTextField from "../../../../components/textfield/FormTextField";
+import { useNavigate } from "react-router-dom";
 
 const paths = [
   {
@@ -80,8 +74,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const TAX_RATE = 0.07;
-
 function ccyFormat(num) {
   return `${num?.toFixed(2)}`;
 }
@@ -93,8 +85,14 @@ function subtotal(items) {
 const PurchaseNumber = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
+
+  const typeList = [
+    { id: 1, label: "Local", value: "Local" },
+    { id: 2, label: "Toll Free", value: "Tollfree" },
+  ];
+
   const [isLoader, setLoader] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
 
   const [rows, setRows] = useState([]);
 
@@ -107,6 +105,7 @@ const PurchaseNumber = () => {
   });
   const [barVariant, setBarVariant] = useState("");
   const [message, setMessage] = useState("");
+
   const { vertical, horizontal, open } = snackbarOpen;
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -117,6 +116,11 @@ const PurchaseNumber = () => {
 
   const [countryList, setCountryList] = useState([]);
   const [selectCountry, setSelectCountry] = useState({
+    value: "",
+    error: false,
+    success: false,
+  });
+  const [type, setType] = useState({
     value: "",
     error: false,
     success: false,
@@ -145,13 +149,19 @@ const PurchaseNumber = () => {
     setSelectCountry(value);
   };
 
+  const handleChangeType = (value) => {
+    setType(value);
+  };
+
   const handleChangeStartsNo = (value) => {
     setSelectStartsNo(value);
   };
 
   useEffect(() => {
+    setLoader(true);
     getAllCountriesReq()
       .then((res) => {
+        setLoader(false);
         const filterCountry = res.data.data.map((ele) => {
           return {
             value: ele.id,
@@ -163,58 +173,107 @@ const PurchaseNumber = () => {
         setCountryList(filterCountry);
       })
       .catch((err) => {
+        setLoader(false);
         console.log(err);
       });
   }, []);
 
-  const selectModal = () => {
-    return <h2>Open Modal</h2>;
+  const fetchSearchNumber = (data) => {
+    setLoader(true);
+    getAllSearchNumbersReq(data)
+      .then((res) => {
+        setRows(res?.data?.data);
+        setLoader(false);
+      })
+      .catch((err) => {
+        setLoader(false);
+        setMessage(err.message);
+      });
   };
+
+  const fetchCartListNumber = (data) => {
+    setLoader(true);
+    getCartListReq()
+      .then((res) => {
+        setCartData(res?.data?.data);
+        setLoader(false);
+      })
+      .catch((err) => {
+        setLoader(false);
+        setMessage(err.message);
+      });
+  };
+
+  useEffect(() => {
+    fetchCartListNumber();
+  }, []);
 
   const handleSearchForm = (e) => {
     e.preventDefault();
+    if (!type.value || !selectStartsNo.value || !selectCountry.value) {
+      setMessage("Please fill in all required fields.");
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setBarVariant("error");
+      return;
+    }
     const data = {
-      country_id: selectCountry.value,
-      starts_with: selectStartsNo.value,
+      countryId: selectCountry.value,
+      starting_digits: selectStartsNo.value,
+      type: type.value,
     };
-    const searchData = fakeData.filter((item) =>
-      item.name.includes(data.starts_with)
-    );
-    setRows(searchData);
-    setCartData([]);
+    setLoader(true);
+    fetchSearchNumber(data);
   };
 
   const invoiceSubtotal = subtotal(cartData);
-  const invoiceTaxes = TAX_RATE * invoiceSubtotal;
-  const invoiceTotal = invoiceTaxes + invoiceSubtotal;
 
   const handleClickCart = (row) => {
-    const cartNumber = {
-      id: row.id,
-      name: row.name,
-      price: row.price,
-      isCart: true,
+    const serch_Params = {
+      countryId: selectCountry.value,
+      starting_digits: selectStartsNo.value,
+      type: type.value,
     };
-    let newNumberData = rows?.map((ele) => {
-      return {
-        ...ele,
-        isCart: ele.id === row.id ? true : ele.isCart,
-      };
-    });
-    setCartData([cartNumber, ...cartData]);
-    setRows(newNumberData);
+    const data = {
+      did_number_id: row.id,
+      did_number: row.did_number,
+      price: row.price,
+    };
+
+    addToCartReq(data)
+      .then((res) => {
+        fetchSearchNumber(serch_Params);
+        fetchCartListNumber();
+        setMessage(res.data.message);
+        setBarVariant("success");
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setLoader(false);
+      })
+      .catch((err) => {
+        setLoader(false);
+        setMessage(err.message);
+      });
   };
 
   const handleRemoveCart = (row) => {
-    const newCartNumber = cartData?.filter((ele) => ele.id !== row.id);
-    let newNumberData = rows?.map((ele) => {
-      return {
-        ...ele,
-        isCart: ele.id === row.id ? false : ele.isCart,
-      };
-    });
-    setCartData(newCartNumber);
-    setRows(newNumberData);
+    const serch_Params = {
+      countryId: selectCountry.value,
+      starting_digits: selectStartsNo.value,
+      type: type.value,
+    };
+    setLoader(true);
+    removeCartItemReq(row.id)
+      .then((res) => {
+        fetchSearchNumber(serch_Params);
+        fetchCartListNumber();
+        setMessage(res.data.message);
+        setBarVariant("success");
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setLoader(false);
+      })
+      .catch((err) => {
+        setLoader(false);
+        setMessage(err.message);
+      });
   };
 
   return (
@@ -234,201 +293,226 @@ const PurchaseNumber = () => {
           {message}
         </Alert>
       </Snackbar>
-      <Modal modal_width={"30%"} isOpen={isOpen}>
-        {selectModal()}
-      </Modal>
-      <Box
-        sx={{
-          mt: 1,
-          ml: 2,
-          mr: 2,
-          mb: 2,
-          height: "80%",
-          backgroundColor: "inherit",
-        }}
-      >
-        <Breadcrumb pathList={paths} />
-        <Box>
-          <Typography variant="h5">{"Create Purchase Numbers"}</Typography>
-        </Box>
-        <Box>
-          <Grid container spacing={1}>
-            <Grid item xs={12} md={3}>
-              <FormTextDropdown
-                Value={selectCountry?.value}
-                onSelect={handleChangeCountry}
-                label={"Country *"}
-                CustomErrorLine={"Choose one"}
-                Required={true}
-                Options={countryList}
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormTextDropdown
-                Value={selectStartsNo?.value}
-                onSelect={handleChangeStartsNo}
-                label={"Starting with *"}
-                CustomErrorLine={"Choose one"}
-                Required={true}
-                Options={startsNoList}
-              />
-            </Grid>
-            <Grid xs={0} md={6} />
 
-            <Grid xs={0} md={4} />
-            <Grid item xs={12} md={2}>
-              <Button
-                size="small"
-                onClick={(e) => handleSearchForm(e)}
-                sx={{
-                  backgroundColor: colors.greenAccent[500],
-                  width: "100%",
-                }}
-                variant="contained"
-              >
-                {"Search"}
-              </Button>
-            </Grid>
-            <Grid xs={0} md={6} />
-          </Grid>
-        </Box>
-        <Box mt={1}>
-          <Grid container spacing={1}>
-            <Grid item md={6} xs={12}>
-              <TableContainer component={Paper} sx={{ maxHeight: 450 }}>
-                <Table stickyHeader aria-label="customized table">
-                  <TableHead>
-                    <TableRow>
-                      <StyledTableCell>Number</StyledTableCell>
-                      <StyledTableCell align="right">Price</StyledTableCell>
-                      <StyledTableCell align="right">Action</StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.length > 0 ? (
-                      rows.map((row) => (
-                        <StyledTableRow key={row.name}>
-                          <StyledTableCell component="th" scope="row">
-                            {row.name}
-                          </StyledTableCell>
+      <Box>
+        <Box
+          sx={{
+            "& .rs-pagination-group": {
+              color: colors.layoutColor[200],
+            },
+            "& .MuiTypography-root": {
+              color: colors.layoutColor[200],
+            },
+            mt: 1,
+            ml: 2,
+            mr: 2,
+            height: "80%",
+            backgroundColor: "inherit",
+            position: "relative",
+            minHeight: "80vh",
+          }}
+        >
+          <Breadcrumb pathList={paths} />
+          <Box>
+            <Box>
+              <Typography variant="h5">{"Create Purchase Numbers"}</Typography>
+            </Box>
+            <Box>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={3}>
+                  <FormTextDropdown
+                    Value={selectCountry?.value}
+                    onSelect={handleChangeCountry}
+                    label={"Country *"}
+                    CustomErrorLine={"Choose one"}
+                    Required={true}
+                    Options={countryList}
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <FormTextDropdown
+                    Value={type?.value}
+                    onSelect={handleChangeType}
+                    label={"Type *"}
+                    CustomErrorLine={"Choose one"}
+                    Required={true}
+                    Options={typeList}
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  {type?.value === "Local" ? (
+                    <FormTextField
+                      type="number"
+                      label={"Starting with"}
+                      Value={selectStartsNo.value}
+                      onChangeText={handleChangeStartsNo}
+                      Required={true}
+                      CustomErrorLine={"Enter proper did_number"}
+                    />
+                  ) : (
+                    <FormTextDropdown
+                      Value={selectStartsNo?.value}
+                      onSelect={handleChangeStartsNo}
+                      label={"Starting with *"}
+                      CustomErrorLine={"Choose one"}
+                      Required={true}
+                      Options={startsNoList}
+                    />
+                  )}
+                </Grid>
+                <Grid item xs={0} md={5} />
+                <Grid item xs={0} md={5} />
+                <Grid item xs={12} md={2}>
+                  <Button
+                    size="small"
+                    onClick={(e) => handleSearchForm(e)}
+                    sx={{
+                      backgroundColor: colors.greenAccent[500],
+                      width: "100%",
+                    }}
+                    variant="contained"
+                  >
+                    {"Search"}
+                  </Button>
+                </Grid>
+                <Grid item xs={0} md={5} />
+              </Grid>
+            </Box>
+            <Box mt={1}>
+              <Grid container spacing={1}>
+                <Grid item md={7} xs={12}>
+                  <TableContainer component={Paper} sx={{ maxHeight: 450 }}>
+                    <Table stickyHeader aria-label="customized table">
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableCell>Number</StyledTableCell>
+                          <StyledTableCell align="right">Price</StyledTableCell>
                           <StyledTableCell align="right">
-                            {row.price}
+                            Action
                           </StyledTableCell>
-                          <StyledTableCell align="right">
-                            {row?.isCart === true ? (
-                              <Chip
-                                icon={<TiTick />}
-                                sx={{
-                                  backgroundColor: colors.blueAccent[800],
-                                }}
-                                label="Added"
-                                size="small"
-                              />
-                            ) : (
-                              <Chip
-                                clickable
-                                sx={{
-                                  backgroundColor: colors.greenAccent[800],
-                                }}
-                                label="Add to cart"
-                                size="small"
-                                onClick={() => handleClickCart(row)}
-                              />
-                            )}
-                          </StyledTableCell>
-                        </StyledTableRow>
-                      ))
-                    ) : (
-                      <StyledTableRow>
-                        <TableCell align="center" colSpan={3}>
-                          No records found
-                        </TableCell>
-                      </StyledTableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TableContainer component={Paper} sx>
-                <Table stickyHeader aria-label="spanning table">
-                  <TableHead>
-                    <TableRow>
-                      <StyledTableCell align="center" colSpan={3}>
-                        Numbers
-                      </StyledTableCell>
-                      <StyledTableCell align="right">Price</StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {cartData.length > 0 ? (
-                      <>
-                        {cartData?.map((row) => (
-                          <TableRow key={row.id}>
-                            <TableCell align="left">{row.name}</TableCell>
-                            <TableCell align="right"></TableCell>
-                            <TableCell align="right"></TableCell>
-                            <TableCell align="right">
-                              <Chip
-                                sx={{
-                                  backgroundColor: "inherit",
-                                }}
-                                size="small"
-                                clickable={false}
-                                label={ccyFormat(row.price)}
-                                onDelete={() => {
-                                  handleRemoveCart(row);
-                                }}
-                                deleteIcon={
-                                  <MdOutlineDeleteForever
-                                    color="red"
-                                    size="18px"
-                                  />
-                                }
-                              />
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {rows.length > 0 ? (
+                          rows.map((row) => (
+                            <StyledTableRow key={row.did_number}>
+                              <StyledTableCell component="th" scope="row">
+                                {row.did_number}
+                              </StyledTableCell>
+                              <StyledTableCell align="right">
+                                {row.price}
+                              </StyledTableCell>
+                              <StyledTableCell align="right">
+                                <Chip
+                                  clickable
+                                  sx={{
+                                    backgroundColor: colors.greenAccent[800],
+                                  }}
+                                  label="Add to cart"
+                                  size="small"
+                                  onClick={() => handleClickCart(row)}
+                                />
+                              </StyledTableCell>
+                            </StyledTableRow>
+                          ))
+                        ) : (
+                          <StyledTableRow>
+                            <TableCell align="center" colSpan={3}>
+                              No records found
                             </TableCell>
-                          </TableRow>
-                        ))}
+                          </StyledTableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+                <Grid item md={5} xs={12}>
+                  <TableContainer component={Paper} sx>
+                    <Table stickyHeader aria-label="spanning table">
+                      <TableHead>
                         <TableRow>
-                          <TableCell rowSpan={3} />
-                          <TableCell colSpan={2}>Subtotal</TableCell>
-                          <TableCell align="right">
-                            {ccyFormat(invoiceSubtotal)}
-                          </TableCell>
+                          <StyledTableCell align="center" colSpan={3}>
+                            Numbers
+                          </StyledTableCell>
+                          <StyledTableCell align="right">Price</StyledTableCell>
                         </TableRow>
-                        <TableRow>
-                          <TableCell>Tax</TableCell>
-                          <TableCell align="right">{`${(TAX_RATE * 100).toFixed(
-                            0
-                          )} %`}</TableCell>
-                          <TableCell align="right">
-                            {ccyFormat(invoiceTaxes)}
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell colSpan={2}>
-                            <Typography variant="h6">Total</Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            {ccyFormat(invoiceTotal)}
-                          </TableCell>
-                        </TableRow>
-                      </>
-                    ) : (
-                      <StyledTableRow>
-                        <TableCell align="center" colSpan={5}>
-                          Your cart is empty
-                        </TableCell>
-                      </StyledTableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-          </Grid>
+                      </TableHead>
+                      <TableBody>
+                        {cartData?.length > 0 ? (
+                          <>
+                            {cartData?.map((row) => (
+                              <TableRow key={row.id}>
+                                <TableCell align="left">
+                                  {row.did_number}
+                                </TableCell>
+                                <TableCell align="right"></TableCell>
+                                <TableCell align="right"></TableCell>
+                                <TableCell align="right">
+                                  <Chip
+                                    sx={{
+                                      backgroundColor: "inherit",
+                                    }}
+                                    size="small"
+                                    clickable={false}
+                                    label={ccyFormat(row.price)}
+                                    onDelete={() => {
+                                      handleRemoveCart(row);
+                                    }}
+                                    deleteIcon={
+                                      <MdOutlineDeleteForever
+                                        color="red"
+                                        size="18px"
+                                      />
+                                    }
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            <TableRow>
+                              <TableCell rowSpan={3} />
+                              <TableCell colSpan={2}>
+                                <Typography variant="h6">Cart Total</Typography>
+                              </TableCell>
+                              <TableCell align="right">
+                                {ccyFormat(invoiceSubtotal)}
+                              </TableCell>
+                            </TableRow>
+                          </>
+                        ) : (
+                          <StyledTableRow>
+                            <TableCell align="center" colSpan={5}>
+                              Your cart is empty
+                            </TableCell>
+                          </StyledTableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  {cartData.length > 0 && (
+                    <Box
+                      mt={3}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        endIcon={<MdKeyboardArrowRight />}
+                        size="medium"
+                        onClick={()=>{
+                          navigate("/purchase-number/invoice-number");
+                        }}
+                      >
+                        <Typography variant="h6">Go to checkout</Typography>
+                      </Button>
+                    </Box>
+                  )}
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
         </Box>
+        <Copyright />
       </Box>
-      {/* <Copyright /> */}
     </>
   );
 };

@@ -96,6 +96,15 @@ const ManageNumber = () => {
         size: 120,
       },
       {
+        accessorKey: "type",
+        header: "Type",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        size: 50,
+      },
+      {
         accessorKey: "price",
         header: "Price",
         enableColumnDragging: false,
@@ -209,6 +218,7 @@ const ManageNumber = () => {
     retail_min_duration,
     retail_billing_block,
     selling_price,
+    type
   }) => {
     setLoader(true);
     const updateData = {
@@ -224,6 +234,7 @@ const ManageNumber = () => {
         retail_min_duration: retail_min_duration,
         retail_billing_block: retail_billing_block,
         selling_price: selling_price,
+        type: type
       },
       id: currentType.id,
     };

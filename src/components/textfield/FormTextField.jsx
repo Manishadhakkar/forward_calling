@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
-import { PatternFormat } from "react-number-format";
-import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import {
   FormHelperText,
   IconButton,
   InputAdornment,
   useTheme,
 } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { PatternFormat } from "react-number-format";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { ERR_BLANK, ERR_EMAIL } from "./textFieldString";
 import { removeSpacesAndBraces } from "../../utility/utilty";
 

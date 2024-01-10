@@ -66,7 +66,12 @@ const UserAccount = lazy(() =>
 );
 const UsersRole = lazy(() => import("../pages/auth/roles/component/roles"));
 
-const PurchaseNumberPage = lazy(() => import("../pages/app/puchaseNumber/component/PurchaseNumber"));
+const PurchaseNumberPage = lazy(() =>
+  import("../pages/app/puchaseNumber/component/PurchaseNumber")
+);
+const InvoiceNumberPage = lazy(() =>
+  import("../pages/app/puchaseNumber/component/CheckoutNumber")
+);
 
 const ChangePassword = lazy(() =>
   import("../pages/auth/changePassword/component/ChangePassword")
@@ -94,9 +99,12 @@ const Router = () => {
                       <Route path="/campaigns" element={<Campaign />} />
                     )}
                     {isAuthorizedFunc(GET_CAMPAIGN) && (
-                      <Route path="/campaigns/update-campaigns" element={<UpdateCampaign />} />
+                      <Route
+                        path="/campaigns/update-campaigns"
+                        element={<UpdateCampaign />}
+                      />
                     )}
-                    
+
                     {isAuthorizedFunc(GET_TARGET) && (
                       <Route path="/targets" element={<ManageTarget />} />
                     )}
@@ -135,6 +143,10 @@ const Router = () => {
                     <Route
                       path="/purchase-number"
                       element={<PurchaseNumberPage />}
+                    />
+                    <Route
+                      path="/purchase-number/invoice-number"
+                      element={<InvoiceNumberPage />}
                     />
                     {isAuthorizedFunc(GET_NUMBER) && (
                       <Route path="/did-numbers" element={<ManageNumber />} />

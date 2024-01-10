@@ -1,5 +1,6 @@
-import React, { useState } from "react";
 import "../styles.css";
+import { useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -15,13 +16,10 @@ import { MdClose } from "react-icons/md";
 import FormTextField from "../../textfield/FormTextField";
 import FormTextDropdown from "../../dropdown/FormTextDropdown";
 import { tokens } from "../../../assets/color/theme";
-import { useEffect } from "react";
 import {
-  allGetAllUsersRequest,
   getAllActiveCarriersRequest,
   getAllCountries,
 } from "../../../pages/app/number/service/numbers.request";
-import { getAllCompanyRequest } from "../../../pages/auth/users/service/users.request";
 
 const NumberForm = (props) => {
   const {
@@ -31,18 +29,11 @@ const NumberForm = (props) => {
     clickedBtn,
     errorMessage,
     setErrorMessage,
-    company_id,
   } = props;
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [companyList, setCompanyList] = useState([]);
-  const [companyId, setCompanyId] = useState({
-    value: initialValue ? initialValue.company_id : "",
-    error: false,
-    success: false,
-  });
   const [didName, setDidName] = useState({
     value: initialValue ? initialValue.did_name : "",
     error: false,
@@ -59,13 +50,21 @@ const NumberForm = (props) => {
     error: false,
     success: false,
   });
+  const typeList = [
+    { id: 1, label: "Local", value: "Local" },
+    { id: 2, label: "Toll Free", value: "Tollfree" },
+  ];
+  const [didType, setDidType] = useState({
+    value: initialValue ? initialValue.type : "",
+    error: false,
+    success: false,
+  });
   const [description, setDescription] = useState({
     value: initialValue ? initialValue.description : "",
     error: false,
     success: false,
   });
   const [carrierData, setCarrierData] = useState([]);
-  const [user_list, setUser_list] = useState([]);
   const [assignCarriers, setAssignCarriers] = useState({
     value: initialValue ? initialValue.carrier_id : "",
     error: false,
@@ -104,57 +103,16 @@ const NumberForm = (props) => {
     success: false,
   });
 
-  useEffect(() => {
-    if (clickedBtn === "edit") {
-      allGetAllUsersRequest()
-        .then((res) => {
-          const result = res.data?.map((ele) => {
-            return {
-              value: ele.id,
-              label: ele.name,
-            };
-          });
-          setUser_list(result);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [clickedBtn]);
-
-  let isValueNOTChanged =
-    didName.value === initialValue.didName &&
-    didNumber.value === initialValue.didNumber &&
-    description.value === initialValue.description &&
-    assignCarriers.value === initialValue.assignCarriers?.id &&
-    assignUser.value === initialValue.assignUser?.id;
-
-  let disable =
-    didName.error ||
-    didName.value === "" ||
-    didName.success === false ||
-    didNumber.error ||
-    didNumber.value === "" ||
-    didNumber.success === false ||
-    description.error ||
-    assignCarriers.error ||
-    assignCarriers.value === "" ||
-    assignCarriers.success === false ||
-    assignUser.error ||
-    assignUser.value === "" ||
-    assignUser.success === false;
-
-  const handleChangeCompany = (value) => {
-    setErrorMessage("");
-    setCompanyId(value);
-  };
-
   const handleChangeDidName = (value) => {
     setErrorMessage("");
     setDidName(value);
   };
   const handleChangeCountry = (value) => {
     setSelectCountry(value);
+    setErrorMessage("");
+  };
+  const handleChangeType = (value) => {
+    setDidType(value);
     setErrorMessage("");
   };
   const handleChangeDidNumber = (value) => {
@@ -172,10 +130,6 @@ const NumberForm = (props) => {
   const handleChangeCarriers = (value) => {
     setErrorMessage("");
     setAssignCarriers(value);
-  };
-  const handleChangeUser = (value) => {
-    setErrorMessage("");
-    setAssignUser(value);
   };
   const handleChangeConnectPrice = (value) => {
     setErrorMessage("");
@@ -229,22 +183,6 @@ const NumberForm = (props) => {
   }, []);
 
   useEffect(() => {
-    getAllCompanyRequest()
-      .then((res) => {
-        const result = res.data?.data?.data?.map((ele) => {
-          return {
-            value: ele.id,
-            label: ele.company_name,
-          };
-        });
-        setCompanyList(result);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  useEffect(() => {
     if (selectCountry.value !== "") {
       let filterCountryData = countryList.filter(
         (ele) => ele.value == selectCountry.value
@@ -283,8 +221,7 @@ const NumberForm = (props) => {
       retail_min_duration: minDuration.value,
       retail_billing_block: billingBlock.value,
       selling_price: sellingPrice.value,
-      // assigned_user: assignUser.value,
-      // company_id: company_id === "0" ? companyId.value : company_id,
+      type: didType.value,
     };
     handleFormData(data);
   };
@@ -318,18 +255,6 @@ const NumberForm = (props) => {
             noValidate={true}
           >
             <Grid container spacing={1}>
-              {/* {company_id === "0" && (
-                <Grid item xs={12} md={6}>
-                  <FormTextDropdown
-                    Value={companyId.value}
-                    onSelect={handleChangeCompany}
-                    label={"Company *"}
-                    CustomErrorLine={"Choose one"}
-                    Required={true}
-                    Options={companyList}
-                  />
-                </Grid>
-              )} */}
               <Grid item xs={12} md={6}>
                 <FormTextField
                   type="alpha"
@@ -350,6 +275,16 @@ const NumberForm = (props) => {
                   CustomErrorLine={"Choose one"}
                   Required={true}
                   Options={countryList}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <FormTextDropdown
+                  Value={didType.value}
+                  onSelect={handleChangeType}
+                  label={"Did Type *"}
+                  CustomErrorLine={"Choose one"}
+                  Required={true}
+                  Options={typeList}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
