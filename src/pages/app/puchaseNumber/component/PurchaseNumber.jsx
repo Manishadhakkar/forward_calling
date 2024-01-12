@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Button,
   Chip,
   Grid,
   Paper,
@@ -16,6 +15,7 @@ import {
   tableCellClasses,
   useTheme,
 } from "@mui/material";
+import Button from "@mui/material/Button";
 import { TbHome2 } from "react-icons/tb";
 import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
@@ -314,7 +314,7 @@ const PurchaseNumber = () => {
         >
           <Breadcrumb pathList={paths} />
           <Box>
-            <Box>
+            <Box pt={1}>
               <Typography variant="h5">{"Create Purchase Numbers"}</Typography>
             </Box>
             <Box>
@@ -495,14 +495,19 @@ const PurchaseNumber = () => {
                     >
                       <Button
                         variant="contained"
-                        color="secondary"
+                        aria-label="split button"
+                        color="success"
                         endIcon={<MdKeyboardArrowRight />}
-                        size="medium"
-                        onClick={()=>{
+                        sx={{
+                          backgroundColor: colors.greenAccent[700],
+                          textTransform: "none",
+                          color: theme.palette.mode === "dark" ? "white" : "black",
+                        }}
+                        onClick={() => {
                           navigate("/purchase-number/invoice-number");
                         }}
                       >
-                        <Typography variant="h6">Go to checkout</Typography>
+                        <Typography variant="h6">Create Invoice</Typography>
                       </Button>
                     </Box>
                   )}

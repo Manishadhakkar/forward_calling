@@ -45,6 +45,7 @@ const ManageTarget = lazy(() =>
 );
 const ServerIp = lazy(() => import("../pages/app/serverIp/component/ServerIp"));
 const Carriers = lazy(() => import("../pages/app/carriers/component/Carriers"));
+
 const ManageNumber = lazy(() =>
   import("../pages/app/number/component/ManageNumber")
 );
@@ -70,8 +71,19 @@ const PurchaseNumberPage = lazy(() =>
   import("../pages/app/puchaseNumber/component/PurchaseNumber")
 );
 const InvoiceNumberPage = lazy(() =>
-  import("../pages/app/puchaseNumber/component/CheckoutNumber")
+  import("../pages/app/number-invoice/component/InvoicePage")
 );
+const CryptoPaymentPage = lazy(() =>
+  import("../pages/app/paymentPage/component/CryptoPayment")
+);
+const CardPaymentPage = lazy(() =>
+  import("../pages/app/paymentPage/component/CardPayment")
+);
+const WalletPaymentPage = lazy(() =>
+  import("../pages/app/paymentPage/component/WalletPayment")
+);
+
+const VerifyCardPage = lazy(() => import("../pages/app/verifyOtp/VerifyOtp"));
 
 const ChangePassword = lazy(() =>
   import("../pages/auth/changePassword/component/ChangePassword")
@@ -148,6 +160,26 @@ const Router = () => {
                       path="/purchase-number/invoice-number"
                       element={<InvoiceNumberPage />}
                     />
+                    <Route
+                      path="/purchase-number/invoice-number/crypto-payment"
+                      element={<CryptoPaymentPage />}
+                    />
+                    
+                    <Route
+                      path="/purchase-number/invoice-number/wallet-payment"
+                      element={<WalletPaymentPage />}
+                    />
+
+                    <Route
+                      path="/purchase-number/invoice-number/card-payment"
+                      element={<CardPaymentPage />}
+                    />
+
+                    <Route
+                      path="/purchase-number/invoice-number/verification"
+                      element={<VerifyCardPage />}
+                    />
+
                     {isAuthorizedFunc(GET_NUMBER) && (
                       <Route path="/did-numbers" element={<ManageNumber />} />
                     )}
