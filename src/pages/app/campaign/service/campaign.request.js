@@ -56,7 +56,27 @@ export const getAllCompanyRequest = () => {
 export const assignCompanyReq = (body) => {
   return axios({
     method: "POST",
-    url: "/campaign/assignTo",
+    url: `"/campaign/assignTo"`,
     data: body,
   });
 };
+
+export const assignCampaignTargetReq = (body) =>{
+  return axios({
+    method: "POST",
+    url: "/campaign-member/add",
+    data: body,
+  });
+}
+export const removeCampaignTargetReq = (id) =>{
+  return axios({
+    method: "DELETE",
+    url: `/campaign-member/remove/${id}`
+  });
+}
+export const getCompanyTargetAndRemainsReq = (id) =>{
+  return axios({
+    method: "GET",
+    url: `/campaign-member/campaignMemberAndOther/${id}`
+  })
+}

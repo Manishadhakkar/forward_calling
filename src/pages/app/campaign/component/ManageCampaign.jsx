@@ -33,9 +33,12 @@ import { tokens } from "../../../../assets/color/theme";
 import { MdDeleteForever, MdExpandMore } from "react-icons/md";
 import { FcCallTransfer } from "react-icons/fc";
 import {
+  assignCampaignTargetReq,
   getAllActiveNumber,
   getAllTargetReq,
   getCampaignByIdRequest,
+  getCompanyTargetAndRemainsReq,
+  removeCampaignTargetReq,
   updateCampaignRequest,
 } from "../service/campaign.request";
 import Loader from "../../../../components/Loader/Loader";
@@ -281,37 +284,39 @@ const UpdateCampaign = () => {
   };
 
   const handleChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
+    if (panel === "panel2" && initialValue.did_number_id === null) {
+      setBarVariant("info");
+      setMessage("Please select Tfn number first");
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } else {
+      setExpanded(isExpanded ? panel : false);
+    }
   };
 
   useEffect(() => {
-    if (!searchTargetParams) {
-      setSearchTargetData(targetList);
-    }
-    const filteredData = targetList?.filter((item) => {
-      return (
-        item.name.toLowerCase().includes(searchTargetParams.toLowerCase()) ||
-        item.destination
-          .toLowerCase()
-          .includes(searchTargetParams.toLowerCase())
-      );
-    });
+    const filteredData = !searchTargetParams
+      ? targetList
+      : targetList?.filter((item) =>
+          [item.name, item.destination]
+            .map((str) => str.toLowerCase())
+            .some((lowercased) =>
+              lowercased.includes(searchTargetParams.toLowerCase())
+            )
+        );
     setSearchTargetData(filteredData);
   }, [searchTargetParams, targetList]);
 
   useEffect(() => {
-    if (!searchCampaignParams) {
-      setSearchCampaignData(campaignTarget);
-    }
-    const filteredData = campaignTarget?.filter((item) => {
-      return (
-        item.name.toLowerCase().includes(searchCampaignParams.toLowerCase()) ||
-        item.destination
-          .toLowerCase()
-          .includes(searchCampaignParams.toLowerCase())
-      );
-    });
-    setSearchCampaignData(filteredData);
+    const filterData = !searchCampaignParams
+      ? campaignTarget
+      : campaignTarget?.filter((item) =>
+          [item.name, item.destination]
+            .map((str) => str.toLowerCase())
+            .some((lowercased) =>
+              lowercased.includes(searchCampaignParams.toLowerCase())
+            )
+        );
+    setSearchCampaignData(filterData);
   }, [searchCampaignParams, campaignTarget]);
 
   const handleChangeSearch = (e) => {
@@ -320,24 +325,6 @@ const UpdateCampaign = () => {
   const handleChangeCampaignSearch = (e) => {
     setSearchCampaignParams(e.target.value);
   };
-
-  useEffect(() => {
-    setIsLoader(true);
-    getAllActiveNumber()
-      .then((res) => {
-        setIsLoader(false);
-        const result = res?.data?.data?.map((ele) => {
-          return {
-            value: ele.id,
-            label: ele.did_number,
-          };
-        });
-        setTFNList(result);
-      })
-      .catch((err) => {
-        setIsLoader(false);
-      });
-  }, []);
 
   const handleChangeName = (value) => {
     setName(value);
@@ -355,7 +342,6 @@ const UpdateCampaign = () => {
     setIsStrict(value);
   };
   const handleChangeRecord = (value) => {
-    console.log(isRecording, value);
     setIsRecording(value);
   };
   const handleChangeDuplicateCalls = (value) => {
@@ -375,104 +361,101 @@ const UpdateCampaign = () => {
   };
 
   useEffect(() => {
-    if (campaign_id) {
-      getCampaignByIdRequest(campaign_id)
-        .then((res) => {
-          setInitValue(res.data.data[0]);
-          setRandomId({ value: res.data.data[0]?.campaign_random_id });
-          setName({ value: res.data.data[0]?.name });
-          setDescription({ value: res.data.data[0]?.description });
-          setNumberFormat({ value: res.data.data[0]?.did_number_format });
-          setTimeout({ value: res.data.data[0]?.connection_timeout });
-          setTFNNo({
-            value: res.data.data[0]?.number?.did_number,
-          });
-          setIsRecording(res.data.data[0].recording !== 1 ? false : true);
+    (async () => {
+      try {
+        setIsLoader(true);
+        const res = await getAllActiveNumber();
+        const result = res?.data?.data?.map((ele) => ({
+          value: ele.id,
+          label: ele.did_number,
+        }));
+        setTFNList(result);
+      } catch (err) {
+        setBarVariant("error");
+        setMessage(err.message);
+        setSnackbarOpen((prev) => ({ ...prev, open: true }));
+        setErrorMessage("");
+      } finally {
+        setIsLoader(false);
+      }
+    })();
+  }, []);
 
-          setCallsType({
-            value: res.data?.data[0]?.route_previously_connected_calls,
-          });
-          setIsStrict(res.data.data[0]?.strict !== 1 ? false : true);
-          setIsDuplicatesCalls(
-            res.data.data[0]?.anonymous_duplicate_call !== 1 ? false : true
-          );
-          setIsWaiting(res.data.data[0]?.call_waiting !== 1 ? false : true);
-          setIsSilent(res.data.data[0]?.trim_silence !== 1 ? false : true);
-          setDialAttempt(res.data.data[0]?.dial_attempt_target);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+  const getCampaignData = async (campaign_id) => {
+    setIsLoader(true);
+
+    try {
+      const res = await getCampaignByIdRequest(campaign_id);
+      const data = res.data.data[0];
+
+      setInitValue(data);
+      setRandomId({ value: data?.campaign_random_id });
+      setName({ value: data?.name });
+      setDescription({ value: data?.description });
+      setNumberFormat({ value: data?.did_number_format });
+      setTimeout({ value: data?.connection_timeout });
+      setTFNNo({ value: data?.number?.did_number });
+      setIsRecording(data.recording !== 1);
+      setCallsType({ value: data?.route_previously_connected_calls });
+      setIsStrict(data.strict !== 1);
+      setIsDuplicatesCalls(data.anonymous_duplicate_call !== 1);
+      setIsWaiting(data.call_waiting !== 1);
+      setIsSilent(data.trim_silence !== 1);
+      setDialAttempt(data.dial_attempt_target);
+    } catch (error) {
+      setIsLoader(false);
+    } finally {
+      setIsLoader(false);
+    }
+  };
+
+  useEffect(() => {
+    if (campaign_id) {
+      getCampaignData(campaign_id);
     }
   }, [campaign_id]);
 
   useEffect(() => {
-    if (initialValue) {
-      getAllTargetReq()
-        .then((res) => {
-          const result_data = res.data?.data?.map((ele) => ({
-            id: ele.id,
-            name: ele.name,
-            destination: ele.forwarding_number,
-            type: ele.type,
-            status: ele.status,
-            weightage: null,
-            priority: null,
-          }));
-          setTargetList(result_data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [initialValue]);
-  // const user = JSON.parse(localStorage.getItem("user"));
-  // let headers = {
-  //   "Content-Type": "application/json",
-  // };
-  // headers["Authorization"] = `Bearer ${user.token}`;
-  // axios
-  //   .get(
-  //     "http://139.84.169.123/portalforwarding/backend/public/api/target/active",
-  //     {
-  //       timeout: 7000, // Set a timeout of  seconds
-  //       headers,
-  //     }
-  //   )
-  //   .then((response) => {
-  //     console.log(response.data.data);
-  //     const result_data = response?.data?.data?.map((ele) => ({
-  //       id: ele.id,
-  //       name: ele.name,
-  //       destination: ele.forwarding_number,
-  //       type: ele.type,
-  //       status: ele.status,
-  //       weightage: null,
-  //       priority: null,
-  //     }));
-  //     setTargetList(result_data);
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //   });
+    (async () => {
+      try {
+        setIsLoader(true);
+        const res = await getCompanyTargetAndRemainsReq(campaign_id);
+        const targetList = res.data.data.AllTargets?.map((ele) => ({
+          id: ele.id,
+          name: ele.name,
+          destination: ele.forwarding_number,
+          type: ele.type,
+          status: ele.status,
+          weightage: null,
+          priority: null,
+        }));
+        const assignTargetList = res.data.data.CampaignMember?.map((ele) => ({
+          id: ele.id,
+          name: ele.target.name,
+          destination: ele.target.forwarding_number,
+          type: ele.target.type,
+          status: ele.target.status,
+          weightage: null,
+          priority: null,
+        }));
+        setCampaignTarget(
+          assignTargetList !== undefined ? assignTargetList : []
+        );
+        setTargetList(targetList !== undefined ? targetList : []);
+      } catch (err) {
+        setBarVariant("error");
+        setMessage(err.message);
+        setSnackbarOpen((prev) => ({ ...prev, open: true }));
+        setErrorMessage("");
+      } finally {
+        setIsLoader(false);
+      }
+    })();
+  }, [message]);
 
   const handleClick = () => {
     setOpenClip(true);
     navigator.clipboard.writeText(randomId.value);
-  };
-
-  const handleClickCart = (val) => {
-    const filter_target_list = targetList?.filter((ele) => ele.id !== val.id);
-    setTargetList(filter_target_list);
-    setCampaignTarget([...campaignTarget, val]);
-  };
-
-  const handleClickRemove = (val) => {
-    const filter_campaign_targets = campaignTarget?.filter(
-      (ele) => ele.id !== val.id
-    );
-    setTargetList([...targetList, val]);
-    setCampaignTarget(filter_campaign_targets);
   };
 
   const handleChangePriority = (e, id) => {
@@ -546,9 +529,10 @@ const UpdateCampaign = () => {
     setDialAttempt((prevValue) => prevValue + 1);
   };
 
-  const handleUpdateCampaign = (e) => {
+  const handleUpdateCampaign = async (e) => {
     e.preventDefault();
-    const did_value = tfnList?.find((no) => no.label == tfnNo.value);
+
+    const did_value = tfnList.find((no) => no.label === tfnNo.value);
     const data = {
       data: {
         name: name.value,
@@ -556,28 +540,67 @@ const UpdateCampaign = () => {
         did_number_format: numberFormat.value,
         did_number_id: did_value?.value,
         connection_timeout: timeout.value?.toString(),
-        recording: isRecording === true ? 1 : 0,
+        recording: isRecording ? 1 : 0,
         route_previously_connected_calls: callsType.value,
-        strict:
-          callsType.value !== "Same target" ? (isStrict === true ? 1 : 0) : 0,
-        anonymous_duplicate_call: isDuplicatesCalls === true ? 1 : 0,
-        call_waiting: isRecording === true ? (isWaiting === true ? 1 : 0) : 0,
-        trim_silence: isRecording === true ? (isSilent === true ? 1 : 0) : 0,
+        strict: callsType.value !== "Same target" ? (isStrict ? 1 : 0) : 0,
+        anonymous_duplicate_call: isDuplicatesCalls ? 1 : 0,
+        call_waiting: isRecording ? (isWaiting ? 1 : 0) : 0,
+        trim_silence: isRecording ? (isSilent ? 1 : 0) : 0,
         dial_attempt_target: dialAttempt,
       },
       id: initialValue.id,
     };
+
+    try {
+      setIsLoader(true);
+      const res = await updateCampaignRequest(data);
+      getCampaignData(campaign_id);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setIsLoader(false);
+      setErrorMessage(err.message);
+    } finally {
+      setIsLoader(false);
+    }
+  };
+
+  const handleClickCart = async (val) => {
     setIsLoader(true);
-    updateCampaignRequest(data)
+    try {
+      const reqData = {
+        campaign_id,
+        target_id: val.id,
+        weightage: val.weightage,
+        priority: val.priority,
+      };
+      const res = await assignCampaignTargetReq(reqData);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
+  };
+
+  const handleClickRemove = (val) => {
+    removeCampaignTargetReq(val.id)
       .then((res) => {
-        setIsLoader(false);
         setBarVariant("success");
         setMessage(res.data.message);
         setSnackbarOpen({ ...snackbarOpen, open: true });
       })
       .catch((err) => {
-        setIsLoader(false);
-        setErrorMessage(err.message);
+        setBarVariant("error");
+        setMessage(err.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setErrorMessage("");
       });
   };
 
@@ -710,7 +733,7 @@ const UpdateCampaign = () => {
                       Value={numberFormat.value}
                       onSelect={handleChangeFormat}
                       placeholder={"Select one"}
-                      label={"Number Format" + " *"}
+                      label={"Number Format *"}
                       CustomErrorLine={"Choose one"}
                       multiSelect={false}
                       Required={true}
@@ -746,7 +769,7 @@ const UpdateCampaign = () => {
                       Value={callsType.value}
                       onSelect={handleChangeCallsType}
                       placeholder={"Select one"}
-                      label={"Send duplicate calls to" + " *"}
+                      label={"Send duplicate calls to *"}
                       CustomErrorLine={"Choose one"}
                       multiSelect={false}
                       Required={true}
@@ -1076,7 +1099,7 @@ const UpdateCampaign = () => {
                                 ))
                               ) : (
                                 <TableRow>
-                                  <StyledTableCell>
+                                  <StyledTableCell align="center" colSpan={7}>
                                     No records found
                                   </StyledTableCell>
                                 </TableRow>
@@ -1308,7 +1331,7 @@ const UpdateCampaign = () => {
                                 ))
                               ) : (
                                 <TableRow>
-                                  <StyledTableCell>
+                                  <StyledTableCell align="center" colSpan={7}>
                                     No records found
                                   </StyledTableCell>
                                 </TableRow>

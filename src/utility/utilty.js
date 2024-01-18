@@ -23,11 +23,9 @@ export function updateParentFromChild(arr1, arr2) {
   return result;
 }
 
-
 export function compareArrays(arr1, arr2) {
   return !_.isEqual(arr1, arr2);
 }
-
 
 const authdata = JSON.parse(localStorage.getItem("authorization"));
 
@@ -39,7 +37,6 @@ const isAuthorizedFunc = (funcCode) => {
   }
 };
 export { isAuthorizedFunc };
-
 
 export const convertFormatNumber = (inputNumber, format_type) => {
   const numberString = inputNumber.toString();
@@ -54,5 +51,11 @@ export const convertFormatNumber = (inputNumber, format_type) => {
       result += currentChar;
     }
   }
+  return result;
+};
+
+export const concatenateDidNumbers = (data) => {
+  const didNumbers = data.map((item) => item.did_number);
+  const result = didNumbers.join("-");
   return result;
 };

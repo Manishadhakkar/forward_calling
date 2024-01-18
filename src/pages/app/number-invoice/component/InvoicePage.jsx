@@ -22,7 +22,8 @@ import { PiHandCoinsFill } from "react-icons/pi";
 import Copyright from "../../../../components/footer/Footer";
 import PaymentStepper from "../../../../components/stepper/PaymentStepper";
 import SplitButton from "../../../../components/buttonGroup/ButtonGroup";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getInvoiceDataReq } from "../service/invoice.request";
 
 const paths = [
   {
@@ -53,9 +54,11 @@ const options = [
 const InvoiceNumber = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+  const invoice_id = location?.state?.invoice_id;
   const colors = tokens(theme.palette.mode);
-
   const [isLoader, setLoader] = useState(false);
+
   const [snackbarOpen, setSnackbarOpen] = useState({
     open: false,
     vertical: "top",
@@ -63,6 +66,8 @@ const InvoiceNumber = () => {
   });
   const [barVariant, setBarVariant] = useState("");
   const [message, setMessage] = useState("");
+
+  const [invData, setInvoiceData] = useState({});
 
   const { vertical, horizontal, open } = snackbarOpen;
   const handleClose = (event, reason) => {
@@ -74,13 +79,37 @@ const InvoiceNumber = () => {
 
   const handleClickPayType = (value) => {
     if (value === 1) {
-      navigate("/purchase-number/invoice-number/crypto-payment");
+      navigate("/purchase-number/invoice-number/crypto-payment", {
+        state: invData,
+      });
     } else if (value === 2) {
-        navigate("/purchase-number/invoice-number/card-payment");
-    } else if (value === 3){
-        navigate("/purchase-number/invoice-number/wallet-payment");
+      navigate("/purchase-number/invoice-number/card-payment", {
+        state: invData,
+      });
+    } else if (value === 3) {
+      navigate(
+        "/purchase-number/invoice-number/wallet-payment",
+        { state: invData }
+      );
     }
   };
+
+  useEffect(() => {
+    if (invoice_id !== null) {
+      setLoader(true);
+      getInvoiceDataReq(invoice_id)
+        .then((res) => {
+          setLoader(false);
+          setInvoiceData(res.data.data[0]);
+        })
+        .catch(() => {
+          setLoader(false);
+          setBarVariant("error");
+          setMessage("Something went wrong");
+          setSnackbarOpen({ ...snackbarOpen, open: true });
+        });
+    }
+  }, [invoice_id]);
 
   return (
     <>
@@ -137,22 +166,31 @@ const InvoiceNumber = () => {
                     <Divider />
                     <List>
                       <ListItem>
-                        <ListItemText primary="Company 1" />
+                        <ListItemText
+                          primary={invData?.company?.company_name}
+                        />
                       </ListItem>
                       <ListItem>
-                        <ListItemText primary="240 Mission Street" />
+                        <ListItemText
+                          primary={invData?.company?.billing_address}
+                        />
                       </ListItem>
                       <ListItem>
-                        <ListItemText primary="San Francisco, CA 94133" />
+                        <ListItemText primary={invData?.company?.city} />
                       </ListItem>
                       <ListItem>
-                        <ListItemText primary="US" />
+                        <ListItemText primary={invData?.states?.state_name} />
                       </ListItem>
                       <ListItem>
-                        <ListItemText primary="4156789012" />
+                        <ListItemText
+                          primary={invData?.countries?.country_name}
+                        />
                       </ListItem>
                       <ListItem>
-                        <Typography>superadmin@textricks.com</Typography>
+                        <ListItemText primary={invData?.company?.zip} />
+                      </ListItem>
+                      <ListItem>
+                        <Typography>{invData?.company?.email}</Typography>
                       </ListItem>
                     </List>
                   </CardContent>
@@ -175,24 +213,38 @@ const InvoiceNumber = () => {
                         color={colors.blueAccent[100]}
                         sx={{ fontWeight: 300 }}
                       >
-                        11Jan2024 / #Inv001
+                        {new Date(`${invData?.created_at}`)
+                          .toLocaleDateString("en-US", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                          .replace(/,/g, "")}{" "}
+                        - {invData?.invoice_id}
                       </Typography>
                     </Box>
                     <Divider />
                     <List dense>
-                      <ListItem
-                        secondaryAction={<ListItemText primary="215" />}
-                      >
-                        <ListItemText primary="18001500500" />
-                      </ListItem>
-                      <ListItem
-                        secondaryAction={<ListItemText primary="150" />}
-                      >
-                        <ListItemText primary="18001500501" />
-                      </ListItem>
+                      {invData?.invoice_items?.map((ele) => {
+                        return (
+                          <ListItem
+                            secondaryAction={
+                              <ListItemText primary={ele.price} />
+                            }
+                          >
+                            <ListItemText primary={ele.did_number} />
+                          </ListItem>
+                        );
+                      })}
                     </List>
                     <Divider />
-                    <ListItem secondaryAction={<ListItemText primary="365" />}>
+                    <ListItem
+                      secondaryAction={
+                        <ListItemText
+                          primary={`${invData?.countries?.currency_symbol} ${invData?.invoice_subtotal_amount}`}
+                        />
+                      }
+                    >
                       <ListItemText primary="Total" />
                     </ListItem>
                   </CardContent>

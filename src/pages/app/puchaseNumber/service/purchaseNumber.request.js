@@ -36,3 +36,17 @@ export const removeCartItemReq = (id) =>{
     url: `/cart/remove-to-cart/${id}`,
   })
 }
+export const createInvoiceReq = (body) =>{
+  return axios({
+    method: "POST",
+    url: "/invoice",
+    data: body
+  })
+}
+export const getInvoiceReq = (body) =>{
+  return axios({
+    method: "GET",
+    url: `invoice/get-invoice/${body.id}`,
+    data: body.data
+  })
+}

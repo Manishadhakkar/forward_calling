@@ -30,6 +30,7 @@ import {
 } from "react-icons/md";
 import {
   addToCartReq,
+  createInvoiceReq,
   getAllCountriesReq,
   getAllSearchNumbersReq,
   getCartListReq,
@@ -276,6 +277,43 @@ const PurchaseNumber = () => {
       });
   };
 
+  const handleCreateInvoice = async (e) => {
+    e.preventDefault();
+
+    try {
+      const transformedData = {
+        did_number_id: [],
+        did_number: [],
+        price: [],
+      };
+
+      cartData?.forEach((item) => {
+        ["did_number_id", "did_number", "price"].forEach((key) => {
+          if (key in item) {
+            transformedData[key].push(item[key]);
+          }
+        });
+      });
+
+      setLoader(true);
+      const res = await createInvoiceReq(transformedData);
+      setMessage(res.data.message);
+      setBarVariant("success");
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setTimeout(() => {
+        navigate("/purchase-number/invoice-number", {
+          state: { invoice_id: res.data.data.id },
+        });
+      }, 1000);
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } finally {
+      setLoader(false);
+    }
+  };
+
   return (
     <>
       {isLoader && <Loader />}
@@ -501,11 +539,10 @@ const PurchaseNumber = () => {
                         sx={{
                           backgroundColor: colors.greenAccent[700],
                           textTransform: "none",
-                          color: theme.palette.mode === "dark" ? "white" : "black",
+                          color:
+                            theme.palette.mode === "dark" ? "white" : "black",
                         }}
-                        onClick={() => {
-                          navigate("/purchase-number/invoice-number");
-                        }}
+                        onClick={(e) => handleCreateInvoice(e)}
                       >
                         <Typography variant="h6">Create Invoice</Typography>
                       </Button>

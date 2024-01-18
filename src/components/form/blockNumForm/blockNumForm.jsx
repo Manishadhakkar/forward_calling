@@ -32,79 +32,103 @@ const BlockNumForm = (props) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [companyList, setCompanyList] = useState([]);
-  const [companyId, setCompanyId] = useState({
-    value: initialValue ? initialValue.company_id : "",
-    error: false,
-    success: false,
-  });
-  const [groupList, setGroupList] = useState([]);
-  const [groupId, setGroupId] = useState({
-    value: initialValue ? initialValue.group_id : "",
+  const subjectList = [
+    {
+      label: "Prefix",
+      value: "prefix",
+    },
+    {
+      label: "Phone",
+      value: "phonenumber",
+    },
+  ];
+  const [subjectId, setSubjectId] = useState({
+    value: initialValue ? initialValue?.subject : "prefix",
     error: false,
     success: false,
   });
   const [number, setNumber] = useState({
-    value: initialValue ? initialValue.rule_number : "",
+    value: initialValue ? initialValue.digits : "",
     error: false,
     success: false,
   });
-  const handleChangeCompany = (value) => {
+  const [transferNumber, setTransferNumber] = useState({
+    value: initialValue ? initialValue?.transfer_number : "",
+    error: false,
+    success: false,
+  });
+
+  const ruleTypeList = [
+    {
+      label: "Transfer",
+      value: "transfer",
+    },
+    {
+      label: "Block",
+      value: "block",
+    },
+  ];
+  const [ruleId, setRuleId] = useState({
+    value: initialValue ? initialValue?.ruletype : "transfer",
+    error: false,
+    success: false,
+  });
+
+  const blockTypeList = [
+    {
+      label: "Busy",
+      value: "busy",
+    },
+    {
+      label: "Congestion",
+      value: "congestion",
+    },
+    {
+      label: "Hang-up",
+      value: "hangup",
+    },
+  ];
+
+  const [blockId, setBlockId] = useState({
+    value: initialValue ? initialValue?.blocktype : "busy",
+    error: false,
+    success: false,
+  });
+
+  const handleChangeSubject = (value) => {
     setErrorMessage("");
-    setCompanyId(value);
+    setSubjectId(value);
   };
   const handleChangeNum = (value) => {
     setErrorMessage("");
     setNumber(value);
   };
-  const handleChangeGroup = (value) => {
+  const handleChangeTransferNum = (value) => {
     setErrorMessage("");
-    setGroupId(value);
+    setTransferNumber(value);
   };
-
-  useEffect(() => {
-    getAllCompanyRequest()
-      .then((res) => {
-        const result = res.data?.data?.data?.map((ele) => {
-          return {
-            value: ele.id,
-            label: ele.company_name,
-          };
-        });
-        setCompanyList(result);
-      })
-      .catch(() => { });
-  }, []);
-
-  useEffect(() => {
-    getAllGroupsRequest(companyId.value)
-      .then((res) => {
-        console.log(res.data.data)
-        const result = res.data?.data?.map((ele) => {
-          return {
-            value: ele.id,
-            label: ele.group_name,
-          };
-        });
-        setGroupList(result);
-      })
-      .catch(() => { });
-  }, [companyId]);
+  const handleChangerule = (value) => {
+    setErrorMessage("");
+    setRuleId(value);
+  };
+  const handleChangeBlock = (value) => {
+    setErrorMessage("");
+    setBlockId(value);
+  };
 
   const handleSubmitForm = (e) => {
     e.preventDefault();
-    if (
-      !groupId.value ||
-      (company_id === "0" && !companyId.value) ||
-      !number.value
-    ) {
+    if (!subjectId.value || !number.value || !ruleId.value) {
       setErrorMessage("Please fill in all required fields.");
       return;
     }
     const data = {
-      group_id: groupId.value,
-      rule_number: number.value,
-      company_id: company_id === "0" ? companyId.value : company_id,
+      digits: number.value,
+      subject: subjectId.value,
+      ruletype: ruleId.value,
+      transfer_number:
+        ruleId.value === "transfer" ? transferNumber.value : null,
+      blocktype: ruleId.value === "block" ? blockId.value : null,
     };
     handleFormData(data);
   };
@@ -123,7 +147,9 @@ const BlockNumForm = (props) => {
             <MdClose color={colors.form[100]} />
           </IconButton>
         }
-        title={clickedBtn === "add" ? "Add Group" : "Update Group"}
+        title={
+          clickedBtn === "add" ? "Add Block Number" : "Update Block Number"
+        }
       />
       {errorMessage && <span className="error_msg">{errorMessage}</span>}
       <CardContent color={colors.form[100]}>
@@ -135,33 +161,25 @@ const BlockNumForm = (props) => {
           noValidate={true}
         >
           <Grid container spacing={1}>
-            {company_id === "0" && (
-              <Grid item xs={12} md={12}>
-                <FormTextDropdown
-                  Value={companyId.value}
-                  onSelect={handleChangeCompany}
-                  label={"Company *"}
-                  CustomErrorLine={"Choose one"}
-                  Required={true}
-                  Options={companyList}
-                />
-              </Grid>
-            )}
             <Grid item xs={12} md={12}>
               <FormTextDropdown
-                Value={groupId.value}
-                onSelect={handleChangeGroup}
-                label={"Group *"}
-                CustomErrorLine={"Choose one"}
+                Value={subjectId.value}
+                onSelect={handleChangeSubject}
+                label={"Subject *"}
+                CustomErrorLine={"Select one"}
                 Required={true}
-                Options={groupList}
+                Options={subjectList}
               />
             </Grid>
             <Grid item xs={12} md={12}>
               <FormTextField
                 type="num"
-                placeholder={"Enter Number"}
-                label={"Number Name"}
+                placeholder={
+                  subjectId.value === "prefix" ? "Enter prefix" : "Enter number"
+                }
+                label={
+                  subjectId.value === "prefix" ? "Enter prefix" : "Enter number"
+                }
                 Value={number.value}
                 onChangeText={handleChangeNum}
                 Required={true}
@@ -169,6 +187,41 @@ const BlockNumForm = (props) => {
               />
             </Grid>
 
+            <Grid item xs={12} md={12}>
+              <FormTextDropdown
+                Value={ruleId.value}
+                onSelect={handleChangerule}
+                label={"Rule type *"}
+                CustomErrorLine={"Select one"}
+                Required={true}
+                Options={ruleTypeList}
+              />
+            </Grid>
+            {ruleId.value === "transfer" && (
+              <Grid item xs={12} md={12}>
+                <FormTextField
+                  type="num"
+                  placeholder={"Enter transfer number"}
+                  label={"Transfer number"}
+                  Value={transferNumber.value}
+                  onChangeText={handleChangeTransferNum}
+                  Required={true}
+                  CustomErrorLine={"Enter proper number"}
+                />
+              </Grid>
+            )}
+            {ruleId.value === "block" && (
+              <Grid item xs={12} md={12}>
+                <FormTextDropdown
+                  Value={blockId.value}
+                  onSelect={handleChangeBlock}
+                  label={"Block type *"}
+                  CustomErrorLine={"Select one"}
+                  Required={true}
+                  Options={blockTypeList}
+                />
+              </Grid>
+            )}
           </Grid>
         </Box>
       </CardContent>

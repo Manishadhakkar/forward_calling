@@ -63,8 +63,8 @@ const ManageBlockNumbers = () => {
   const columns = useMemo(
     () => [
       {
-        accessorKey: "block_group.group_name",
-        header: "Group Name",
+        accessorKey: "digits",
+        header: "Number",
         size: 200,
         enableColumnDragging: false,
         enableGlobalFilter: true,
@@ -78,9 +78,54 @@ const ManageBlockNumbers = () => {
         },
       },
       {
-        accessorKey: "rule_number",
-        header: "Number",
-        size: 350,
+        accessorKey: "subject",
+        header: "Subject",
+        size: 100,
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        muiTableHeadCell: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
+        accessorKey: "ruletype",
+        header: "Type",
+        size: 70,
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        muiTableHeadCell: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
+        accessorKey: "transfer_number",
+        header: "Transfer No.",
+        size: 70,
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        muiTableHeadCell: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
+        accessorKey: "blocktype",
+        header: "Block type",
+        size: 70,
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
@@ -95,7 +140,7 @@ const ManageBlockNumbers = () => {
       {
         accessorKey: "status",
         header: "Status",
-        size: 100,
+        size: 50,
         enableColumnDragging: false,
         enableGlobalFilter: false,
         enableColumnFilter: false,
@@ -121,7 +166,7 @@ const ManageBlockNumbers = () => {
   const getAllBlockNumber = (activePage, limit) => {
     getBlockNoRequest(activePage, limit)
       .then((res) => {
-        console.log(res.data.data)
+        console.log(res.data.data);
         let getData = res.data.data.length === 0 ? [] : res.data.data.data;
         setRows(getData);
         setTotal(res.data.data.length === 0 ? 0 : res.data.data?.total);
@@ -195,9 +240,11 @@ const ManageBlockNumbers = () => {
     setLoader(true);
     const updateData = {
       data: {
-        group_id: value.group_id,
-        rule_number: value.rule_number,
-        company_id: value.company_id,
+        digits: value.digits,
+        subject: value.subject,
+        ruletype: value.ruletype,
+        transfer_number: value.transfer_number,
+        blocktype: value.blocktype,
       },
       id: currentType.id,
     };
