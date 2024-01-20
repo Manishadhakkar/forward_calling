@@ -60,9 +60,7 @@ import AddIcon from "@mui/icons-material/Add";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Pusher from "pusher-js";
 import { Add } from "iconsax-react";
-// import pusher from "../../../../config/path-to-your-pusher-config";
 
 const blue = {
   100: "#daecff",
@@ -261,7 +259,7 @@ const UpdateCampaign = () => {
   const addRowTable = () => {
     const data = {
       input_digits: "",
-      operation: desinationTypeList,
+      destination: '',
       ivrDropox: "",
       targetDropbox: "",
     };
@@ -828,6 +826,12 @@ const UpdateCampaign = () => {
     const intervalId = setInterval(myFunction, 8000);
     return () => clearInterval(intervalId);
   }, []);
+
+  const handleChangeDigits = (data, id, event, currRow) => {
+    console.log(event)
+  };
+
+  const handleChangeDestinationType = () => {};
 
   return (
     <>
@@ -1650,7 +1654,45 @@ const UpdateCampaign = () => {
                       {ivrRow?.length ? (
                         ivrRow?.map((obj, index) => {
                           const key = index;
-                          return <h2></h2>;
+                          return (
+                            <tr key={key}>
+                              <td>
+                                <FormTextField
+                                  type="num"
+                                  placeholder={"Enter digit"}
+                                  label={"Digit"}
+                                  Value={ivrRow.input_digits}
+                                  onChangeText={(data, event) =>
+                                    handleChangeDigits(
+                                      data,
+                                      index + 1,
+                                      event,
+                                      obj
+                                    )
+                                  }
+                                  Required={false}
+                                  CustomErrorLine={"Enter proper digits"}
+                                />
+                              </td>
+                              <td>
+                                <FormTextDropdown
+                                  Value={ivrRow.destination}
+                                  onSelect={(data, event) =>
+                                    handleChangeDestinationType(
+                                      data,
+                                      index + 1,
+                                      event,
+                                      obj
+                                    )
+                                  }
+                                  label={"Destination Type *"}
+                                  CustomErrorLine={"Choose one"}
+                                  Required={true}
+                                  Options={desinationTypeList}
+                                />
+                              </td>
+                            </tr>
+                          );
                         })
                       ) : (
                         <h5>No records found</h5>
