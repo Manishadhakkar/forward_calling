@@ -61,22 +61,38 @@ export const assignCompanyReq = (body) => {
   });
 };
 
-export const assignCampaignTargetReq = (body) =>{
+export const assignCampaignTargetReq = (body) => {
   return axios({
     method: "POST",
     url: "/campaign-member/add",
     data: body,
   });
-}
-export const removeCampaignTargetReq = (id) =>{
+};
+export const removeCampaignTargetReq = (id) => {
   return axios({
     method: "DELETE",
-    url: `/campaign-member/remove/${id}`
+    url: `/campaign-member/remove/${id}`,
   });
-}
-export const getCompanyTargetAndRemainsReq = (id) =>{
+};
+export const getCompanyTargetAndRemainsReq = (id) => {
   return axios({
     method: "GET",
-    url: `/campaign-member/campaignMemberAndOther/${id}`
-  })
-}
+    url: `/campaign-member/campaignMemberAndOther/${id}`,
+  });
+};
+
+export const updateTargetPriorityReq = (body) => {
+  return axios({
+    method: "PATCH",
+    url: `/campaign-member/priority/${body.id}`,
+    data: body.data,
+  });
+};
+
+export const updateTargetWeightageReq = (body) => {
+  return axios({
+    method: "PATCH",
+    url: `/campaign-member/weightage/${body.id}`,
+    data: body.data,
+  });
+};

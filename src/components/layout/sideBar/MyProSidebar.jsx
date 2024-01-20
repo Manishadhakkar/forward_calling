@@ -14,7 +14,13 @@ import { SidebarHeader } from "./SidebarHeader";
 import { Aave, Buildings2, Profile2User, Setting4 } from "iconsax-react";
 import { HiOutlineHashtag } from "react-icons/hi2";
 import { IoServerOutline } from "react-icons/io5";
-import { SiGroupme } from "react-icons/si";
+import { LiaGoogleWallet } from "react-icons/lia";
+import { RiFolderHistoryFill } from "react-icons/ri";
+import { BsFileEarmarkMusic } from "react-icons/bs";
+import { MdRecordVoiceOver } from "react-icons/md";
+// import { SiGroupme } from "react-icons/si";
+import { IoMdRecording } from "react-icons/io";
+import { SlWallet } from "react-icons/sl";
 import { GiCarrier, GiSecurityGate } from "react-icons/gi";
 import {
   MdAppBlocking,
@@ -46,7 +52,7 @@ const MyProSidebar = () => {
 
   let is_campaign_active =
     location.pathname === "/campaigns" ||
-    location.pathname === "/campaigns/configuration";
+    location.pathname === "/campaigns/update-campaigns";
 
   let is_access_active =
     location.pathname === "/access/users" ||
@@ -57,6 +63,13 @@ const MyProSidebar = () => {
     location.pathname === "/auth/roles" ||
     location.pathname === "/auth/configuration";
 
+  let is_wallet_active =
+    location.pathname === "/wallet" || location.pathname === "/wallet/add";
+
+  let is_ivr_active =
+    location.pathname === "/ivr/media" ||
+    location.pathname === "/ivr/manage-ivr";
+    
   useEffect(() => {
     setUrl(location.pathname);
   }, [location]);
@@ -217,7 +230,7 @@ const MyProSidebar = () => {
                     </MenuItem>
                   </Tooltip>
                 )}
-                <Tooltip
+                {/* <Tooltip
                   title={collapsed && "Group"}
                   placement="right"
                   arrow
@@ -230,7 +243,7 @@ const MyProSidebar = () => {
                   >
                     <Typography>{"Group"}</Typography>
                   </MenuItem>
-                </Tooltip>
+                </Tooltip> */}
                 <Tooltip
                   title={collapsed && "Block Numbers"}
                   placement="right"
@@ -244,6 +257,64 @@ const MyProSidebar = () => {
                   >
                     <Typography>{"Block Numbers"}</Typography>
                   </MenuItem>
+                </Tooltip>
+
+                <Tooltip
+                  title={collapsed && "Wallet"}
+                  placement="right"
+                  arrow
+                  TransitionComponent={Zoom}
+                >
+                  <SubMenu
+                    label="Wallet"
+                    active={is_wallet_active}
+                    defaultOpen={is_wallet_active}
+                    icon={<SlWallet size="25" variant="Outline" />}
+                  >
+                    <MenuItem
+                      active={url === "/wallet"}
+                      component={<Link to="/wallet" />}
+                      icon={<RiFolderHistoryFill size="20" variant="Outline" />}
+                    >
+                      Wallet
+                    </MenuItem>
+                    <MenuItem
+                      active={url === "/wallet/add"}
+                      component={<Link to="/wallet/add" />}
+                      icon={<LiaGoogleWallet size="20" variant="Outline" />}
+                    >
+                      Add Wallet
+                    </MenuItem>
+                  </SubMenu>
+                </Tooltip>
+
+                <Tooltip
+                  title={collapsed && "IVR"}
+                  placement="right"
+                  arrow
+                  TransitionComponent={Zoom}
+                >
+                  <SubMenu
+                    label="IVR"
+                    active={is_ivr_active}
+                    defaultOpen={is_ivr_active}
+                    icon={<MdRecordVoiceOver size="25" variant="Outline" />}
+                  >
+                    <MenuItem
+                      active={url === "/ivr/media"}
+                      component={<Link to="/ivr/media" />}
+                      icon={<BsFileEarmarkMusic size="20" variant="Outline" />}
+                    >
+                      Media
+                    </MenuItem>
+                    <MenuItem
+                      active={url === "/ivr/manage-ivr"}
+                      component={<Link to="/ivr/manage-ivr" />}
+                      icon={<IoMdRecording size="20" variant="Outline" />}
+                    >
+                      Manage Ivr
+                    </MenuItem>
+                  </SubMenu>
                 </Tooltip>
 
                 {(isAuthorizedFunc(GET_USER) ||

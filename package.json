@@ -22,12 +22,11 @@
     "chart.js": "^4.4.0",
     "iconsax-react": "^0.0.8",
     "install": "^0.13.0",
-    "laravel-echo": "^1.15.3",
     "lodash": "^4.17.21",
     "material-react-table": "^1.14.0",
+    "moment": "^2.30.1",
     "mui-one-time-password-input": "^2.0.0",
     "mui-tel-input": "^4.0.0",
-    "pusher-js": "^8.4.0-rc2",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.1",
     "react-chartjs-2": "^5.2.0",
@@ -47,7 +46,6 @@
     "react-toastify": "^9.1.3",
     "redux-thunk": "^2.4.2",
     "rsuite": "^5.40.0",
-    "socket.io-client": "^4.7.3",
     "start": "^5.1.0",
     "sweetalert2": "^11.7.32",
     "web-vitals": "^2.1.4"
@@ -76,6 +74,8 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/fs-extra": "^11.0.1",
-    "@types/lodash": "^4.14.197"
+    "@types/lodash": "^4.14.197",
+    "laravel-echo": "^1.15.3",
+    "pusher-js": "^8.4.0-rc2"
   }
 }

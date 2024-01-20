@@ -9,11 +9,10 @@ import "./styles.css";
 import {
   MdAssignmentInd,
   MdDeleteForever,
-  MdMotionPhotosOn,
-  MdMotionPhotosPause,
   MdOutlineSettingsBackupRestore,
   MdPhoneCallback,
   MdPhonePaused,
+  MdRemoveRedEye,
 } from "react-icons/md";
 
 const DefaultTable = (props) => {
@@ -24,12 +23,14 @@ const DefaultTable = (props) => {
     handleDeleteAction,
     handleStatusAction,
     handlePlayPause,
-    isEditable,
-    isDeletable,
-    isStatusChangable,
-    isPlayPause,
-    isAssignable,
     handleAssignChangable,
+    handleViewChange,
+    isEditable = false,
+    isDeletable = false,
+    isStatusChangable = false,
+    isPlayPause = false,
+    isAssignable = false,
+    isView = false,
   } = props;
 
   const theme = useTheme();
@@ -64,9 +65,13 @@ const DefaultTable = (props) => {
     handlePlayPause(ele);
   };
 
-  const handleChangeAssign = (ele)=>{
-    handleAssignChangable(ele)
-  }
+  const handleChangeAssign = (ele) => {
+    handleAssignChangable(ele);
+  };
+
+  const handleChangeView = (ele) => {
+    handleViewChange(ele);
+  };
 
   return (
     <MaterialReactTable
@@ -165,13 +170,16 @@ const DefaultTable = (props) => {
           )}
 
           {isAssignable && (
-            <Tooltip
-              arrow
-              placement="right"
-              title={"Assign to"}
-            >
+            <Tooltip arrow placement="right" title={"Assign to"}>
               <IconButton onClick={() => handleChangeAssign(row.original)}>
                 <MdAssignmentInd />
+              </IconButton>
+            </Tooltip>
+          )}
+          {isView && (
+            <Tooltip arrow placement="left" title="Edit">
+              <IconButton onClick={() => handleChangeView(row.original)}>
+                <MdRemoveRedEye />
               </IconButton>
             </Tooltip>
           )}

@@ -2,14 +2,12 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 const user = JSON.parse(localStorage.getItem("user"));
+
 let headers = {
-  "Content-Type": "application/json",
+  "Content-Type": "application/json"
 };
 if (user && user.token) {
   headers["Authorization"] = `Bearer ${user.token}`;
-  // headers = {
-  //   "X-ACCESS-TOKEN": `Bearer ${user.token}`,
-  // };
 }
 export const BASE_URL = process.env.REACT_APP_BASE_URL;
 const headerOption = {

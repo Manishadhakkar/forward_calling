@@ -58,6 +58,14 @@ const ManageBlkNumber = lazy(() =>
   import("../pages/app/blockNumber/component/ManageBlockNumber")
 );
 
+const WalletHistoryPage = lazy(() =>
+  import("../pages/app/wallet/comonent/WalletContainer")
+);
+
+const AddWalletPage = lazy(() =>
+  import("../pages/app/wallet/comonent/AddWallet")
+);
+
 const PageNotFound = lazy(() =>
   import("../pages/app/pageNotFound/PageNotFound")
 );
@@ -83,7 +91,19 @@ const WalletPaymentPage = lazy(() =>
   import("../pages/app/paymentPage/component/WalletPayment")
 );
 
+const IvrMedia = lazy(() =>
+  import("../pages/app/ivrMedia/component/IvrMedia")
+);
+
+const IvrManage = lazy(() =>
+  import("../pages/app/ivrManage/component/ManageIvr")
+);
+
 const VerifyCardPage = lazy(() => import("../pages/app/verifyOtp/VerifyOtp"));
+
+const SuccessPage = lazy(() =>
+  import("../pages/app/paymentPage/component/SuccessPayment")
+);
 
 const ChangePassword = lazy(() =>
   import("../pages/auth/changePassword/component/ChangePassword")
@@ -116,6 +136,9 @@ const Router = () => {
                         element={<UpdateCampaign />}
                       />
                     )}
+
+                    <Route path="/wallet" element={<WalletHistoryPage />} />
+                    <Route path="/wallet/add" element={<AddWalletPage />} />
 
                     {isAuthorizedFunc(GET_TARGET) && (
                       <Route path="/targets" element={<ManageTarget />} />
@@ -164,11 +187,14 @@ const Router = () => {
                       path="/purchase-number/invoice-number/crypto-payment"
                       element={<CryptoPaymentPage />}
                     />
-                    
+
                     <Route
                       path="/purchase-number/invoice-number/wallet-payment"
                       element={<WalletPaymentPage />}
                     />
+
+                    <Route path="/ivr/media" element={<IvrMedia />} />
+                    <Route path="/ivr/manage-ivr" element={<IvrManage />} />                  
 
                     <Route
                       path="/purchase-number/invoice-number/card-payment"
@@ -178,6 +204,11 @@ const Router = () => {
                     <Route
                       path="/purchase-number/invoice-number/verification"
                       element={<VerifyCardPage />}
+                    />
+
+                    <Route
+                      path="/purchase-number/invoice-number/success"
+                      element={<SuccessPage />}
                     />
 
                     {isAuthorizedFunc(GET_NUMBER) && (

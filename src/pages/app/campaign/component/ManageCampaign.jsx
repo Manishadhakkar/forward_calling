@@ -40,6 +40,8 @@ import {
   getCompanyTargetAndRemainsReq,
   removeCampaignTargetReq,
   updateCampaignRequest,
+  updateTargetPriorityReq,
+  updateTargetWeightageReq,
 } from "../service/campaign.request";
 import Loader from "../../../../components/Loader/Loader";
 import { PiCopySimpleThin } from "react-icons/pi";
@@ -54,6 +56,11 @@ import { FaCircle } from "react-icons/fa";
 import "./styles.css";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+import PropTypes from "prop-types";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Pusher from "pusher-js";
+// import pusher from "../../../../config/path-to-your-pusher-config";
 
 const blue = {
   100: "#daecff",
@@ -78,6 +85,39 @@ const grey = {
   800: "#303740",
   900: "#1C2025",
 };
+
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -191,6 +231,14 @@ const UpdateCampaign = () => {
   const [expanded, setExpanded] = useState("panel1");
   const [message, setMessage] = useState("");
 
+  const [timer, setTimer] = useState(0);
+
+  const [tabValue, setTabValue] = React.useState(0);
+
+  const handleChangeTab = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
   const [searchTargetData, setSearchTargetData] = useState([]);
   const [searchCampaignData, setSearchCampaignData] = useState([]);
 
@@ -201,6 +249,17 @@ const UpdateCampaign = () => {
   const [initialValue, setInitValue] = useState({});
 
   const campaign_id = location?.state?.campaign_id;
+
+  // const addRowTable = () => {
+  //   const data = {
+  //     input_digits: [],
+  //     operation: allOperation,
+  //     bonus: '0',
+  //     partial_pay: '0',
+  //     gang_number: ' ',
+  //   }
+  //   setWorklogs([...workLogs, data])
+  // }
 
   const format_list = [
     { id: 1, label: "(###) #### ### ###", value: "(###) #### ### ###" },
@@ -435,9 +494,10 @@ const UpdateCampaign = () => {
           destination: ele.target.forwarding_number,
           type: ele.target.type,
           status: ele.target.status,
-          weightage: null,
-          priority: null,
+          weightage: ele.weightage,
+          priority: ele.priority,
         }));
+        console.log(res.data.data.CampaignMember);
         setCampaignTarget(
           assignTargetList !== undefined ? assignTargetList : []
         );
@@ -451,7 +511,7 @@ const UpdateCampaign = () => {
         setIsLoader(false);
       }
     })();
-  }, [message]);
+  }, [timer]);
 
   const handleClick = () => {
     setOpenClip(true);
@@ -466,44 +526,132 @@ const UpdateCampaign = () => {
     );
   };
 
-  const handleDecrementPriority = (id) => {
-    setCampaignTarget((prevData) =>
-      prevData.map((item) =>
-        item.id === id
-          ? { ...item, priority: parseInt(item.priority) - 1 }
-          : item
-      )
-    );
+  const handleUpdatePriority = async (e, row) => {
+    if (e.target.value !== row.priority) {
+      try {
+        setIsLoader(true);
+        const reqData = {
+          id: row.id,
+          data: {
+            priority: parseInt(e.target.value),
+          },
+        };
+        const res = await updateTargetPriorityReq(reqData);
+        setTimer((prevTimer) => prevTimer + 1);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+      } catch (err) {
+        setBarVariant("error");
+        setMessage(err.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setErrorMessage("");
+      } finally {
+        setIsLoader(false);
+      }
+    }
   };
 
-  const handleIncrementPriority = (id) => {
-    setCampaignTarget((prevData) =>
-      prevData.map((item) =>
-        item.id === id
-          ? { ...item, priority: parseInt(item.priority) + 1 }
-          : item
-      )
-    );
+  const handleDecrementPriority = async (row) => {
+    if (row.priority === 0) {
+      return;
+    }
+    try {
+      setIsLoader(true);
+      const reqData = {
+        id: row.id,
+        data: {
+          priority: parseInt(row.priority) - 1,
+        },
+      };
+      const res = await updateTargetPriorityReq(reqData);
+      setTimer((prevTimer) => prevTimer + 1);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
   };
 
-  const handleDecrementWeightage = (id) => {
-    setCampaignTarget((prevData) =>
-      prevData.map((item) =>
-        item.id === id
-          ? { ...item, weightage: parseInt(item.weightage) - 1 }
-          : item
-      )
-    );
+  const handleIncrementPriority = async (row) => {
+    try {
+      setIsLoader(true);
+      const reqData = {
+        id: row.id,
+        data: {
+          priority: parseInt(row.priority) + 1,
+        },
+      };
+      const res = await updateTargetPriorityReq(reqData);
+      setTimer((prevTimer) => prevTimer + 1);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
   };
 
-  const handleIncrementWeightage = (id) => {
-    setCampaignTarget((prevData) =>
-      prevData.map((item) =>
-        item.id === id
-          ? { ...item, weightage: parseInt(item.weightage) + 1 }
-          : item
-      )
-    );
+  const handleDecrementWeightage = async (row) => {
+    if (row.weightage === 0) {
+      return;
+    }
+    try {
+      setIsLoader(true);
+      const reqData = {
+        id: row.id,
+        data: {
+          weightage: parseInt(row.weightage) - 1,
+        },
+      };
+      const res = await updateTargetWeightageReq(reqData);
+      setTimer((prevTimer) => prevTimer + 1);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
+  };
+
+  const handleIncrementWeightage = async (row) => {
+    try {
+      setIsLoader(true);
+      const reqData = {
+        id: row.id,
+        data: {
+          weightage: parseInt(row.weightage) + 1,
+        },
+      };
+      const res = await updateTargetWeightageReq(reqData);
+      setTimer((prevTimer) => prevTimer + 1);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
   };
 
   const handleChangeWeightage = (e, id) => {
@@ -512,6 +660,32 @@ const UpdateCampaign = () => {
         item.id === id ? { ...item, weightage: parseInt(e.target.value) } : item
       )
     );
+  };
+
+  const handleUpdateWeightage = async (e, row) => {
+    if (e.target.value !== row.weightage) {
+      try {
+        setIsLoader(true);
+        const reqData = {
+          id: row.id,
+          data: {
+            weightage: parseInt(e.target.value),
+          },
+        };
+        const res = await updateTargetWeightageReq(reqData);
+        setTimer((prevTimer) => prevTimer + 1);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+      } catch (err) {
+        setBarVariant("error");
+        setMessage(err.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setErrorMessage("");
+      } finally {
+        setIsLoader(false);
+      }
+    }
   };
 
   const handleChangeAttempt = (e) => {
@@ -572,10 +746,11 @@ const UpdateCampaign = () => {
       const reqData = {
         campaign_id,
         target_id: val.id,
-        weightage: val.weightage,
-        priority: val.priority,
+        weightage: 0,
+        priority: 0,
       };
       const res = await assignCampaignTargetReq(reqData);
+      setTimer((prevTimer) => prevTimer + 1);
       setBarVariant("success");
       setMessage(res.data.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
@@ -589,20 +764,63 @@ const UpdateCampaign = () => {
     }
   };
 
-  const handleClickRemove = (val) => {
-    removeCampaignTargetReq(val.id)
-      .then((res) => {
-        setBarVariant("success");
-        setMessage(res.data.message);
-        setSnackbarOpen({ ...snackbarOpen, open: true });
-      })
-      .catch((err) => {
+  const handleClickRemove = async (val) => {
+    try {
+      setIsLoader(true);
+      const res = await removeCampaignTargetReq(val.id);
+      setTimer((prevTimer) => prevTimer + 1);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setIsLoader(false);
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
+  };
+
+  useEffect(() => {
+    const myFunction = async () => {
+      try {
+        const res = await getCompanyTargetAndRemainsReq(campaign_id);
+        const targetList = res.data.data.AllTargets?.map((ele) => ({
+          id: ele.id,
+          name: ele.name,
+          destination: ele.forwarding_number,
+          type: ele.type,
+          status: ele.status,
+          weightage: null,
+          priority: null,
+        }));
+        const assignTargetList = res.data.data.CampaignMember?.map((ele) => ({
+          id: ele.id,
+          name: ele.target.name,
+          destination: ele.target.forwarding_number,
+          type: ele.target.type,
+          status: ele.target.status,
+          weightage: ele.weightage,
+          priority: ele.priority,
+        }));
+        setCampaignTarget(
+          assignTargetList !== undefined ? assignTargetList : []
+        );
+        setTargetList(targetList !== undefined ? targetList : []);
+      } catch (err) {
         setBarVariant("error");
         setMessage(err.message);
-        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setSnackbarOpen((prev) => ({ ...prev, open: true }));
         setErrorMessage("");
-      });
-  };
+      } finally {
+        setIsLoader(false);
+      }
+    };
+    const intervalId = setInterval(myFunction, 8000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <>
@@ -941,408 +1159,470 @@ const UpdateCampaign = () => {
                 <Divider />
               </AccordionSummary>
               <AccordionDetails>
-                <Grid container spacing={3}>
-                  <Grid item md={5} sm={12}>
-                    <div>
-                      <div>
-                        <Paper
-                          component="form"
-                          sx={{
-                            p: "2px 4px",
-                            display: "flex",
-                            alignItems: "center",
-                            width: "50%",
-                            border: `1px solid  ${colors.blueAccent[700]}`,
-                          }}
-                        >
-                          <InputBase
-                            sx={{ ml: 1, flex: 1 }}
-                            placeholder="Search ..."
-                            inputProps={{ "aria-label": "search..." }}
-                            value={searchTargetParams}
-                            onChange={handleChangeSearch}
-                          />
-                        </Paper>
-                      </div>
-                      <div>
-                        <TableContainer
-                          sx={{
-                            width: "100%",
-                            bgcolor: colors.blueAccent[900],
-                            maxHeight: 400,
-                          }}
-                        >
-                          <Table
-                            size={"small"}
-                            sx={{ width: "100%" }}
-                            aria-label="Target table"
-                            stickyHeader
-                          >
-                            <TableHead>
-                              <TableRow>
-                                <StyledTableCell align="center">
-                                  Name
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Type
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Destination
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Status
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Action
-                                </StyledTableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {searchTargetData.length > 0 ? (
-                                searchTargetData.map((row) => (
-                                  <StyledTableRow key={row.id}>
+                <Box sx={{ width: "100%" }}>
+                  <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                    <Tabs value={tabValue} onChange={handleChangeTab}>
+                      <Tab
+                        sx={{
+                          "&.Mui-selected": {
+                            color: colors.greenAccent[900],
+                            backgroundColor: colors.primary[100],
+                            fontWeight: 400,
+                          },
+                          backgroundColor: colors.primary[700],
+                          textTransform: "none",
+                        }}
+                        label="Select Target"
+                        {...a11yProps(0)}
+                      />
+                      <Tab
+                        sx={{
+                          "&.Mui-selected": {
+                            color: colors.greenAccent[900],
+                            backgroundColor: colors.primary[100],
+                            fontWeight: 400,
+                          },
+                          backgroundColor: colors.primary[700],
+                          textTransform: "none",
+                        }}
+                        label="Create Ivr"
+                        {...a11yProps(1)}
+                      />
+                    </Tabs>
+                  </Box>
+                  <CustomTabPanel value={tabValue} index={0}>
+                    <Grid container spacing={3}>
+                      <Grid item md={5} sm={12}>
+                        <div>
+                          <div>
+                            <Paper
+                              component="form"
+                              sx={{
+                                p: "2px 4px",
+                                display: "flex",
+                                alignItems: "center",
+                                width: "50%",
+                                border: `1px solid  ${colors.blueAccent[700]}`,
+                              }}
+                            >
+                              <InputBase
+                                sx={{ ml: 1, flex: 1 }}
+                                placeholder="Search ..."
+                                inputProps={{ "aria-label": "search..." }}
+                                value={searchTargetParams}
+                                onChange={handleChangeSearch}
+                              />
+                            </Paper>
+                          </div>
+                          <div>
+                            <TableContainer
+                              sx={{
+                                width: "100%",
+                                bgcolor: colors.blueAccent[900],
+                                maxHeight: 400,
+                              }}
+                            >
+                              <Table
+                                size={"small"}
+                                sx={{ width: "100%" }}
+                                aria-label="Target table"
+                                stickyHeader
+                              >
+                                <TableHead>
+                                  <TableRow>
                                     <StyledTableCell align="center">
-                                      <Tooltip
-                                        placement="right-start"
-                                        TransitionComponent={Zoom}
-                                        arrow
-                                        title={row.name}
-                                      >
-                                        <span>{row.name}</span>
-                                      </Tooltip>
+                                      Name
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
-                                      <Tooltip
-                                        TransitionComponent={Zoom}
-                                        title={row.type}
-                                        arrow
-                                        placement="right-start"
+                                      Type
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
+                                      Destination
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
+                                      Status
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
+                                      Action
+                                    </StyledTableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {searchTargetData.length > 0 ? (
+                                    searchTargetData.map((row) => (
+                                      <StyledTableRow key={row.id}>
+                                        <StyledTableCell align="center">
+                                          <Tooltip
+                                            placement="right-start"
+                                            TransitionComponent={Zoom}
+                                            arrow
+                                            title={row.name}
+                                          >
+                                            <span>{row.name}</span>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Tooltip
+                                            TransitionComponent={Zoom}
+                                            title={row.type}
+                                            arrow
+                                            placement="right-start"
+                                          >
+                                            <IconButton
+                                              aria-label="add"
+                                              size="small"
+                                              disableRipple
+                                              sx={{ cursor: "default" }}
+                                            >
+                                              {row.type === "Number" ? (
+                                                <FaMobileRetro size="18px" />
+                                              ) : (
+                                                <SiWebmoney size="18px" />
+                                              )}
+                                            </IconButton>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Tooltip
+                                            TransitionComponent={Zoom}
+                                            title={row.destination}
+                                            arrow
+                                            placement="right-start"
+                                          >
+                                            <span>{row.destination}</span>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Tooltip
+                                            title={
+                                              row.status === 1
+                                                ? "Live"
+                                                : row.status === 2
+                                                ? "Pause"
+                                                : "Inactive"
+                                            }
+                                            arrow
+                                            placement="right-start"
+                                            TransitionComponent={Zoom}
+                                          >
+                                            <IconButton
+                                              aria-label="add"
+                                              size="small"
+                                              disableRipple
+                                              sx={{ cursor: "default" }}
+                                            >
+                                              {row.status === 1 ? (
+                                                <FaCircle
+                                                  size="15px"
+                                                  color={colors.green[100]}
+                                                />
+                                              ) : row.status === 2 ? (
+                                                <FaCircle
+                                                  size="15px"
+                                                  color="yellow"
+                                                />
+                                              ) : (
+                                                <FaCircle
+                                                  size="15px"
+                                                  color="red"
+                                                />
+                                              )}
+                                            </IconButton>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Tooltip
+                                            placement="right-start"
+                                            TransitionComponent={Zoom}
+                                            arrow
+                                            title="Add"
+                                          >
+                                            <IconButton
+                                              aria-label="add"
+                                              size="18px"
+                                              onClick={(e) =>
+                                                handleClickCart(row)
+                                              }
+                                            >
+                                              <FcCallTransfer
+                                                color={colors.greenAccent[300]}
+                                              />
+                                            </IconButton>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                      </StyledTableRow>
+                                    ))
+                                  ) : (
+                                    <TableRow>
+                                      <StyledTableCell
+                                        align="center"
+                                        colSpan={7}
                                       >
-                                        <IconButton
-                                          aria-label="add"
-                                          size="small"
-                                          disableRipple
-                                          sx={{ cursor: "default" }}
+                                        No records found
+                                      </StyledTableCell>
+                                    </TableRow>
+                                  )}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          </div>
+                        </div>
+                      </Grid>
+                      <Grid item md={7} sm={12}>
+                        <div>
+                          <div>
+                            <Paper
+                              component="form"
+                              sx={{
+                                p: "2px 4px",
+                                display: "flex",
+                                alignItems: "center",
+                                width: "50%",
+                                border: `1px solid  ${colors.blueAccent[700]}`,
+                              }}
+                            >
+                              <InputBase
+                                sx={{ ml: 1, flex: 1 }}
+                                placeholder="Search ..."
+                                inputProps={{ "aria-label": "search..." }}
+                                value={searchCampaignParams}
+                                onChange={handleChangeCampaignSearch}
+                              />
+                            </Paper>
+                          </div>
+                          <div>
+                            <TableContainer
+                              sx={{
+                                width: "100%",
+                                maxHeight: 400,
+                                bgcolor: colors.blueAccent[900],
+                              }}
+                            >
+                              <Table
+                                size={"small"}
+                                sx={{ width: "100%" }}
+                                aria-label="Campaign target table"
+                                stickyHeader
+                              >
+                                <TableHead>
+                                  <TableRow>
+                                    <StyledTableCell>Name</StyledTableCell>
+                                    <StyledTableCell align="center">
+                                      Type
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
+                                      Destination
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
+                                      Priority
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
+                                      Weightage
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
+                                      Status
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
+                                      Action
+                                    </StyledTableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {searchCampaignData.length > 0 ? (
+                                    searchCampaignData.map((row) => (
+                                      <StyledTableRow key={row.id}>
+                                        <StyledTableCell
+                                          component="th"
+                                          scope="row"
                                         >
-                                          {row.type === "Number" ? (
-                                            <FaMobileRetro size="18px" />
-                                          ) : (
-                                            <SiWebmoney size="18px" />
-                                          )}
-                                        </IconButton>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                      <Tooltip
-                                        TransitionComponent={Zoom}
-                                        title={row.destination}
-                                        arrow
-                                        placement="right-start"
-                                      >
-                                        <span>{row.destination}</span>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                      <Tooltip
-                                        title={
-                                          row.status === 1
-                                            ? "Live"
-                                            : row.status === 2
-                                            ? "Pause"
-                                            : "Inactive"
-                                        }
-                                        arrow
-                                        placement="right-start"
-                                        TransitionComponent={Zoom}
-                                      >
-                                        <IconButton
-                                          aria-label="add"
-                                          size="small"
-                                          disableRipple
-                                          sx={{ cursor: "default" }}
-                                        >
-                                          {row.status === 1 ? (
-                                            <FaCircle
-                                              size="15px"
-                                              color={colors.green[100]}
+                                          <Tooltip
+                                            placement="right-start"
+                                            TransitionComponent={Zoom}
+                                            arrow
+                                            title={row.name}
+                                          >
+                                            <span> {row.name}</span>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Tooltip
+                                            TransitionComponent={Zoom}
+                                            title={row.type}
+                                            arrow
+                                            placement="right-start"
+                                          >
+                                            <IconButton
+                                              aria-label="add"
+                                              size="small"
+                                              disableRipple
+                                              sx={{ cursor: "default" }}
+                                            >
+                                              {row.type === "Number" ? (
+                                                <FaMobileRetro size="18px" />
+                                              ) : (
+                                                <SiWebmoney size="18px" />
+                                              )}
+                                            </IconButton>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Tooltip
+                                            TransitionComponent={Zoom}
+                                            title={row.destination}
+                                          >
+                                            <span> {row.destination}</span>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Box
+                                            display="flex"
+                                            justifyContent="center"
+                                            alignItems="center"
+                                          >
+                                            <StyledButton
+                                              onClick={() =>
+                                                handleDecrementPriority(row)
+                                              }
+                                            >
+                                              <RemoveIcon fontSize="small" />
+                                            </StyledButton>
+                                            <StyledInput
+                                              value={row.priority}
+                                              onChange={(e) =>
+                                                handleChangePriority(e, row.id)
+                                              }
+                                              onBlur={(e) => {
+                                                handleUpdatePriority(e, row);
+                                              }}
+                                              type="number"
+                                              min={0}
+                                              max={999}
                                             />
-                                          ) : row.status === 2 ? (
-                                            <FaCircle
-                                              size="15px"
-                                              color="yellow"
+                                            <StyledButton
+                                              onClick={() =>
+                                                handleIncrementPriority(row)
+                                              }
+                                            >
+                                              <AddIcon fontSize="small" />
+                                            </StyledButton>
+                                          </Box>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Box
+                                            display="flex"
+                                            justifyContent="center"
+                                            alignItems="center"
+                                          >
+                                            <StyledButton
+                                              onClick={() =>
+                                                handleDecrementWeightage(row)
+                                              }
+                                            >
+                                              <RemoveIcon fontSize="small" />
+                                            </StyledButton>
+                                            <StyledInput
+                                              value={row.weightage}
+                                              onChange={(e) =>
+                                                handleChangeWeightage(e, row.id)
+                                              }
+                                              onBlur={(e) => {
+                                                handleUpdateWeightage(e, row);
+                                              }}
+                                              min="0"
+                                              type="number"
+                                              onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"
                                             />
-                                          ) : (
-                                            <FaCircle size="15px" color="red" />
-                                          )}
-                                        </IconButton>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                      <Tooltip
-                                        placement="right-start"
-                                        TransitionComponent={Zoom}
-                                        arrow
-                                        title="Add"
+                                            <StyledButton
+                                              onClick={() =>
+                                                handleIncrementWeightage(row)
+                                              }
+                                            >
+                                              <AddIcon fontSize="small" />
+                                            </StyledButton>
+                                          </Box>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Tooltip
+                                            title={
+                                              row.status === 1
+                                                ? "Live"
+                                                : row.status === 2
+                                                ? "Pause"
+                                                : "Inactive"
+                                            }
+                                            arrow
+                                            placement="right-start"
+                                            TransitionComponent={Zoom}
+                                          >
+                                            <IconButton
+                                              aria-label="add"
+                                              size="small"
+                                              disableRipple
+                                              sx={{ cursor: "default" }}
+                                            >
+                                              {row.status === 1 ? (
+                                                <FaCircle
+                                                  size="15px"
+                                                  color={colors.green[100]}
+                                                />
+                                              ) : row.status === 2 ? (
+                                                <FaCircle
+                                                  size="15px"
+                                                  color="yellow"
+                                                />
+                                              ) : (
+                                                <FaCircle
+                                                  size="15px"
+                                                  color="red"
+                                                />
+                                              )}
+                                            </IconButton>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                          <Tooltip
+                                            placement="right-start"
+                                            TransitionComponent={Zoom}
+                                            title="Delete"
+                                          >
+                                            <IconButton
+                                              aria-label="add"
+                                              size="small"
+                                              onClick={() =>
+                                                handleClickRemove(row)
+                                              }
+                                            >
+                                              <MdDeleteForever
+                                                fontSize="inherit"
+                                                color={colors.redAccent[400]}
+                                              />
+                                            </IconButton>
+                                          </Tooltip>
+                                        </StyledTableCell>
+                                      </StyledTableRow>
+                                    ))
+                                  ) : (
+                                    <TableRow>
+                                      <StyledTableCell
+                                        align="center"
+                                        colSpan={7}
                                       >
-                                        <IconButton
-                                          aria-label="add"
-                                          size="18px"
-                                          onClick={(e) => handleClickCart(row)}
-                                        >
-                                          <FcCallTransfer
-                                            color={colors.greenAccent[300]}
-                                          />
-                                        </IconButton>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                  </StyledTableRow>
-                                ))
-                              ) : (
-                                <TableRow>
-                                  <StyledTableCell align="center" colSpan={7}>
-                                    No records found
-                                  </StyledTableCell>
-                                </TableRow>
-                              )}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      </div>
-                    </div>
-                  </Grid>
-                  <Grid item md={7} sm={12}>
-                    <div>
-                      <div>
-                        <Paper
-                          component="form"
-                          sx={{
-                            p: "2px 4px",
-                            display: "flex",
-                            alignItems: "center",
-                            width: "50%",
-                            border: `1px solid  ${colors.blueAccent[700]}`,
-                          }}
-                        >
-                          <InputBase
-                            sx={{ ml: 1, flex: 1 }}
-                            placeholder="Search ..."
-                            inputProps={{ "aria-label": "search..." }}
-                            value={searchCampaignParams}
-                            onChange={handleChangeCampaignSearch}
-                          />
-                        </Paper>
-                      </div>
-                      <div>
-                        <TableContainer
-                          sx={{
-                            width: "100%",
-                            maxHeight: 400,
-                            bgcolor: colors.blueAccent[900],
-                          }}
-                        >
-                          <Table
-                            size={"small"}
-                            sx={{ width: "100%" }}
-                            aria-label="Campaign target table"
-                            stickyHeader
-                          >
-                            <TableHead>
-                              <TableRow>
-                                <StyledTableCell>Name</StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Type
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Destination
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Priority
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Weightage
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Status
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  Action
-                                </StyledTableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {searchCampaignData.length > 0 ? (
-                                searchCampaignData.map((row) => (
-                                  <StyledTableRow key={row.id}>
-                                    <StyledTableCell component="th" scope="row">
-                                      <Tooltip
-                                        placement="right-start"
-                                        TransitionComponent={Zoom}
-                                        arrow
-                                        title={row.name}
-                                      >
-                                        <span> {row.name}</span>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                      <Tooltip
-                                        TransitionComponent={Zoom}
-                                        title={row.type}
-                                        arrow
-                                        placement="right-start"
-                                      >
-                                        <IconButton
-                                          aria-label="add"
-                                          size="small"
-                                          disableRipple
-                                          sx={{ cursor: "default" }}
-                                        >
-                                          {row.type === "Number" ? (
-                                            <FaMobileRetro size="18px" />
-                                          ) : (
-                                            <SiWebmoney size="18px" />
-                                          )}
-                                        </IconButton>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                      <Tooltip
-                                        TransitionComponent={Zoom}
-                                        title={row.destination}
-                                      >
-                                        <span> {row.destination}</span>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                      <Box
-                                        display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                      >
-                                        <StyledButton
-                                          onClick={() =>
-                                            handleDecrementPriority(row.id)
-                                          }
-                                        >
-                                          <RemoveIcon fontSize="small" />
-                                        </StyledButton>
-                                        <StyledInput
-                                          value={row.priority}
-                                          onChange={(e) =>
-                                            handleChangePriority(e, row.id)
-                                          }
-                                          type="number"
-                                          min={0}
-                                          max={999}
-                                        />
-                                        <StyledButton
-                                          onClick={() =>
-                                            handleIncrementPriority(row.id)
-                                          }
-                                        >
-                                          <AddIcon fontSize="small" />
-                                        </StyledButton>
-                                      </Box>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                      <Box
-                                        display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                      >
-                                        <StyledButton
-                                          onClick={() =>
-                                            handleDecrementWeightage(row.id)
-                                          }
-                                        >
-                                          <RemoveIcon fontSize="small" />
-                                        </StyledButton>
-                                        <StyledInput
-                                          value={row.weightage}
-                                          onChange={(e) =>
-                                            handleChangeWeightage(e, row.id)
-                                          }
-                                          min="0"
-                                          type="number"
-                                          onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"
-                                        />
-                                        <StyledButton
-                                          onClick={() =>
-                                            handleIncrementWeightage(row.id)
-                                          }
-                                        >
-                                          <AddIcon fontSize="small" />
-                                        </StyledButton>
-                                      </Box>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                      <Tooltip
-                                        title={
-                                          row.status === 1
-                                            ? "Live"
-                                            : row.status === 2
-                                            ? "Pause"
-                                            : "Inactive"
-                                        }
-                                        arrow
-                                        placement="right-start"
-                                        TransitionComponent={Zoom}
-                                      >
-                                        <IconButton
-                                          aria-label="add"
-                                          size="small"
-                                          disableRipple
-                                          sx={{ cursor: "default" }}
-                                        >
-                                          {row.status === 1 ? (
-                                            <FaCircle
-                                              size="15px"
-                                              color={colors.green[100]}
-                                            />
-                                          ) : row.status === 2 ? (
-                                            <FaCircle
-                                              size="15px"
-                                              color="yellow"
-                                            />
-                                          ) : (
-                                            <FaCircle size="15px" color="red" />
-                                          )}
-                                        </IconButton>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                    <StyledTableCell align="center">
-                                      <Tooltip
-                                        placement="right-start"
-                                        TransitionComponent={Zoom}
-                                        title="Delete"
-                                      >
-                                        <IconButton
-                                          aria-label="add"
-                                          size="small"
-                                          onClick={() => handleClickRemove(row)}
-                                        >
-                                          <MdDeleteForever
-                                            fontSize="inherit"
-                                            color={colors.redAccent[400]}
-                                          />
-                                        </IconButton>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                  </StyledTableRow>
-                                ))
-                              ) : (
-                                <TableRow>
-                                  <StyledTableCell align="center" colSpan={7}>
-                                    No records found
-                                  </StyledTableCell>
-                                </TableRow>
-                              )}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      </div>
-                    </div>
-                  </Grid>
-                </Grid>
+                                        No records found
+                                      </StyledTableCell>
+                                    </TableRow>
+                                  )}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          </div>
+                        </div>
+                      </Grid>
+                    </Grid>
+                  </CustomTabPanel>
+                  <CustomTabPanel value={tabValue} index={1}>
+                    Ivr
+                  </CustomTabPanel>
+                </Box>
               </AccordionDetails>
             </Accordion>
             <CardActions sx={{ justifyContent: "space-between", m: 1 }}>

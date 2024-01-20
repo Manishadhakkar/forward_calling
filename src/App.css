@@ -14,7 +14,7 @@
 .error_msg {
   color: red;
   font-weight: 300;
-  padding: 0 16px;
+  /* padding: 0 16px; */
 }
 
 input::-webkit-outer-spin-button,

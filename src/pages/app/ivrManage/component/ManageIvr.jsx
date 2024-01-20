@@ -1,25 +1,26 @@
-import React, { useMemo, useState, useEffect } from "react";
-import { Box, Fab, Tooltip, Typography, useTheme } from "@mui/material";
+import React, { forwardRef, useEffect, useMemo, useState } from "react";
 import { Pagination } from "rsuite";
+import { Box, Fab, Tooltip, Typography, useTheme } from "@mui/material";
 import { Add } from "iconsax-react";
-import { TbHome2 } from "react-icons/tb";
-import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import { MdRecordVoiceOver } from "react-icons/md";
+import { TbHome2, TbTargetArrow } from "react-icons/tb";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
+import StatusChip from "../../../../components/chip/StatusChip";
 import { tokens } from "../../../../assets/color/theme";
 import { FormModal as Modal } from "../../../../components/modal/FormModal";
-import StatusBadge from "../../../../components/chip/StatusBadge";
+import Loader from "../../../../components/Loader/Loader";
 import DefaultTable from "../../../../components/tables/DefaultTable";
 import Copyright from "../../../../components/footer/Footer";
-import Loader from "../../../../components/Loader/Loader";
 import {
-  createBlockNoRequest,
-  getBlockNoRequest,
-  updateBlockNoRequest,
-  updateBlockNoStatusRequest,
-} from "../service/blocknumber.request";
-import BlockNumForm from "../../../../components/form/blockNumForm/blockNumForm";
-import { MdAppBlocking } from "react-icons/md";
+  createIvrRequest,
+  getAllIvrRequest,
+  updateIvrRequest,
+  updateStatusIvrRequest,
+} from "../service/ivr.request";
+import IvrForm from "../../../../components/form/ivrForm/IvrForm";
+import StatusBadge from "../../../../components/chip/StatusBadge";
 
 const paths = [
   {
@@ -28,27 +29,24 @@ const paths = [
     icon: <TbHome2 />,
   },
   {
-    name: "Block Number",
-    icon: <MdAppBlocking />,
+    name: "Manage Ivr",
+    icon: <MdRecordVoiceOver />,
   },
 ];
-
-const Alert = React.forwardRef(function Alert(props, ref) {
+const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const ManageBlockNumbers = () => {
+const ManageIvr = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const getId = JSON.parse(localStorage.getItem("user"));
-  const company_id = getId.user_data.company_id;
-
   const [rows, setRows] = useState([]);
   const [isLoader, setLoader] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [clickedBtn, setClickedBtn] = useState("");
   const [currentType, setCurrentType] = useState();
   const [errorMessage, setErrorMessage] = useState();
+  const [message, setMessage] = useState("");
   const [total, setTotal] = useState(0);
   const [activePage, setActivePage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -58,84 +56,54 @@ const ManageBlockNumbers = () => {
     horizontal: "right",
   });
   const [barVariant, setBarVariant] = useState("");
-  const [message, setMessage] = useState("");
   const { vertical, horizontal, open } = snackbarOpen;
+
   const columns = useMemo(
     () => [
       {
-        accessorKey: "digits",
-        header: "Number",
-        size: 200,
+        accessorKey: "name",
+        header: "Name",
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
-        muiTableHeadCell: {
+        muiTableHeadCellProps: {
           align: "left",
         },
         muiTableBodyCellProps: {
           align: "left",
         },
-      },
-      {
-        accessorKey: "subject",
-        header: "Subject",
         size: 100,
-        enableColumnDragging: false,
-        enableGlobalFilter: true,
-        enableColumnFilter: false,
-        enableColumnActions: false,
-        muiTableHeadCell: {
-          align: "left",
-        },
-        muiTableBodyCellProps: {
-          align: "left",
-        },
       },
       {
-        accessorKey: "ruletype",
-        header: "Type",
-        size: 70,
+        accessorKey: "description",
+        header: "Description",
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
-        muiTableHeadCell: {
+        muiTableHeadCellProps: {
           align: "left",
         },
         muiTableBodyCellProps: {
           align: "left",
         },
+        size: 100,
       },
       {
-        accessorKey: "transfer_number",
-        header: "Transfer No.",
-        size: 70,
+        accessorKey: "timeout",
+        header: "Timeout",
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
-        muiTableHeadCell: {
+        muiTableHeadCellProps: {
           align: "left",
         },
         muiTableBodyCellProps: {
           align: "left",
         },
-      },
-      {
-        accessorKey: "blocktype",
-        header: "Block type",
-        size: 70,
-        enableColumnDragging: false,
-        enableGlobalFilter: true,
-        enableColumnFilter: false,
-        enableColumnActions: false,
-        muiTableHeadCell: {
-          align: "left",
-        },
-        muiTableBodyCellProps: {
-          align: "left",
-        },
+        size: 100,
       },
       {
         accessorKey: "status",
@@ -162,24 +130,6 @@ const ManageBlockNumbers = () => {
     }
     setSnackbarOpen({ ...snackbarOpen, open: false });
   };
-
-  const getAllBlockNumber = (activePage, limit) => {
-    getBlockNoRequest(activePage, limit)
-      .then((res) => {
-        let getData = res.data.data.length === 0 ? [] : res.data.data.data;
-        setRows(getData);
-        setTotal(res.data.data.length === 0 ? 0 : res.data.data?.total);
-        setLoader(false);
-      })
-      .catch(() => {
-        setLoader(false);
-      });
-  };
-
-  useEffect(() => {
-    getAllBlockNumber(activePage, limit);
-  }, [activePage, limit]);
-
   const openAddModal = () => {
     setErrorMessage("");
     setIsOpen(true);
@@ -189,6 +139,7 @@ const ManageBlockNumbers = () => {
     setIsOpen(false);
   };
   const handleSelectBtn = (btn) => {
+    setErrorMessage("");
     setClickedBtn(btn);
   };
   const handleChangeEdit = (ele) => {
@@ -197,61 +148,59 @@ const ManageBlockNumbers = () => {
     setIsOpen(true);
   };
 
-  const handleStatusChange = (body) => {
+  const getAllIvr = (activePage, limit) => {
     setLoader(true);
-    const data = {
-      id: body.id,
-      status: body.status === 1 ? 0 : 1,
-    };
-    updateBlockNoStatusRequest(data)
+    getAllIvrRequest(activePage, limit)
       .then((res) => {
-        getAllBlockNumber(activePage, limit);
-        setBarVariant("success");
-        setMessage(res.data.message);
-        setSnackbarOpen({ ...snackbarOpen, open: true });
-        setErrorMessage("");
-        setIsOpen(false);
+        let getData = res.data.data.length === 0 ? [] : res.data.data.data;
+        setTotal(res.data.data.length === 0 ? 0 : res.data.data?.total);
+        setRows(getData);
         setLoader(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setLoader(false);
       });
   };
-  const handleCreateBlockNum = (value) => {
+
+  useEffect(() => {
+    getAllIvr(activePage, limit);
+  }, [activePage, limit]);
+
+  const handleAddIvr = (value) => {
     setLoader(true);
-    createBlockNoRequest(value)
+    createIvrRequest(value)
       .then((res) => {
-        getAllBlockNumber(activePage, limit);
-        setErrorMessage("");
+        getAllIvr(activePage, limit);
         setLoader(false);
-        setBarVariant("success");
+        setErrorMessage("");
         setMessage(res.data.message);
+        setBarVariant("success");
         setSnackbarOpen({ ...snackbarOpen, open: true });
         setIsOpen(false);
-        setTotal(total + 1);
       })
       .catch((err) => {
         setLoader(false);
         setErrorMessage(err.message);
       });
   };
-  const handleUpdateBlockNum = (value) => {
+
+  const handleUpdateIvr = (data) => {
     setLoader(true);
     const updateData = {
       data: {
-        digits: value.digits,
-        subject: value.subject,
-        ruletype: value.ruletype,
-        transfer_number: value.transfer_number,
-        blocktype: value.blocktype,
+        name: data.name,
+        input_auth_type: data.input_auth_type,
+        description: data.description,
+        ivr_media_id: data.ivr_media_id,
+        timeout: data.timeout,
       },
       id: currentType.id,
     };
-    updateBlockNoRequest(updateData)
+    updateIvrRequest(updateData)
       .then((res) => {
-        getAllBlockNumber(activePage, limit);
-        setErrorMessage("");
+        getAllIvr(activePage, limit);
         setLoader(false);
+        setErrorMessage("");
         setBarVariant("success");
         setMessage(res.data.message);
         setSnackbarOpen({ ...snackbarOpen, open: true });
@@ -263,18 +212,41 @@ const ManageBlockNumbers = () => {
       });
   };
 
+  const handleStatusChange = (body) => {
+    setLoader(true);
+    const data = {
+      id: body.id,
+      status: body.status === 1 ? 0 : 1,
+    };
+    updateStatusIvrRequest(data)
+      .then((res) => {
+        getAllIvr(activePage, limit);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setErrorMessage("");
+        setIsOpen(false);
+        setLoader(false);
+      })
+      .catch((err) => {
+        setBarVariant("error");
+        setMessage(err.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setErrorMessage("");
+        setIsOpen(false);
+        setLoader(false);
+      });
+  };
+
   const selectModal = () => {
     return (
-      <BlockNumForm
-        handleFormData={
-          clickedBtn === "add" ? handleCreateBlockNum : handleUpdateBlockNum
-        }
+      <IvrForm
+        handleFormData={clickedBtn === "add" ? handleAddIvr : handleUpdateIvr}
         onHandleClose={handleModalClose}
         clickedBtn={clickedBtn}
         initialValue={clickedBtn === "edit" ? currentType : {}}
         errorMessage={errorMessage}
         setErrorMessage={setErrorMessage}
-        company_id={company_id}
       />
     );
   };
@@ -314,9 +286,10 @@ const ManageBlockNumbers = () => {
       >
         <Breadcrumb pathList={paths} />
         <Box>
-          <Modal modal_width={"30%"} isOpen={isOpen}>
+          <Modal modal_width={"50%"} isOpen={isOpen}>
             {selectModal()}
           </Modal>
+
           <Box
             sx={{
               display: "flex",
@@ -326,7 +299,7 @@ const ManageBlockNumbers = () => {
             }}
           >
             <div>
-              <Typography variant="h5">{"Manage Block Number"}</Typography>
+              <Typography variant="h5">{"Manage Ivr"}</Typography>
             </div>
             <div style={{ zIndex: 1 }}>
               <Fab
@@ -347,7 +320,6 @@ const ManageBlockNumbers = () => {
               </Fab>
             </div>
           </Box>
-
           <Box>
             <DefaultTable
               isLoading={isLoader}
@@ -357,7 +329,6 @@ const ManageBlockNumbers = () => {
               handleStatusAction={handleStatusChange}
               isSearchable={true}
               isEditable={true}
-              isDeletable={false}
               isStatusChangable={true}
             />
             <Pagination
@@ -388,4 +359,4 @@ const ManageBlockNumbers = () => {
   );
 };
 
-export default ManageBlockNumbers;
+export default ManageIvr;
