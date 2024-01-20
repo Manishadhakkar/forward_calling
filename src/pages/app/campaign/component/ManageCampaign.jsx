@@ -26,6 +26,7 @@ import {
   Zoom,
   CardActions,
   Alert,
+  Fab,
 } from "@mui/material";
 import { TbAssembly, TbBrandCampaignmonitor, TbHome2 } from "react-icons/tb";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
@@ -60,6 +61,7 @@ import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Pusher from "pusher-js";
+import { Add } from "iconsax-react";
 // import pusher from "../../../../config/path-to-your-pusher-config";
 
 const blue = {
@@ -223,6 +225,11 @@ const paths = [
   },
 ];
 
+const desinationTypeList = [
+  { label: "Ivr", value: "Ivr" },
+  { label: "Target", value: "Target" },
+];
+
 const UpdateCampaign = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -247,19 +254,19 @@ const UpdateCampaign = () => {
   const [errorMessage, setErrorMessage] = useState();
 
   const [initialValue, setInitValue] = useState({});
+  const [ivrRow, setIvrRow] = useState([]);
 
   const campaign_id = location?.state?.campaign_id;
 
-  // const addRowTable = () => {
-  //   const data = {
-  //     input_digits: [],
-  //     operation: allOperation,
-  //     bonus: '0',
-  //     partial_pay: '0',
-  //     gang_number: ' ',
-  //   }
-  //   setWorklogs([...workLogs, data])
-  // }
+  const addRowTable = () => {
+    const data = {
+      input_digits: "",
+      operation: desinationTypeList,
+      ivrDropox: "",
+      targetDropbox: "",
+    };
+    setIvrRow([...ivrRow, data]);
+  };
 
   const format_list = [
     { id: 1, label: "(###) #### ### ###", value: "(###) #### ### ###" },
@@ -1620,7 +1627,35 @@ const UpdateCampaign = () => {
                     </Grid>
                   </CustomTabPanel>
                   <CustomTabPanel value={tabValue} index={1}>
-                    Ivr
+                    <Box display={"flex"} justifyContent={"end"}>
+                      <div>
+                        <Fab
+                          aria-label="add"
+                          size="small"
+                          sx={{
+                            boxShadow: "none",
+                            backgroundColor: colors.greenAccent[500],
+                          }}
+                          onClick={() => {
+                            addRowTable();
+                          }}
+                        >
+                          <Tooltip title="Add">
+                            <Add />
+                          </Tooltip>
+                        </Fab>
+                      </div>
+                    </Box>
+                    <Box>
+                      {ivrRow?.length ? (
+                        ivrRow?.map((obj, index) => {
+                          const key = index;
+                          return <h2></h2>;
+                        })
+                      ) : (
+                        <h5>No records found</h5>
+                      )}
+                    </Box>
                   </CustomTabPanel>
                 </Box>
               </AccordionDetails>
