@@ -18,7 +18,10 @@ import {
   createIvrMedia,
   getAllIvrMediaRequest,
   updateIvrMedia,
+  updateMediaStatusRequest,
 } from "../service/media.request";
+import axios from "axios";
+import StatusBadge from "../../../../components/chip/StatusBadge";
 
 const paths = [
   {
@@ -75,7 +78,7 @@ const WalletContainer = () => {
         size: 100,
       },
       {
-        accessorKey: "media_name",
+        accessorKey: "media_file",
         header: "Media Name",
         enableColumnDragging: false,
         enableGlobalFilter: true,
@@ -90,19 +93,35 @@ const WalletContainer = () => {
         size: 100,
       },
       {
-        accessorKey: "play",
-        header: "Play",
+        accessorKey: "file_ext",
+        header: "Type",
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
-        muiTableHeadCellProps: {
-          align: "left",
-        },
         muiTableBodyCellProps: {
           align: "left",
         },
-        size: 30,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        size: 100,
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        size: 50,
+        enableColumnDragging: false,
+        enableGlobalFilter: false,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        Cell: ({ cell }) => <StatusBadge value={cell.getValue()} />,
+        muiTableHeadCellProps: {
+          align: "right",
+        },
+        muiTableBodyCellProps: {
+          align: "right",
+        },
       },
     ],
     []
@@ -156,47 +175,115 @@ const WalletContainer = () => {
     getAllIvrMedia(activePage, limit);
   }, [activePage, limit]);
 
-  const handleAddMedia = async (value) => {
+  const handleAddMedia = async (formData) => {
+    const user = JSON.parse(localStorage.getItem("user"));
     try {
-      setLoader(true);
-      const res = await createIvrMedia(value);
-      const message = res.data.message;
+      const response = await axios.post(
+        "http://139.84.169.123/portalforwarding/backend/public/api/ivr-media",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
       getAllIvrMedia(activePage, limit);
       setLoader(false);
       setErrorMessage("");
-      setMessage(message);
+      setMessage(response.data.message);
       setBarVariant("success");
       setSnackbarOpen({ ...snackbarOpen, open: true });
       setIsOpen(false);
     } catch (error) {
+      console.log(error.response.data.message);
       setLoader(false);
       setErrorMessage(error.message);
     }
+    // try {
+    //   setLoader(true);
+    //   const res = await createIvrMedia(formData);
+    //   const message = res.data.message;
+    //   getAllIvrMedia(activePage, limit);
+    //   setLoader(false);
+    //   setErrorMessage("");
+    //   setMessage(message);
+    //   setBarVariant("success");
+    //   setSnackbarOpen({ ...snackbarOpen, open: true });
+    //   setIsOpen(false);
+    // } catch (error) {
+    //   setLoader(false);
+    //   setErrorMessage(error.message);
+    // }
   };
 
-  const handleUpdateMedia = async (value) => {
+  const handleStatusChange = (body) => {
+    setLoader(true);
+    const data = {
+      id: body.id,
+      status: body.status === 1 ? 0 : 1,
+    };
+    updateMediaStatusRequest(data)
+      .then((res) => {
+        getAllIvrMedia(activePage, limit);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setErrorMessage("");
+        setIsOpen(false);
+        setLoader(false);
+      })
+      .catch((err) => {
+        setLoader(false);
+      });
+  };
+
+  const handleUpdateMedia = async (formData) => {
+    const user = JSON.parse(localStorage.getItem("user"));
     try {
-      setLoader(true);
-      const data = {
-        id: currentType.id,
-        data: {
-          media_file: value.media_file,
-          name: value.name,
-        },
-      };
-      const res = await updateIvrMedia(data);
-      const message = res.data.message;
+      const response = await axios.put(
+        `http://139.84.169.123/portalforwarding/backend/public/api/ivr-media/${currentType.id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
       getAllIvrMedia(activePage, limit);
       setLoader(false);
       setErrorMessage("");
+      setMessage(response.data.message);
       setBarVariant("success");
-      setMessage(message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
       setIsOpen(false);
     } catch (error) {
       setLoader(false);
-      setErrorMessage(error.message);
+      setErrorMessage(error.response.data.message);
     }
+    // try {
+    //   setLoader(true);
+    //   const data = {
+    //     id: currentType.id,
+    //     data: {
+    //       media_file: value.media_file,
+    //       name: value.name,
+    //     },
+    //   };
+    //   const res = await updateIvrMedia(data);
+    //   const message = res.data.message;
+    //   getAllIvrMedia(activePage, limit);
+    //   setLoader(false);
+    //   setErrorMessage("");
+    //   setBarVariant("success");
+    //   setMessage(message);
+    //   setSnackbarOpen({ ...snackbarOpen, open: true });
+    //   setIsOpen(false);
+    // } catch (error) {
+    //   setLoader(false);
+    //   setErrorMessage(error.message);
+    // }
   };
 
   const selectModal = () => {
@@ -291,6 +378,10 @@ const WalletContainer = () => {
               data={rows}
               column={columns}
               isSearchable={true}
+              isStatusChangable={true}
+              handleStatusAction={handleStatusChange}
+              isEditable={true}
+              handleEditAction={handleChangeEdit}
             />
             <Pagination
               style={{

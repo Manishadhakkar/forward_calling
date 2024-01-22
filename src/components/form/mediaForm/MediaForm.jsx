@@ -19,21 +19,6 @@ import { FaRegPlayCircle } from "react-icons/fa";
 import { FaRegPauseCircle } from "react-icons/fa";
 import "../styles.css";
 
-const Item = styled(Paper)(({ theme }) => ({
-  ...theme.typography.body2,
-  boxShadow: "none",
-  textAlign: "start",
-  color: theme.palette.text.secondary,
-  flexGrow: 1,
-}));
-const SwitchItem = styled(Paper)(({ theme }) => ({
-  ...theme.typography.body2,
-  boxShadow: "none",
-  textAlign: "end",
-  color: theme.palette.text.primary,
-  flexGrow: 1,
-}));
-
 var a;
 
 const MediaForm = (props) => {
@@ -50,13 +35,15 @@ const MediaForm = (props) => {
   const colors = tokens(theme.palette.mode);
 
   const [name, setName] = useState({
-    value: "",
+    value: initialValue ? initialValue?.name : "",
     error: false,
     success: false,
   });
 
   const [buttonName, setButtonName] = useState("Play");
-  const [audio, setAudio] = useState();
+  const [audio, setAudio] = useState(
+    initialValue ? initialValue?.media_file : ""
+  );
 
   const handleChangeName = (value) => {
     setErrorMessage("");
@@ -79,11 +66,10 @@ const MediaForm = (props) => {
 
   const handleClick = (e) => {
     e.preventDefault();
-
-    if (buttonName === "Play") {
+    if (buttonName === "Play" && a) {
       a.play();
       setButtonName("Pause");
-    } else {
+    } else if (buttonName === "Pause" && a) {
       a.pause();
       setButtonName("Play");
     }
@@ -99,16 +85,12 @@ const MediaForm = (props) => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!audio) {
-      console.warn("Please select a file before submitting.");
       return;
     }
     const formData = new FormData();
-    formData.append("file", audio);
-    const data = {
-      media_file: formData,
-      name: name.value,
-    };
-    handleFormData(data);
+    formData.append("name", name.value);
+    formData.append("media_file", audio);
+    handleFormData(formData);
   };
 
   return (
@@ -129,7 +111,6 @@ const MediaForm = (props) => {
       />
       <CardContent color={colors.form[100]}>
         <Box
-          component="form"
           sx={{
             "& .MuiTextField-root": { mb: 1 },
             "&::-webkit-scrollbar": {

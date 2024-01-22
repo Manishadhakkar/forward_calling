@@ -17,8 +17,15 @@ export const createIvrMedia = (body) => {
 
 export const updateIvrMedia = (body) => {
   return axios({
-    method: "POST",
+    method: "PUT",
     url: `/ivr-media/${body.id}`,
     data: body.data,
+  });
+};
+export const updateMediaStatusRequest = (body) => {
+  return axios({
+    method: "PATCH",
+    url: `/ivr-media/changeStatus/${body.id}`,
+    data: { status: body.status },
   });
 };

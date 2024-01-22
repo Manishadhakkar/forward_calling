@@ -41,9 +41,13 @@ import {
   GET_TARGET,
   GET_USER,
 } from "../../../utility/constant";
-import { FaShopLock } from "react-icons/fa6";
+import { FaFileInvoice, FaShopLock } from "react-icons/fa6";
+import { GoNumber } from "react-icons/go";
 
 const MyProSidebar = () => {
+  const userData = JSON.parse(localStorage.getItem("user"));
+  const roleData = userData?.user_data?.roles[0]?.role_id;
+
   const theme = useTheme();
   const location = useLocation();
   const colors = tokens(theme.palette.mode);
@@ -69,7 +73,15 @@ const MyProSidebar = () => {
   let is_ivr_active =
     location.pathname === "/ivr/media" ||
     location.pathname === "/ivr/manage-ivr";
-    
+
+  let is_number_active =
+    location.pathname === "/purchase-number" ||
+    location.pathname === "/purchase-number/invoice" ||
+    location.pathname === "/numbers" ||
+    location.pathname === "/purchase-number/invoice-number" ||
+    location.pathname === "/purchase-number/invoice-number/crypto-payment" ||
+    location.pathname === "/purchase-number/invoice-number/wallet-payment";
+
   useEffect(() => {
     setUrl(location.pathname);
   }, [location]);
@@ -200,20 +212,45 @@ const MyProSidebar = () => {
                     </MenuItem>
                   </Tooltip>
                 )}
-                <Tooltip
-                  title={collapsed && "Purchase Number"}
-                  placement="right"
-                  arrow
-                  TransitionComponent={Zoom}
-                >
-                  <MenuItem
-                    active={url === "/purchase-number" ? true : false}
-                    icon={<MdOutlinePriceChange size="25" />}
-                    component={<Link to={"/purchase-number"} />}
+                {roleData !== 1 && (
+                  <Tooltip
+                    title={collapsed && "Number"}
+                    placement="right"
+                    arrow
+                    TransitionComponent={Zoom}
                   >
-                    <Typography>{"Purchase Number"}</Typography>
-                  </MenuItem>
-                </Tooltip>
+                    <SubMenu
+                      label="Numbers"
+                      active={is_number_active}
+                      defaultOpen={is_number_active}
+                      icon={<HiOutlineHashtag size="25" />}
+                    >
+                      <MenuItem
+                        active={url === "/numbers"}
+                        component={<Link to="/numbers" />}
+                        icon={<GoNumber size="20" variant="Outline" />}
+                      >
+                        Manage Number
+                      </MenuItem>
+                      <MenuItem
+                        active={url === "/purchase-number"}
+                        component={<Link to="/purchase-number" />}
+                        icon={<MdOutlinePriceChange size="25" />}
+                      >
+                        Purchase Number
+                      </MenuItem>
+                      <MenuItem
+                        active={url === "/purchase-number/invoice-report"}
+                        component={
+                          <Link to="/purchase-number/invoice-report" />
+                        }
+                        icon={<FaFileInvoice size="20" variant="Outline" />}
+                      >
+                        Number Invoice
+                      </MenuItem>
+                    </SubMenu>
+                  </Tooltip>
+                )}
                 {isAuthorizedFunc(GET_NUMBER) && (
                   <Tooltip
                     title={collapsed && "DID Number"}
@@ -244,78 +281,86 @@ const MyProSidebar = () => {
                     <Typography>{"Group"}</Typography>
                   </MenuItem>
                 </Tooltip> */}
-                <Tooltip
-                  title={collapsed && "Block Numbers"}
-                  placement="right"
-                  arrow
-                  TransitionComponent={Zoom}
-                >
-                  <MenuItem
-                    active={url === "/block-number" ? true : false}
-                    icon={<MdAppBlocking size="25" />}
-                    component={<Link to={"/block-number"} />}
-                  >
-                    <Typography>{"Block Numbers"}</Typography>
-                  </MenuItem>
-                </Tooltip>
-
-                <Tooltip
-                  title={collapsed && "Wallet"}
-                  placement="right"
-                  arrow
-                  TransitionComponent={Zoom}
-                >
-                  <SubMenu
-                    label="Wallet"
-                    active={is_wallet_active}
-                    defaultOpen={is_wallet_active}
-                    icon={<SlWallet size="25" variant="Outline" />}
+                {roleData !== 1 && (
+                  <Tooltip
+                    title={collapsed && "Block Numbers"}
+                    placement="right"
+                    arrow
+                    TransitionComponent={Zoom}
                   >
                     <MenuItem
-                      active={url === "/wallet"}
-                      component={<Link to="/wallet" />}
-                      icon={<RiFolderHistoryFill size="20" variant="Outline" />}
+                      active={url === "/block-number" ? true : false}
+                      icon={<MdAppBlocking size="25" />}
+                      component={<Link to={"/block-number"} />}
                     >
-                      Wallet
+                      <Typography>{"Block Numbers"}</Typography>
                     </MenuItem>
-                    <MenuItem
-                      active={url === "/wallet/add"}
-                      component={<Link to="/wallet/add" />}
-                      icon={<LiaGoogleWallet size="20" variant="Outline" />}
-                    >
-                      Add Wallet
-                    </MenuItem>
-                  </SubMenu>
-                </Tooltip>
-
-                <Tooltip
-                  title={collapsed && "IVR"}
-                  placement="right"
-                  arrow
-                  TransitionComponent={Zoom}
-                >
-                  <SubMenu
-                    label="IVR"
-                    active={is_ivr_active}
-                    defaultOpen={is_ivr_active}
-                    icon={<MdRecordVoiceOver size="25" variant="Outline" />}
+                  </Tooltip>
+                )}
+                {roleData !== 1 && (
+                  <Tooltip
+                    title={collapsed && "Wallet"}
+                    placement="right"
+                    arrow
+                    TransitionComponent={Zoom}
                   >
-                    <MenuItem
-                      active={url === "/ivr/media"}
-                      component={<Link to="/ivr/media" />}
-                      icon={<BsFileEarmarkMusic size="20" variant="Outline" />}
+                    <SubMenu
+                      label="Wallet"
+                      active={is_wallet_active}
+                      defaultOpen={is_wallet_active}
+                      icon={<SlWallet size="25" variant="Outline" />}
                     >
-                      Media
-                    </MenuItem>
-                    <MenuItem
-                      active={url === "/ivr/manage-ivr"}
-                      component={<Link to="/ivr/manage-ivr" />}
-                      icon={<IoMdRecording size="20" variant="Outline" />}
+                      <MenuItem
+                        active={url === "/wallet"}
+                        component={<Link to="/wallet" />}
+                        icon={
+                          <RiFolderHistoryFill size="20" variant="Outline" />
+                        }
+                      >
+                        Wallet
+                      </MenuItem>
+                      <MenuItem
+                        active={url === "/wallet/add"}
+                        component={<Link to="/wallet/add" />}
+                        icon={<LiaGoogleWallet size="20" variant="Outline" />}
+                      >
+                        Add Wallet
+                      </MenuItem>
+                    </SubMenu>
+                  </Tooltip>
+                )}
+                {roleData !== 1 && (
+                  <Tooltip
+                    title={collapsed && "IVR"}
+                    placement="right"
+                    arrow
+                    TransitionComponent={Zoom}
+                  >
+                    <SubMenu
+                      label="IVR"
+                      active={is_ivr_active}
+                      defaultOpen={is_ivr_active}
+                      icon={<MdRecordVoiceOver size="25" variant="Outline" />}
                     >
-                      Manage Ivr
-                    </MenuItem>
-                  </SubMenu>
-                </Tooltip>
+                      <MenuItem
+                        active={url === "/ivr/media"}
+                        component={<Link to="/ivr/media" />}
+                        icon={
+                          <BsFileEarmarkMusic size="20" variant="Outline" />
+                        }
+                      >
+                        Media
+                      </MenuItem>
+                      <MenuItem
+                        active={url === "/ivr/manage-ivr"}
+                        component={<Link to="/ivr/manage-ivr" />}
+                        icon={<IoMdRecording size="20" variant="Outline" />}
+                      >
+                        Manage Ivr
+                      </MenuItem>
+                    </SubMenu>
+                  </Tooltip>
+                )}
 
                 {(isAuthorizedFunc(GET_USER) ||
                   isAuthorizedFunc(GET_BUYER) ||

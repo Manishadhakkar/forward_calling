@@ -96,3 +96,40 @@ export const updateTargetWeightageReq = (body) => {
     data: body.data,
   });
 };
+
+export const getAllIvrListReq = () => {
+  return axios({
+    method: "GET",
+    url: `/ivr/active`,
+  });
+};
+
+export const getAllIvrReq = (id) => {
+  return axios({
+    method: "GET",
+    url: `/ivr-options/${id}`,
+  });
+};
+
+export const createIvrReq = (body) => {
+  return axios({
+    method: "POST",
+    url: `/ivr-options/add`,
+    data: body,
+  });
+};
+
+export const updateIvrReq = (body) => {
+  return axios({
+    method: "PUT",
+    url: `ivr-options/${body.id}`,
+    data: body.data,
+  });
+};
+
+export const removeIvrReq = (id) => {
+  return axios({
+    method: "DELETE",
+    url: `ivr-options/remove/${id}`
+  });
+};

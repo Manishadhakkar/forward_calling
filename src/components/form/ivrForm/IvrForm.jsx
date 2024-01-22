@@ -21,6 +21,7 @@ import FormTextField from "../../textfield/FormTextField";
 import FormTextDropdown from "../../dropdown/FormTextDropdown";
 import { tokens } from "../../../assets/color/theme";
 import "../styles.css";
+import { getAllActiveMedia } from "../../../pages/app/ivrManage/service/ivr.request";
 
 const authTypeList = [
   {
@@ -41,25 +42,6 @@ const authTypeList = [
   },
 ];
 
-const ivr_option = [
-  {
-    value: 1,
-    label: "Audio 1",
-  },
-  {
-    value: 2,
-    label: "Audio 2",
-  },
-  {
-    value: 3,
-    label: "Audio 3",
-  },
-  {
-    value: 4,
-    label: "Audio 4",
-  },
-];
-
 const IvrForm = (props) => {
   const {
     initialValue = {},
@@ -74,7 +56,7 @@ const IvrForm = (props) => {
   const colors = tokens(theme.palette.mode);
 
   const [authType, setAuthType] = useState({
-    value:initialValue ? initialValue.input_auth_type : "",
+    value: initialValue ? initialValue.input_auth_type : "",
     error: false,
     success: false,
   });
@@ -89,15 +71,17 @@ const IvrForm = (props) => {
     success: false,
   });
   const [ivrId, setIvrId] = useState({
-     value:initialValue ? initialValue.ivr_media_id : "",
+    value: initialValue ? initialValue.ivr_media_id : "",
     error: false,
     success: false,
   });
   const [timeOut, setTimeout] = useState({
-     value:initialValue ? initialValue.timeout : "",
+    value: initialValue ? initialValue.timeout : "",
     error: false,
     success: false,
   });
+  const [ivr_option, setivr_option] = useState([]);
+
   const handleChangeAuthType = (value) => {
     setErrorMessage("");
     setAuthType(value);
@@ -118,6 +102,22 @@ const IvrForm = (props) => {
     setErrorMessage("");
     setTimeout(value);
   };
+
+  useEffect(() => {
+    getAllActiveMedia()
+      .then((res) => {
+        const filterData = res.data?.data?.map((ele) => {
+          return {
+            value: ele.id,
+            label: ele.name,
+          };
+        });
+        setivr_option(filterData);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const handleClick = (e) => {
     e.preventDefault();

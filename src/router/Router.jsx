@@ -75,6 +75,14 @@ const UserAccount = lazy(() =>
 );
 const UsersRole = lazy(() => import("../pages/auth/roles/component/roles"));
 
+const NumberListPage = lazy(() =>
+  import("../pages/app/puchaseNumber/component/Number")
+);
+
+const NumberInvoicePage = lazy(() =>
+  import("../pages/app/puchaseNumber/component/NumberInvoice")
+);
+
 const PurchaseNumberPage = lazy(() =>
   import("../pages/app/puchaseNumber/component/PurchaseNumber")
 );
@@ -91,9 +99,7 @@ const WalletPaymentPage = lazy(() =>
   import("../pages/app/paymentPage/component/WalletPayment")
 );
 
-const IvrMedia = lazy(() =>
-  import("../pages/app/ivrMedia/component/IvrMedia")
-);
+const IvrMedia = lazy(() => import("../pages/app/ivrMedia/component/IvrMedia"));
 
 const IvrManage = lazy(() =>
   import("../pages/app/ivrManage/component/ManageIvr")
@@ -179,6 +185,12 @@ const Router = () => {
                       path="/purchase-number"
                       element={<PurchaseNumberPage />}
                     />
+                    <Route path="/numbers" element={<NumberListPage />} />
+                    <Route
+                      path="/purchase-number/invoice-report"
+                      element={<NumberInvoicePage />}
+                    />
+
                     <Route
                       path="/purchase-number/invoice-number"
                       element={<InvoiceNumberPage />}
@@ -194,7 +206,7 @@ const Router = () => {
                     />
 
                     <Route path="/ivr/media" element={<IvrMedia />} />
-                    <Route path="/ivr/manage-ivr" element={<IvrManage />} />                  
+                    <Route path="/ivr/manage-ivr" element={<IvrManage />} />
 
                     <Route
                       path="/purchase-number/invoice-number/card-payment"

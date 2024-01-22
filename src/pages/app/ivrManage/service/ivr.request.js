@@ -1,5 +1,12 @@
 import { axios } from "../../../../api/setup.interseptor";
 
+export const getAllActiveMedia = () => {
+  return axios({
+    method: "GET",
+    url: `/ivr-media/active`,
+  });
+};
+
 export const getAllIvrRequest = (page, perpage) => {
   return axios({
     method: "GET",

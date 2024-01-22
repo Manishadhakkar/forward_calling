@@ -9,6 +9,7 @@ import "./styles.css";
 import {
   MdAssignmentInd,
   MdDeleteForever,
+  MdDownload,
   MdOutlineSettingsBackupRestore,
   MdPhoneCallback,
   MdPhonePaused,
@@ -25,12 +26,14 @@ const DefaultTable = (props) => {
     handlePlayPause,
     handleAssignChangable,
     handleViewChange,
+    handleDownloadClick,
     isEditable = false,
     isDeletable = false,
     isStatusChangable = false,
     isPlayPause = false,
     isAssignable = false,
     isView = false,
+    isDownload = false,
   } = props;
 
   const theme = useTheme();
@@ -71,6 +74,10 @@ const DefaultTable = (props) => {
 
   const handleChangeView = (ele) => {
     handleViewChange(ele);
+  };
+
+  const handleDownload = (ele) => {
+    handleDownloadClick(ele);
   };
 
   return (
@@ -168,7 +175,6 @@ const DefaultTable = (props) => {
               </IconButton>
             </Tooltip>
           )}
-
           {isAssignable && (
             <Tooltip arrow placement="right" title={"Assign to"}>
               <IconButton onClick={() => handleChangeAssign(row.original)}>
@@ -177,9 +183,16 @@ const DefaultTable = (props) => {
             </Tooltip>
           )}
           {isView && (
-            <Tooltip arrow placement="left" title="Edit">
+            <Tooltip arrow placement="left" title="Vies">
               <IconButton onClick={() => handleChangeView(row.original)}>
                 <MdRemoveRedEye />
+              </IconButton>
+            </Tooltip>
+          )}
+          {isDownload && (
+            <Tooltip arrow placement="left" title="Download">
+              <IconButton onClick={() => handleDownload(row.original)}>
+                <MdDownload />
               </IconButton>
             </Tooltip>
           )}

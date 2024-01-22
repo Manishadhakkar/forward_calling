@@ -169,7 +169,7 @@ const Topbar = () => {
             <Message size={"20px"} />
           </IconButton>
           <Typography sx={{ marginLeft: "2px" }} textAlign="center">
-            Accont
+            Account
           </Typography>
         </MenuItem>
       )}

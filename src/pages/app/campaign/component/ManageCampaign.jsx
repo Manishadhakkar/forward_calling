@@ -27,6 +27,7 @@ import {
   CardActions,
   Alert,
   Fab,
+  Stack,
 } from "@mui/material";
 import { TbAssembly, TbBrandCampaignmonitor, TbHome2 } from "react-icons/tb";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
@@ -35,12 +36,17 @@ import { MdDeleteForever, MdExpandMore } from "react-icons/md";
 import { FcCallTransfer } from "react-icons/fc";
 import {
   assignCampaignTargetReq,
+  createIvrReq,
   getAllActiveNumber,
+  getAllIvrListReq,
+  getAllIvrReq,
   getAllTargetReq,
   getCampaignByIdRequest,
   getCompanyTargetAndRemainsReq,
   removeCampaignTargetReq,
+  removeIvrReq,
   updateCampaignRequest,
+  updateIvrReq,
   updateTargetPriorityReq,
   updateTargetWeightageReq,
 } from "../service/campaign.request";
@@ -224,8 +230,8 @@ const paths = [
 ];
 
 const desinationTypeList = [
-  { label: "Ivr", value: "Ivr" },
-  { label: "Target", value: "Target" },
+  { label: "Ivr", value: 1 },
+  { label: "Target", value: 2 },
 ];
 
 const UpdateCampaign = () => {
@@ -246,22 +252,29 @@ const UpdateCampaign = () => {
 
   const [searchTargetData, setSearchTargetData] = useState([]);
   const [searchCampaignData, setSearchCampaignData] = useState([]);
-
+  const [ivrList, setIvrList] = useState([]);
   const [searchTargetParams, setSearchTargetParams] = useState("");
   const [searchCampaignParams, setSearchCampaignParams] = useState("");
   const [errorMessage, setErrorMessage] = useState();
 
   const [initialValue, setInitValue] = useState({});
-  const [ivrRow, setIvrRow] = useState([]);
+  const [ivrRow, setIvrRow] = useState([
+    {
+      input_digits: "",
+      ivrSelect: "",
+      destination: "",
+      destination_id: "",
+    },
+  ]);
 
   const campaign_id = location?.state?.campaign_id;
 
   const addRowTable = () => {
     const data = {
       input_digits: "",
-      destination: '',
-      ivrDropox: "",
-      targetDropbox: "",
+      ivrSelect: "",
+      destination: "",
+      destination_id: "",
     };
     setIvrRow([...ivrRow, data]);
   };
@@ -334,7 +347,7 @@ const UpdateCampaign = () => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [isSilent, setIsSilent] = useState(false);
   const [dialAttempt, setDialAttempt] = useState(null);
-
+  const [ivrTargets, setIvrTargets] = useState([]);
   const [targetList, setTargetList] = useState([]);
   const [campaignTarget, setCampaignTarget] = useState([]);
 
@@ -383,13 +396,88 @@ const UpdateCampaign = () => {
     setSearchCampaignData(filterData);
   }, [searchCampaignParams, campaignTarget]);
 
+  useEffect(() => {
+    if (expanded === "panel2") {
+      setIsLoader(true);
+      getAllTargetReq()
+        .then((res) => {
+          const result = res.data?.data?.map((ele) => {
+            return {
+              value: ele.id,
+              label: ele.name,
+            };
+          });
+          setIsLoader(false);
+          setIvrTargets(result);
+        })
+        .catch((err) => {
+          setIsLoader(false);
+        });
+    }
+  }, [expanded, tabValue]);
+
+  useEffect(() => {
+    if (expanded === "panel2" && tabValue === 1) {
+      setIsLoader(true);
+      getAllIvrListReq()
+        .then((res) => {
+          const result = res.data?.data?.map((ele) => {
+            return {
+              value: ele.id,
+              label: ele.name,
+            };
+          });
+          setIsLoader(false);
+          setIvrList(result);
+        })
+        .catch(() => {
+          setIsLoader(false);
+        });
+    }
+  }, [expanded, tabValue]);
+
+  const getIvrRows = () => {
+    setIsLoader(true);
+    getAllIvrReq(campaign_id)
+      .then((res) => {
+        setIsLoader(false);
+        const resultData =
+          res.data?.data.length > 0
+            ? res.data?.data.map((ele) => ({
+                ...ele,
+                input_digits: ele.input_digit,
+                ivrSelect: ele.ivr_id,
+                destination: ele.destination_type,
+                destination_id: ele.destination_id,
+              }))
+            : [
+                {
+                  input_digits: "",
+                  ivrSelect: "",
+                  destination: "",
+                  destination_id: "",
+                },
+              ];
+        setIvrRow(resultData);
+      })
+
+      .catch(() => {
+        setIsLoader(false);
+      });
+  };
+
+  useEffect(() => {
+    if (expanded === "panel2" && tabValue === 1) {
+      getIvrRows();
+    }
+  }, [expanded, tabValue]);
+
   const handleChangeSearch = (e) => {
     setSearchTargetParams(e.target.value);
   };
   const handleChangeCampaignSearch = (e) => {
     setSearchCampaignParams(e.target.value);
   };
-
   const handleChangeName = (value) => {
     setName(value);
   };
@@ -425,51 +513,55 @@ const UpdateCampaign = () => {
   };
 
   useEffect(() => {
-    (async () => {
+    if (expanded === "panel1") {
+      (async () => {
+        try {
+          setIsLoader(true);
+          const res = await getAllActiveNumber();
+          const result = res?.data?.data?.map((ele) => ({
+            value: ele.id,
+            label: ele.did_number,
+          }));
+          setTFNList(result);
+        } catch (err) {
+          setBarVariant("error");
+          setMessage(err.message);
+          setSnackbarOpen((prev) => ({ ...prev, open: true }));
+          setErrorMessage("");
+        } finally {
+          setIsLoader(false);
+        }
+      })();
+    }
+  }, [expanded]);
+
+  const getCampaignData = async (campaign_id) => {
+    if (expanded === "panel1") {
+      setIsLoader(true);
       try {
-        setIsLoader(true);
-        const res = await getAllActiveNumber();
-        const result = res?.data?.data?.map((ele) => ({
-          value: ele.id,
-          label: ele.did_number,
-        }));
-        setTFNList(result);
-      } catch (err) {
-        setBarVariant("error");
-        setMessage(err.message);
-        setSnackbarOpen((prev) => ({ ...prev, open: true }));
-        setErrorMessage("");
+        const res = await getCampaignByIdRequest(campaign_id);
+        const data = res.data.data[0];
+        setInitValue(data);
+        setRandomId({ value: data?.campaign_random_id });
+        setName({ value: data?.name });
+        setDescription({ value: data?.description });
+        setNumberFormat({ value: data?.did_number_format });
+        setTimeout({ value: data?.connection_timeout });
+        setTFNNo({ value: data?.number?.did_number });
+        setIsRecording(data.recording !== 1 ? false : true);
+        setCallsType({ value: data?.route_previously_connected_calls });
+        setIsStrict(data.strict !== 1 ? false : true);
+        setIsDuplicatesCalls(
+          data.anonymous_duplicate_call !== 1 ? false : true
+        );
+        setIsWaiting(data.call_waiting !== 1 ? false : true);
+        setIsSilent(data.trim_silence);
+        setDialAttempt(data.dial_attempt_target);
+      } catch (error) {
+        setIsLoader(false);
       } finally {
         setIsLoader(false);
       }
-    })();
-  }, []);
-
-  const getCampaignData = async (campaign_id) => {
-    setIsLoader(true);
-
-    try {
-      const res = await getCampaignByIdRequest(campaign_id);
-      const data = res.data.data[0];
-
-      setInitValue(data);
-      setRandomId({ value: data?.campaign_random_id });
-      setName({ value: data?.name });
-      setDescription({ value: data?.description });
-      setNumberFormat({ value: data?.did_number_format });
-      setTimeout({ value: data?.connection_timeout });
-      setTFNNo({ value: data?.number?.did_number });
-      setIsRecording(data.recording !== 1);
-      setCallsType({ value: data?.route_previously_connected_calls });
-      setIsStrict(data.strict !== 1);
-      setIsDuplicatesCalls(data.anonymous_duplicate_call !== 1);
-      setIsWaiting(data.call_waiting !== 1);
-      setIsSilent(data.trim_silence !== 1);
-      setDialAttempt(data.dial_attempt_target);
-    } catch (error) {
-      setIsLoader(false);
-    } finally {
-      setIsLoader(false);
     }
   };
 
@@ -480,43 +572,44 @@ const UpdateCampaign = () => {
   }, [campaign_id]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        setIsLoader(true);
-        const res = await getCompanyTargetAndRemainsReq(campaign_id);
-        const targetList = res.data.data.AllTargets?.map((ele) => ({
-          id: ele.id,
-          name: ele.name,
-          destination: ele.forwarding_number,
-          type: ele.type,
-          status: ele.status,
-          weightage: null,
-          priority: null,
-        }));
-        const assignTargetList = res.data.data.CampaignMember?.map((ele) => ({
-          id: ele.id,
-          name: ele.target.name,
-          destination: ele.target.forwarding_number,
-          type: ele.target.type,
-          status: ele.target.status,
-          weightage: ele.weightage,
-          priority: ele.priority,
-        }));
-        console.log(res.data.data.CampaignMember);
-        setCampaignTarget(
-          assignTargetList !== undefined ? assignTargetList : []
-        );
-        setTargetList(targetList !== undefined ? targetList : []);
-      } catch (err) {
-        setBarVariant("error");
-        setMessage(err.message);
-        setSnackbarOpen((prev) => ({ ...prev, open: true }));
-        setErrorMessage("");
-      } finally {
-        setIsLoader(false);
-      }
-    })();
-  }, [timer]);
+    if (expanded === "panel2") {
+      (async () => {
+        try {
+          setIsLoader(true);
+          const res = await getCompanyTargetAndRemainsReq(campaign_id);
+          const targetList = res.data.data.AllTargets?.map((ele) => ({
+            id: ele.id,
+            name: ele.name,
+            destination: ele.forwarding_number,
+            type: ele.type,
+            status: ele.status,
+            weightage: null,
+            priority: null,
+          }));
+          const assignTargetList = res.data.data.CampaignMember?.map((ele) => ({
+            id: ele.id,
+            name: ele.target.name,
+            destination: ele.target.forwarding_number,
+            type: ele.target.type,
+            status: ele.target.status,
+            weightage: ele.weightage,
+            priority: ele.priority,
+          }));
+          setCampaignTarget(
+            assignTargetList !== undefined ? assignTargetList : []
+          );
+          setTargetList(targetList !== undefined ? targetList : []);
+        } catch (err) {
+          setBarVariant("error");
+          setMessage(err.message);
+          setSnackbarOpen((prev) => ({ ...prev, open: true }));
+          setErrorMessage("");
+        } finally {
+          setIsLoader(false);
+        }
+      })();
+    }
+  }, [expanded, timer]);
 
   const handleClick = () => {
     setOpenClip(true);
@@ -710,7 +803,6 @@ const UpdateCampaign = () => {
 
   const handleUpdateCampaign = async (e) => {
     e.preventDefault();
-
     const did_value = tfnList.find((no) => no.label === tfnNo.value);
     const data = {
       data: {
@@ -749,7 +841,7 @@ const UpdateCampaign = () => {
     setIsLoader(true);
     try {
       const reqData = {
-        campaign_id,
+        campaign_id: campaign_id,
         target_id: val.id,
         weightage: 0,
         priority: 0,
@@ -789,49 +881,170 @@ const UpdateCampaign = () => {
   };
 
   useEffect(() => {
-    const myFunction = async () => {
-      try {
-        const res = await getCompanyTargetAndRemainsReq(campaign_id);
-        const targetList = res.data.data.AllTargets?.map((ele) => ({
-          id: ele.id,
-          name: ele.name,
-          destination: ele.forwarding_number,
-          type: ele.type,
-          status: ele.status,
-          weightage: null,
-          priority: null,
-        }));
-        const assignTargetList = res.data.data.CampaignMember?.map((ele) => ({
-          id: ele.id,
-          name: ele.target.name,
-          destination: ele.target.forwarding_number,
-          type: ele.target.type,
-          status: ele.target.status,
-          weightage: ele.weightage,
-          priority: ele.priority,
-        }));
-        setCampaignTarget(
-          assignTargetList !== undefined ? assignTargetList : []
-        );
-        setTargetList(targetList !== undefined ? targetList : []);
-      } catch (err) {
-        setBarVariant("error");
-        setMessage(err.message);
-        setSnackbarOpen((prev) => ({ ...prev, open: true }));
-        setErrorMessage("");
-      } finally {
-        setIsLoader(false);
-      }
-    };
-    const intervalId = setInterval(myFunction, 8000);
-    return () => clearInterval(intervalId);
-  }, []);
+    if (expanded === "panel2" && tabValue === 0) {
+      const myFunction = async () => {
+        try {
+          setIsLoader(true);
+          const res = await getCompanyTargetAndRemainsReq(campaign_id);
+          const targetList = res.data.data.AllTargets?.map((ele) => ({
+            id: ele.id,
+            name: ele.name,
+            destination: ele.forwarding_number,
+            type: ele.type,
+            status: ele.status,
+            weightage: null,
+            priority: null,
+          }));
+          const assignTargetList = res.data.data.CampaignMember?.map((ele) => ({
+            id: ele.id,
+            name: ele.target.name,
+            destination: ele.target.forwarding_number,
+            type: ele.target.type,
+            status: ele.target.status,
+            weightage: ele.weightage,
+            priority: ele.priority,
+          }));
+          setCampaignTarget(
+            assignTargetList !== undefined ? assignTargetList : []
+          );
+          setTargetList(targetList !== undefined ? targetList : []);
+        } catch (err) {
+          setBarVariant("error");
+          setMessage(err.message);
+          setSnackbarOpen((prev) => ({ ...prev, open: true }));
+          setErrorMessage("");
+        } finally {
+          setIsLoader(false);
+        }
+      };
+      const intervalId = setInterval(myFunction, 8000);
+      return () => clearInterval(intervalId);
+    }
+  }, [expanded, tabValue]);
 
-  const handleChangeDigits = (data, id, event, currRow) => {
-    console.log(event)
+  const handleChangeDigits = (data, id) => {
+    const addDigits = ivrRow?.map((item, index) => {
+      if (index + 1 === id) {
+        return { ...item, input_digits: data };
+      } else {
+        return item;
+      }
+    });
+    setIvrRow(addDigits);
   };
 
-  const handleChangeDestinationType = () => {};
+  const handleChangeSelectIvr = (data, id) => {
+    const addDestination = ivrRow?.map((item, index) => {
+      if (index + 1 === id) {
+        return { ...item, ivrSelect: data };
+      } else {
+        return item;
+      }
+    });
+    setIvrRow(addDestination);
+  };
+
+  const handleChangeDestinationType = (data, id) => {
+    const addDestination = ivrRow?.map((item, index) => {
+      if (index + 1 === id) {
+        return { ...item, destination: data };
+      } else {
+        return item;
+      }
+    });
+    setIvrRow(addDestination);
+  };
+
+  const handleChangeRemainsIvr = (data, id) => {
+    const result = ivrRow?.map((item, index) => {
+      if (index + 1 === id) {
+        return { ...item, destination_id: data };
+      } else {
+        return item;
+      }
+    });
+    setIvrRow(result);
+  };
+
+  const handleClickSaveIvr = async (e, index) => {
+    e.preventDefault();
+    const foundObject = ivrRow.find((item, i) => i === index);
+    setIsLoader(true);
+    try {
+      const reqData = {
+        campaign_id: campaign_id,
+        ivr_id: foundObject.ivrSelect,
+        input_digit: foundObject.input_digits,
+        destination_type: foundObject.destination,
+        destination_id: foundObject.destination_id,
+      };
+      const res = await createIvrReq(reqData);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
+  };
+
+  const handleClickRemoveIvr = async (e, index) => {
+    e.preventDefault();
+    const foundObject = ivrRow.filter((item, i) => i !== index);
+    setIvrRow(foundObject);
+  };
+
+  const handleClickUpdateIvr = async (e, data) => {
+    e.preventDefault();
+    const foundObject = ivrRow.find((item) => item.id === data.id);
+    setIsLoader(true);
+    try {
+      const reqData = {
+        id: foundObject.id,
+        data: {
+          campaign_id: foundObject.campaign_id,
+          ivr_id: foundObject.ivrSelect,
+          input_digit: foundObject.input_digits,
+          destination_type: foundObject.destination_type,
+          destination_id: foundObject.destination_id,
+        },
+      };
+      const res = await updateIvrReq(reqData);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
+  };
+
+  const handleClickDeleteIvr = async (e, id) => {
+    e.preventDefault();
+    setIsLoader(true);
+    try {
+      const res = await removeIvrReq(id);
+      getIvrRows();
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
+  };
 
   return (
     <>
@@ -1651,52 +1864,150 @@ const UpdateCampaign = () => {
                       </div>
                     </Box>
                     <Box>
-                      {ivrRow?.length ? (
-                        ivrRow?.map((obj, index) => {
-                          const key = index;
-                          return (
-                            <tr key={key}>
-                              <td>
-                                <FormTextField
-                                  type="num"
-                                  placeholder={"Enter digit"}
-                                  label={"Digit"}
-                                  Value={ivrRow.input_digits}
-                                  onChangeText={(data, event) =>
-                                    handleChangeDigits(
-                                      data,
-                                      index + 1,
-                                      event,
-                                      obj
-                                    )
-                                  }
-                                  Required={false}
-                                  CustomErrorLine={"Enter proper digits"}
-                                />
-                              </td>
-                              <td>
-                                <FormTextDropdown
-                                  Value={ivrRow.destination}
-                                  onSelect={(data, event) =>
-                                    handleChangeDestinationType(
-                                      data,
-                                      index + 1,
-                                      event,
-                                      obj
-                                    )
-                                  }
-                                  label={"Destination Type *"}
-                                  CustomErrorLine={"Choose one"}
-                                  Required={true}
-                                  Options={desinationTypeList}
-                                />
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <h5>No records found</h5>
-                      )}
+                      <Grid container spacing={1}>
+                        {ivrRow?.length ? (
+                          ivrRow?.map((obj, index) => {
+                            const key = index;
+                            return (
+                              <>
+                                <Grid item xs={6} md={2}>
+                                  <FormTextField
+                                    type="num"
+                                    placeholder={"Enter digit"}
+                                    label={"Digit"}
+                                    Value={obj.input_digits}
+                                    onChangeText={(e) =>
+                                      handleChangeDigits(e.value, index + 1)
+                                    }
+                                    Required={true}
+                                    CustomErrorLine={"Enter proper digits"}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={6} md={2}>
+                                  <FormTextDropdown
+                                    Value={obj.ivrSelect}
+                                    onSelect={(e) =>
+                                      handleChangeSelectIvr(e.value, index + 1)
+                                    }
+                                    label={"Ivr No.*"}
+                                    CustomErrorLine={"Choose one"}
+                                    Required={true}
+                                    Options={ivrList}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={6} md={3}>
+                                  <FormTextDropdown
+                                    Value={obj.destination}
+                                    onSelect={(e) =>
+                                      handleChangeDestinationType(
+                                        e.value,
+                                        index + 1
+                                      )
+                                    }
+                                    label={"Destination Type *"}
+                                    CustomErrorLine={"Choose one"}
+                                    Required={true}
+                                    Options={desinationTypeList}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={6} md={3}>
+                                  <FormTextDropdown
+                                    Value={obj.destination_id}
+                                    onSelect={(e) =>
+                                      handleChangeRemainsIvr(e.value, index + 1)
+                                    }
+                                    label={
+                                      obj.destination === 1
+                                        ? "Select Ivr *"
+                                        : "Select Target *"
+                                    }
+                                    CustomErrorLine={"Choose one"}
+                                    Required={true}
+                                    Options={
+                                      obj.destination === 1
+                                        ? ivrList
+                                        : ivrTargets
+                                    }
+                                  />
+                                </Grid>
+
+                                <Grid
+                                  item
+                                  xs={6}
+                                  md={2}
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
+                                  <Stack spacing={2} direction="row">
+                                    {obj.id ? (
+                                      <Button
+                                        size="small"
+                                        variant="contained"
+                                        sx={{
+                                          backgroundColor:
+                                            colors.greenAccent[600],
+                                        }}
+                                        onClick={(e) =>
+                                          handleClickUpdateIvr(e, obj)
+                                        }
+                                      >
+                                        Update
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        size="small"
+                                        variant="contained"
+                                        sx={{
+                                          backgroundColor:
+                                            colors.greenAccent[600],
+                                        }}
+                                        onClick={(e) =>
+                                          handleClickSaveIvr(e, key)
+                                        }
+                                      >
+                                        Save
+                                      </Button>
+                                    )}
+                                    {obj.id ? (
+                                      <Button
+                                        size="small"
+                                        variant="contained"
+                                        sx={{
+                                          backgroundColor:
+                                            colors.redAccent[500],
+                                        }}
+                                        onClick={(e) =>
+                                          handleClickDeleteIvr(e, obj.id)
+                                        }
+                                      >
+                                        Delete
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        size="small"
+                                        variant="contained"
+                                        sx={{
+                                          backgroundColor:
+                                            colors.redAccent[500],
+                                        }}
+                                        onClick={(e) =>
+                                          handleClickRemoveIvr(e, key)
+                                        }
+                                      >
+                                        Remove
+                                      </Button>
+                                    )}
+                                  </Stack>
+                                </Grid>
+                              </>
+                            );
+                          })
+                        ) : (
+                          <h5>No records found</h5>
+                        )}
+                      </Grid>
                     </Box>
                   </CustomTabPanel>
                 </Box>
