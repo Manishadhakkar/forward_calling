@@ -9,8 +9,9 @@ import {
   Grid,
   IconButton,
   useTheme,
+  Tooltip,
 } from "@mui/material";
-import { MdClose } from "react-icons/md";
+import { MdClose, MdDeleteSweep } from "react-icons/md";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import FormTextField from "../../textfield/FormTextField";
@@ -40,6 +41,12 @@ const MediaForm = (props) => {
     success: false,
   });
 
+  const [selectFile, setSelectFile] = useState(
+    clickedBtn !== "add"
+      ? `${process.env.REACT_APP_MEDIA_URL}/${initialValue.media_file}.${initialValue.file_ext}`
+      : " "
+  );
+
   const [buttonName, setButtonName] = useState("Play");
   const [audio, setAudio] = useState(
     initialValue ? initialValue?.media_file : ""
@@ -56,13 +63,13 @@ const MediaForm = (props) => {
       a = null;
       setButtonName("Play");
     }
-    if (audio) {
-      a = new Audio(audio);
+    if (selectFile) {
+      a = new Audio(selectFile);
       a.onended = () => {
         setButtonName("Play");
       };
     }
-  }, [audio]);
+  }, [selectFile]);
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -77,9 +84,14 @@ const MediaForm = (props) => {
 
   const addFile = (e) => {
     if (e.target.files[0]) {
-      // setAudio(URL.createObjectURL(e.target.files[0]));
+      setSelectFile(URL.createObjectURL(e.target.files[0]));
       setAudio(e.target.files[0]);
     }
+  };
+
+  const handleRemove = () => {
+    setAudio("");
+    setSelectFile(null);
   };
 
   const handleFormSubmit = (e) => {
@@ -152,7 +164,25 @@ const MediaForm = (props) => {
                 }}
               >
                 <div>
-                  <input type="file" onChange={addFile} />
+                  {/* <input type="file" onChange={addFile} /> */}
+                  {clickedBtn === "add" && !audio ? (
+                    <input type="file" accept=".mp3, .wav" onChange={addFile} />
+                  ) : clickedBtn === "edit" && !audio ? (
+                    <input type="file" accept=".mp3, .wav" onChange={addFile} />
+                  ) : (
+                    <>
+                      <span>
+                        {initialValue.media_file}.{initialValue.file_ext}
+                      </span>
+                      <span style={{ marginLeft: 2 }}>
+                        <Tooltip title={"Remove"}>
+                          <IconButton onClick={handleRemove}>
+                            <MdDeleteSweep />
+                          </IconButton>
+                        </Tooltip>
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div>
                   <IconButton onClick={handleClick} disabled={!audio}>

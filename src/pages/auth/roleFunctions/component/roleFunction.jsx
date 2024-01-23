@@ -17,19 +17,6 @@ import {
   updateRolePermissionReq,
 } from "../service/permission.request";
 
-export const rolefunctionslist = [
-  {
-    id: 1,
-    name: "Super Admin",
-    permission: [1, 2, 3, 4, 5, 6, 7, 8],
-  },
-  {
-    id: 2,
-    name: "Manager",
-    permission: [1, 2, 3, 4, 5, 6, 7, 8],
-  },
-];
-
 const paths = [
   {
     name: "Dashboard",
@@ -51,14 +38,10 @@ const RoleFunctionMapping = (props) => {
   const colors = tokens(theme.palette.mode);
   const getId = JSON.parse(localStorage.getItem("user"));
   const user_slug = getId.user_data.roles[0].slug;
-  const company_id = getId.user_data.company_id;
 
   const [isOpen, setIsOpen] = useState(false);
   const [clickedBtn, setClickedBtn] = useState("add");
   const [currentType, setCurrentType] = useState();
-  const [total, setTotal] = useState(0);
-  const [activePage, setActivePage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [rows, setRows] = useState([]);
   const [isLoader, setLoader] = useState(false);
   const [message, setMessage] = useState("");
@@ -114,7 +97,6 @@ const RoleFunctionMapping = (props) => {
   const getFetchAllRolePermission = () => {
     getRolePermissionReq(user_slug)
       .then((res) => {
-        console.log(res.data);
         const result = res.data?.data?.role_permissions?.map((ele) => ({
           id: ele.role_id,
           name: ele.role,
@@ -223,7 +205,7 @@ const RoleFunctionMapping = (props) => {
         <Breadcrumb pathList={paths} />
         <Box>
           {isLoader && <h2>Loader</h2>}
-          <Modal modal_width={"30%"} isOpen={isOpen}>
+          <Modal modal_width={"50%"} isOpen={isOpen}>
             {selectModal()}
           </Modal>
           <Box
@@ -265,26 +247,6 @@ const RoleFunctionMapping = (props) => {
               isEditable={true}
               isDeletable={false}
               isStatusChangable={false}
-            />
-            <Pagination
-              style={{
-                marginTop: 5,
-              }}
-              layout={["total", "-", "pager", "skip"]}
-              size={"xs"}
-              prev={true}
-              next={true}
-              first={true}
-              last={true}
-              ellipsis={true}
-              boundaryLinks={true}
-              total={total}
-              limit={limit}
-              maxButtons={5}
-              activePage={activePage}
-              onChangePage={setActivePage}
-              limitOptions={[5, 10, 25, 50, 100]}
-              onChangeLimit={setLimit}
             />
           </Box>
         </Box>

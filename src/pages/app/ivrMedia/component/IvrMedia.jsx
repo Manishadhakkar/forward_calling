@@ -177,6 +177,7 @@ const WalletContainer = () => {
 
   const handleAddMedia = async (formData) => {
     const user = JSON.parse(localStorage.getItem("user"));
+    setLoader(true);
     try {
       const response = await axios.post(
         "http://139.84.169.123/portalforwarding/backend/public/api/ivr-media",
@@ -196,9 +197,8 @@ const WalletContainer = () => {
       setSnackbarOpen({ ...snackbarOpen, open: true });
       setIsOpen(false);
     } catch (error) {
-      console.log(error.response.data.message);
       setLoader(false);
-      setErrorMessage(error.message);
+      setErrorMessage(error.response.data.message);
     }
     // try {
     //   setLoader(true);
@@ -239,9 +239,11 @@ const WalletContainer = () => {
   };
 
   const handleUpdateMedia = async (formData) => {
+    formData.append("_method", "PUT");
+
     const user = JSON.parse(localStorage.getItem("user"));
     try {
-      const response = await axios.put(
+      const response = await axios.post(
         `http://139.84.169.123/portalforwarding/backend/public/api/ivr-media/${currentType.id}`,
         formData,
         {

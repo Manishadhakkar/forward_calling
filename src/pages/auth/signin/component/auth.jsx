@@ -91,9 +91,12 @@ const SignIn = (props) => {
     if (slugId !== null) {
       headers["Authorization"] = `Bearer ${userDetail.token}`;
       axios
-        .get(`${process.env.REACT_APP_BASE_URL}/permission/permission-by-group/${slugId}`, {
-          headers,
-        })
+        .get(
+          `${process.env.REACT_APP_BASE_URL}/permission/permission-by-group/${slugId}`,
+          {
+            headers,
+          }
+        )
         .then((res) => {
           const value = res.data?.data?.role_permissions.map((ele) => ele.slug);
           localStorage.setItem("authorization", JSON.stringify(value));

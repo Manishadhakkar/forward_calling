@@ -29,10 +29,16 @@ import {
 } from "react-icons/md";
 import { isAuthorizedFunc } from "../../../utility/utilty";
 import {
+  CREATE_WALLET_RECHARGE,
+  GET_ALL_SEARCH_NUMBER,
+  GET_BLOCK_RULE,
   GET_BUYER,
   GET_CAMPAIGN,
   GET_CARRIER,
   GET_COMPANY,
+  GET_INVOICE,
+  GET_IVR,
+  GET_IVR_MEDIA,
   GET_NUMBER,
   GET_PUBLISHER,
   GET_ROLE,
@@ -40,6 +46,8 @@ import {
   GET_SERVERIP,
   GET_TARGET,
   GET_USER,
+  GET_WALLET_RECHARGE,
+  NUMBER_PURCHASE_LIST,
 } from "../../../utility/constant";
 import { FaFileInvoice, FaShopLock } from "react-icons/fa6";
 import { GoNumber } from "react-icons/go";
@@ -219,36 +227,46 @@ const MyProSidebar = () => {
                     arrow
                     TransitionComponent={Zoom}
                   >
-                    <SubMenu
-                      label="Numbers"
-                      active={is_number_active}
-                      defaultOpen={is_number_active}
-                      icon={<HiOutlineHashtag size="25" />}
-                    >
-                      <MenuItem
-                        active={url === "/numbers"}
-                        component={<Link to="/numbers" />}
-                        icon={<GoNumber size="20" variant="Outline" />}
+                    {(isAuthorizedFunc(GET_ALL_SEARCH_NUMBER) ||
+                      isAuthorizedFunc(NUMBER_PURCHASE_LIST) ||
+                      isAuthorizedFunc(GET_INVOICE)) && (
+                      <SubMenu
+                        label="Numbers"
+                        active={is_number_active}
+                        defaultOpen={is_number_active}
+                        icon={<HiOutlineHashtag size="25" />}
                       >
-                        Manage Number
-                      </MenuItem>
-                      <MenuItem
-                        active={url === "/purchase-number"}
-                        component={<Link to="/purchase-number" />}
-                        icon={<MdOutlinePriceChange size="25" />}
-                      >
-                        Purchase Number
-                      </MenuItem>
-                      <MenuItem
-                        active={url === "/purchase-number/invoice-report"}
-                        component={
-                          <Link to="/purchase-number/invoice-report" />
-                        }
-                        icon={<FaFileInvoice size="20" variant="Outline" />}
-                      >
-                        Number Invoice
-                      </MenuItem>
-                    </SubMenu>
+                        {isAuthorizedFunc(GET_ALL_SEARCH_NUMBER) && (
+                          <MenuItem
+                            active={url === "/numbers"}
+                            component={<Link to="/numbers" />}
+                            icon={<GoNumber size="20" variant="Outline" />}
+                          >
+                            Manage Number
+                          </MenuItem>
+                        )}
+                        {isAuthorizedFunc(NUMBER_PURCHASE_LIST) && (
+                          <MenuItem
+                            active={url === "/purchase-number"}
+                            component={<Link to="/purchase-number" />}
+                            icon={<MdOutlinePriceChange size="25" />}
+                          >
+                            Purchase Number
+                          </MenuItem>
+                        )}
+                        {isAuthorizedFunc(GET_INVOICE) && (
+                          <MenuItem
+                            active={url === "/purchase-number/invoice-report"}
+                            component={
+                              <Link to="/purchase-number/invoice-report" />
+                            }
+                            icon={<FaFileInvoice size="20" variant="Outline" />}
+                          >
+                            Number Invoice
+                          </MenuItem>
+                        )}
+                      </SubMenu>
+                    )}
                   </Tooltip>
                 )}
                 {isAuthorizedFunc(GET_NUMBER) && (
@@ -288,13 +306,15 @@ const MyProSidebar = () => {
                     arrow
                     TransitionComponent={Zoom}
                   >
-                    <MenuItem
-                      active={url === "/block-number" ? true : false}
-                      icon={<MdAppBlocking size="25" />}
-                      component={<Link to={"/block-number"} />}
-                    >
-                      <Typography>{"Block Numbers"}</Typography>
-                    </MenuItem>
+                    {isAuthorizedFunc(GET_BLOCK_RULE) && (
+                      <MenuItem
+                        active={url === "/block-number" ? true : false}
+                        icon={<MdAppBlocking size="25" />}
+                        component={<Link to={"/block-number"} />}
+                      >
+                        <Typography>{"Block Numbers"}</Typography>
+                      </MenuItem>
+                    )}
                   </Tooltip>
                 )}
                 {roleData !== 1 && (
@@ -304,29 +324,41 @@ const MyProSidebar = () => {
                     arrow
                     TransitionComponent={Zoom}
                   >
-                    <SubMenu
-                      label="Wallet"
-                      active={is_wallet_active}
-                      defaultOpen={is_wallet_active}
-                      icon={<SlWallet size="25" variant="Outline" />}
-                    >
-                      <MenuItem
-                        active={url === "/wallet"}
-                        component={<Link to="/wallet" />}
-                        icon={
-                          <RiFolderHistoryFill size="20" variant="Outline" />
-                        }
+                    {(isAuthorizedFunc(CREATE_WALLET_RECHARGE) ||
+                      isAuthorizedFunc(GET_WALLET_RECHARGE)) && (
+                      <SubMenu
+                        label="Wallet"
+                        active={is_wallet_active}
+                        defaultOpen={is_wallet_active}
+                        icon={<SlWallet size="25" variant="Outline" />}
                       >
-                        Wallet
-                      </MenuItem>
-                      <MenuItem
-                        active={url === "/wallet/add"}
-                        component={<Link to="/wallet/add" />}
-                        icon={<LiaGoogleWallet size="20" variant="Outline" />}
-                      >
-                        Add Wallet
-                      </MenuItem>
-                    </SubMenu>
+                        {isAuthorizedFunc(GET_WALLET_RECHARGE) && (
+                          <MenuItem
+                            active={url === "/wallet"}
+                            component={<Link to="/wallet" />}
+                            icon={
+                              <RiFolderHistoryFill
+                                size="20"
+                                variant="Outline"
+                              />
+                            }
+                          >
+                            Wallet
+                          </MenuItem>
+                        )}
+                        {isAuthorizedFunc(CREATE_WALLET_RECHARGE) && (
+                          <MenuItem
+                            active={url === "/wallet/add"}
+                            component={<Link to="/wallet/add" />}
+                            icon={
+                              <LiaGoogleWallet size="20" variant="Outline" />
+                            }
+                          >
+                            Add Wallet
+                          </MenuItem>
+                        )}
+                      </SubMenu>
+                    )}
                   </Tooltip>
                 )}
                 {roleData !== 1 && (
@@ -336,32 +368,38 @@ const MyProSidebar = () => {
                     arrow
                     TransitionComponent={Zoom}
                   >
-                    <SubMenu
-                      label="IVR"
-                      active={is_ivr_active}
-                      defaultOpen={is_ivr_active}
-                      icon={<MdRecordVoiceOver size="25" variant="Outline" />}
-                    >
-                      <MenuItem
-                        active={url === "/ivr/media"}
-                        component={<Link to="/ivr/media" />}
-                        icon={
-                          <BsFileEarmarkMusic size="20" variant="Outline" />
-                        }
+                    {(isAuthorizedFunc(GET_IVR) ||
+                      isAuthorizedFunc(GET_IVR_MEDIA)) && (
+                      <SubMenu
+                        label="IVR"
+                        active={is_ivr_active}
+                        defaultOpen={is_ivr_active}
+                        icon={<MdRecordVoiceOver size="25" variant="Outline" />}
                       >
-                        Media
-                      </MenuItem>
-                      <MenuItem
-                        active={url === "/ivr/manage-ivr"}
-                        component={<Link to="/ivr/manage-ivr" />}
-                        icon={<IoMdRecording size="20" variant="Outline" />}
-                      >
-                        Manage Ivr
-                      </MenuItem>
-                    </SubMenu>
+                        {isAuthorizedFunc(GET_IVR_MEDIA) && (
+                          <MenuItem
+                            active={url === "/ivr/media"}
+                            component={<Link to="/ivr/media" />}
+                            icon={
+                              <BsFileEarmarkMusic size="20" variant="Outline" />
+                            }
+                          >
+                            Media
+                          </MenuItem>
+                        )}
+                        {isAuthorizedFunc(GET_IVR) && (
+                          <MenuItem
+                            active={url === "/ivr/manage-ivr"}
+                            component={<Link to="/ivr/manage-ivr" />}
+                            icon={<IoMdRecording size="20" variant="Outline" />}
+                          >
+                            Manage Ivr
+                          </MenuItem>
+                        )}
+                      </SubMenu>
+                    )}
                   </Tooltip>
                 )}
-
                 {(isAuthorizedFunc(GET_USER) ||
                   isAuthorizedFunc(GET_BUYER) ||
                   isAuthorizedFunc(GET_PUBLISHER) ||
