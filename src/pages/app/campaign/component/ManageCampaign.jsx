@@ -979,6 +979,7 @@ const UpdateCampaign = () => {
         destination_id: foundObject.destination_id,
       };
       const res = await createIvrReq(reqData);
+      getIvrRows();
       setBarVariant("success");
       setMessage(res.data.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });

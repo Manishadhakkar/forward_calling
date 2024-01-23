@@ -9,10 +9,8 @@ import DefaultTable from "../../../../components/tables/DefaultTable";
 import Copyright from "../../../../components/footer/Footer";
 import Loader from "../../../../components/Loader/Loader";
 import {
-  getAllPurchaseNumInvoiceReq,
-  getAllPurchaseNumReq,
+  getAllPurchaseNumInvoiceReq
 } from "../service/purchaseNumber.request";
-import { GoNumber } from "react-icons/go";
 import { FaFileInvoice } from "react-icons/fa6";
 
 const paths = [

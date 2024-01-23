@@ -57,9 +57,9 @@ export const getAllPurchaseNumReq = () => {
   });
 };
 
-export const getAllPurchaseNumInvoiceReq = () => {
+export const getAllPurchaseNumInvoiceReq = (page, perpage) => {
   return axios({
     method: "GET",
-    url: `invoice/get-invoices`,
+    url: `invoice/get-invoices?page=${page}&perpage=${perpage}`,
   });
 };

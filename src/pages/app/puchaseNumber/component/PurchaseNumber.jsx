@@ -222,7 +222,6 @@ const PurchaseNumber = () => {
       starting_digits: selectStartsNo.value,
       type: type.value,
     };
-    setLoader(true);
     fetchSearchNumber(data);
   };
 
@@ -239,7 +238,7 @@ const PurchaseNumber = () => {
       did_number: row.did_number,
       price: row.price,
     };
-
+    setLoader(true);
     addToCartReq(data)
       .then((res) => {
         fetchSearchNumber(serch_Params);
