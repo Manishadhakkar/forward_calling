@@ -167,6 +167,14 @@ const MediaForm = (props) => {
                   {/* <input type="file" onChange={addFile} /> */}
                   {clickedBtn === "add" && !audio ? (
                     <input type="file" accept=".mp3, .wav" onChange={addFile} />
+                  ) : clickedBtn === "add" && audio ? (
+                    <>
+                      <input
+                        type="file"
+                        accept=".mp3, .wav"
+                        onChange={addFile}
+                      />
+                    </>
                   ) : clickedBtn === "edit" && !audio ? (
                     <input type="file" accept=".mp3, .wav" onChange={addFile} />
                   ) : (

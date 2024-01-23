@@ -6,19 +6,17 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  FormControl,
-  FormLabel,
   Grid,
   IconButton,
   Switch,
   useTheme,
-  Button
+  Button,
+  InputLabel,
 } from "@mui/material";
 import { MdClose } from "react-icons/md";
 import FormTextField from "../../textfield/FormTextField";
 import { tokens } from "../../../assets/color/theme";
 import FormTextDropdown from "../../dropdown/FormTextDropdown";
-import CustomizedButtons from "../../button/CustomizedButtons";
 import {
   getAllCountryRequest,
   getStateByCountry,
@@ -219,7 +217,7 @@ const BuyerForm = (props) => {
         state_id: state.value,
         city: city.value,
         zip: parseInt(zipCode.value),
-        status: 1
+        status: 1,
       };
       handleFormData(value);
     }
@@ -249,29 +247,33 @@ const BuyerForm = (props) => {
           <CardContent color={colors.form[100]}>
             <Box className={"formResponsiveHeight"}>
               <Grid container spacing={1}>
-                <Grid item xs={12} md={12}>
-                  <FormControl
-                    orientation="horizontal"
-                    sx={{ width: "100%", justifyContent: "space-between" }}
+                <Grid item xs={6} md={3}>
+                  <InputLabel
+                    id="demo-select-small-label"
+                    sx={{ color: colors.btn[100], marginTop: 1 }}
                   >
-                    <div>
-                      <FormLabel>Exist Company</FormLabel>
-                      <Switch
-                        checked={isExist}
-                        onChange={(event) => setIsExist(event.target.checked)}
-                        color={isExist ? "success" : "neutral"}
-                        variant={isExist ? "solid" : "outlined"}
-                        endDecorator={isExist ? "Yes" : "No"}
-                        slotProps={{
-                          endDecorator: {
-                            sx: {
-                              minWidth: 24,
-                            },
-                          },
-                        }}
-                      />
-                    </div>
-                  </FormControl>
+                    Exist Company
+                  </InputLabel>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <Switch
+                    checked={isExist}
+                    onChange={(event) => setIsExist(event.target.checked)}
+                    color={isExist ? "success" : "neutral"}
+                    variant={isExist ? "solid" : "outlined"}
+                    endDecorator={isExist ? "Yes" : "No"}
+                    slotProps={{
+                      endDecorator: {
+                        sx: {
+                          minWidth: 24,
+                        },
+                      },
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={0} md={6}>
+
                 </Grid>
 
                 {isExist && (

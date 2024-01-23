@@ -204,7 +204,6 @@ const RoleFunctionMapping = (props) => {
       >
         <Breadcrumb pathList={paths} />
         <Box>
-          {isLoader && <h2>Loader</h2>}
           <Modal modal_width={"50%"} isOpen={isOpen}>
             {selectModal()}
           </Modal>

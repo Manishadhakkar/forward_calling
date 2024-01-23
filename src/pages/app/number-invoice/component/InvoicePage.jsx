@@ -87,10 +87,9 @@ const InvoiceNumber = () => {
         state: invData,
       });
     } else if (value === 3) {
-      navigate(
-        "/purchase-number/invoice-number/wallet-payment",
-        { state: invData }
-      );
+      navigate("/purchase-number/invoice-number/wallet-payment", {
+        state: invData,
+      });
     }
   };
 
@@ -100,7 +99,7 @@ const InvoiceNumber = () => {
       getInvoiceDataReq(invoice_id)
         .then((res) => {
           setLoader(false);
-          setInvoiceData(res.data.data[0]);
+          setInvoiceData(res.data.data);
         })
         .catch(() => {
           setLoader(false);

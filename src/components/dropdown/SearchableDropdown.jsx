@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import { FormControl, FormHelperText, useTheme } from '@mui/material';
+import React, { useState } from "react";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import { FormControl, FormHelperText, useTheme } from "@mui/material";
+import { tokens } from "../../assets/color/theme";
 
 export default function FreeSolo(props) {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
   const {
-    label, Options, Value, CustomErrorLine, Required, disable, onSelect
+    label,
+    Options,
+    Value,
+    CustomErrorLine,
+    Required,
+    disable,
+    onSelect,
   } = props;
 
   const [selectValue, setSelectValue] = useState({
@@ -67,10 +77,10 @@ export default function FreeSolo(props) {
         value={Value ? Value : selectValue.value}
         onSelect={handleSelect}
         onBlur={handleChangeBlur}
-        size='small'
+        size="small"
         freeSolo
         id="free-solo-2-demo"
-        placeholder='Select one'
+        placeholder="Select one"
         disableClearable
         options={Options?.map((option) => option.label)}
         renderInput={(params) => (
@@ -79,15 +89,24 @@ export default function FreeSolo(props) {
             label={label}
             InputProps={{
               ...params.InputProps,
-              type: 'search',
+              type: "search",
+            }}
+            InputLabelProps={{
+              style: {
+                color:
+                  theme.palette.mode === "dark"
+                    ? "white"
+                    : "black",
+              },
             }}
           />
         )}
       />
       {error && (
-        <FormHelperText sx={{ marginLeft: "inherit" }} error>{error}</FormHelperText>
+        <FormHelperText sx={{ marginLeft: "inherit" }} error>
+          {error}
+        </FormHelperText>
       )}
     </FormControl>
-
   );
 }

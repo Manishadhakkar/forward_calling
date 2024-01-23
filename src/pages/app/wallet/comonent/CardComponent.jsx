@@ -26,23 +26,23 @@ import { createPaymentWallet } from "../service/wallet.request";
 import SuccessWallet from "./SuccessWallet";
 
 const CardComponent = ({ invoice_data }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
   const cardElementOptions = {
     style: {
       base: {
         width: "100%",
         fontSize: "14px",
-        color: "#424770",
+        color: "#FFFFFF",
         "::placeholder": { color: "#aab7c4" },
         border: "1px solid #9e2146",
       },
       invalid: { color: "#9e2146" },
     },
   };
-
-  const stripe = useStripe();
-  const elements = useElements();
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
   const [step, setStep] = useState(1);
   const [isLoader, setIsLoader] = useState(false);
@@ -101,11 +101,7 @@ const CardComponent = ({ invoice_data }) => {
             sx={{
               width: "45%",
               boxShadow: "none",
-              backgroundColor:
-                theme.palette.mode === "dark"
-                  ? colors.grey[900]
-                  : colors.grey[900],
-              color: colors.form[100],
+              color: colors.form[200],
             }}
           >
             <CardHeader title="Pay with card" />

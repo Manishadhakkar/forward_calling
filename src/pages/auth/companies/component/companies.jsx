@@ -302,7 +302,6 @@ const AuthUser = () => {
       >
         <Breadcrumb pathList={paths} />
         <Box>
-          {isLoader && <h2>Loader</h2>}
           <Modal modal_width={"40%"} isOpen={isOpen}>
             {selectModal()}
           </Modal>
