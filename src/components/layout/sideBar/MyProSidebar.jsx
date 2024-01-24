@@ -88,6 +88,15 @@ const MyProSidebar = () => {
     location.pathname === "/numbers" ||
     location.pathname === "/purchase-number/invoice-number" ||
     location.pathname === "/purchase-number/invoice-number/crypto-payment" ||
+    location.pathname === "/purchase-number/invoice-number/success" ||
+    location.pathname === "/purchase-number/invoice-number/wallet-payment";
+
+  let is_purchase_active =
+    location.pathname === "/purchase-number" ||
+    location.pathname === "/purchase-number/invoice" ||
+    location.pathname === "/purchase-number/invoice-number" ||
+    location.pathname === "/purchase-number/invoice-number/crypto-payment" ||
+    location.pathname === "/purchase-number/invoice-number/success" ||
     location.pathname === "/purchase-number/invoice-number/wallet-payment";
 
   useEffect(() => {
@@ -247,7 +256,7 @@ const MyProSidebar = () => {
                         )}
                         {isAuthorizedFunc(NUMBER_PURCHASE_LIST) && (
                           <MenuItem
-                            active={url === "/purchase-number"}
+                            active={is_purchase_active}
                             component={<Link to="/purchase-number" />}
                             icon={<MdOutlinePriceChange size="25" />}
                           >

@@ -26,6 +26,7 @@ import { tokens } from "../../../assets/color/theme";
 import { createCardPayment } from "../../../pages/app/paymentPage/service/payment.request";
 import { concatenateDidNumbers } from "../../../utility/utilty";
 import { useNavigate } from "react-router-dom";
+import Loader from "../../Loader/Loader";
 
 const StripeContainer = ({ invoice_data }) => {
   const cardElementOptions = {
@@ -53,6 +54,7 @@ const StripeContainer = ({ invoice_data }) => {
 
   const [error, setError] = useState(null);
   const [cardDetails, setCardDetails] = useState({});
+  const [isLoader, setIsLoader] = useState(false);
 
   const handleChange = (e) => {
     setCardDetails({ ...cardDetails, [e.elementType]: e });
@@ -82,30 +84,36 @@ const StripeContainer = ({ invoice_data }) => {
         currency: invoice_data.invoice_currency,
         item_numbers: concatenateDidNumbers(invoice_data.invoice_items),
       };
+      setIsLoader(true);
       createCardPayment(req_data)
         .then((res) => {
+          setIsLoader(false);
           navigate("/purchase-number/invoice-number/success");
         })
         .catch((err) => {
-          console.log(err);
+          setIsLoader(false);
+          setError(err.message);
         });
     }
   };
 
   return (
-    <Box
-      mt={1}
-      display={"flex"}
-      justifyContent={"center"}
-      component="form"
-      onSubmit={handleSubmit}
-    >
-      <Card sx={{ width: "40%" }}>
-        <CardHeader title="Pay with card" />
-        <Divider />
-        <CardContent color={colors.form[100]}>
-          {error && <p className="error_msg">{error}</p>}
-          {/* 
+    <>
+      {isLoader && <Loader />}
+
+      <Box
+        mt={1}
+        display={"flex"}
+        justifyContent={"center"}
+        component="form"
+        onSubmit={handleSubmit}
+      >
+        <Card sx={{ width: "40%" }}>
+          <CardHeader title="Pay with card" />
+          <Divider />
+          <CardContent color={colors.form[100]}>
+            {error && <p className="error_msg">{error}</p>}
+            {/* 
             </ListItem>
             <ListItem>
               <ListItemText primary=" Expiration Date" />
@@ -130,136 +138,139 @@ const StripeContainer = ({ invoice_data }) => {
               </ListItemText>
             </ListItem> */}
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={7.6}>
-              <Typography variant="h6">Invoice No.</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={7.6}>
+                <Typography variant="h6">Invoice No.</Typography>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={4.4}
+                sx={{
+                  "& .StripeElement": {
+                    border: "1px solid white",
+                    padding: 1,
+                    borderRadius: "8px",
+                    width: "100%",
+                  },
+                }}
+              >
+                <Typography variant="h6">{invoice_data?.invoice_id}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={7.6}>
+                <Typography variant="h6">Card Number</Typography>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={4.4}
+                sx={{
+                  "& .StripeElement": {
+                    border: "1px solid white",
+                    padding: 1,
+                    borderRadius: "8px",
+                    width: "100%",
+                  },
+                }}
+              >
+                <CardNumberElement
+                  options={cardElementOptions}
+                  onChange={(e) =>
+                    handleChange({ elementType: "cardNumber", ...e })
+                  }
+                />
+              </Grid>
+              <Grid item xs={6} sm={7.6}>
+                <Typography>Expiry Date</Typography>
+              </Grid>
+              <Grid
+                item
+                xs={4}
+                sm={2.5}
+                sx={{
+                  "& .StripeElement": {
+                    border: "1px solid #fff",
+                    padding: 1,
+                    borderRadius: "8px",
+                    width: "100%",
+                  },
+                }}
+              >
+                <CardExpiryElement
+                  options={cardElementOptions}
+                  onChange={(e) =>
+                    handleChange({ elementType: "cardExpiry", ...e })
+                  }
+                />
+              </Grid>
+              <Grid item xs={4} sm={7.6}>
+                <Typography>CVC</Typography>
+              </Grid>
+              <Grid
+                item
+                xs={4}
+                sm={1.9}
+                sx={{
+                  "& .StripeElement": {
+                    border: "1px solid #fff",
+                    padding: 1,
+                    borderRadius: "8px",
+                    width: "100%",
+                  },
+                }}
+              >
+                <CardCvcElement
+                  options={cardElementOptions}
+                  onChange={(e) =>
+                    handleChange({ elementType: "cardCvc", ...e })
+                  }
+                />
+              </Grid>
             </Grid>
-            <Grid
-              item
-              xs={12}
-              sm={4.4}
+          </CardContent>
+          <Divider />
+          <CardActions sx={{ justifyContent: "center", mr: 1, ml: 1 }}>
+            <Button
+              fullWidth
+              type="submit"
+              size="medium"
               sx={{
-                "& .StripeElement": {
-                  border: "1px solid white",
-                  padding: 1,
-                  borderRadius: "8px",
-                  width: "100%",
-                },
+                backgroundColor: colors.greenAccent[700],
+                textTransform: "none",
+                color: theme.palette.mode === "dark" ? "white" : "black",
               }}
+              variant="contained"
+              className="btn"
             >
-              <Typography variant="h6">{invoice_data?.invoice_id}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={7.6}>
-              <Typography variant="h6">Card Number</Typography>
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              sm={4.4}
-              sx={{
-                "& .StripeElement": {
-                  border: "1px solid white",
-                  padding: 1,
-                  borderRadius: "8px",
-                  width: "100%",
-                },
-              }}
-            >
-              <CardNumberElement
-                options={cardElementOptions}
-                onChange={(e) =>
-                  handleChange({ elementType: "cardNumber", ...e })
-                }
-              />
-            </Grid>
-            <Grid item xs={6} sm={7.6}>
-              <Typography>Expiry Date</Typography>
-            </Grid>
-            <Grid
-              item
-              xs={4}
-              sm={2.5}
-              sx={{
-                "& .StripeElement": {
-                  border: "1px solid #fff",
-                  padding: 1,
-                  borderRadius: "8px",
-                  width: "100%",
-                },
-              }}
-            >
-              <CardExpiryElement
-                options={cardElementOptions}
-                onChange={(e) =>
-                  handleChange({ elementType: "cardExpiry", ...e })
-                }
-              />
-            </Grid>
-            <Grid item xs={4} sm={7.6}>
-              <Typography>CVC</Typography>
-            </Grid>
-            <Grid
-              item
-              xs={4}
-              sm={1.9}
-              sx={{
-                "& .StripeElement": {
-                  border: "1px solid #fff",
-                  padding: 1,
-                  borderRadius: "8px",
-                  width: "100%",
-                },
-              }}
-            >
-              <CardCvcElement
-                options={cardElementOptions}
-                onChange={(e) => handleChange({ elementType: "cardCvc", ...e })}
-              />
-            </Grid>
-          </Grid>
-        </CardContent>
-        <Divider />
-        <CardActions sx={{ justifyContent: "center", mr: 1, ml: 1 }}>
-          <Button
-            fullWidth
-            type="submit"
-            size="medium"
-            sx={{
-              backgroundColor: colors.greenAccent[700],
-              textTransform: "none",
-              color: theme.palette.mode === "dark" ? "white" : "black",
-            }}
-            variant="contained"
-            className="btn"
-          >
-            Validate
-          </Button>
-        </CardActions>
-      </Card>
+              Validate
+            </Button>
+          </CardActions>
+        </Card>
 
-      {/* <label>
+        {/* <label>
         Card Number
         <CardNumberElement
           onChange={(e) => handleChange({ elementType: "cardNumber", ...e })}
         />
       </label> */}
-      {/* <label>
+        {/* <label>
         Expiration Date
         <CardExpiryElement
           onChange={(e) => handleChange({ elementType: "cardExpiry", ...e })}
         />
       </label> */}
-      {/* <label>
+        {/* <label>
         CVC
         <CardCvcElement
           onChange={(e) => handleChange({ elementType: "cardCvc", ...e })}
         />
       </label> */}
-      {/* <button type="submit" disabled={!stripe}>
+        {/* <button type="submit" disabled={!stripe}>
         Pay
       </button> */}
-      {/* {error && <p>{error}</p>} */}
-    </Box>
+        {/* {error && <p>{error}</p>} */}
+      </Box>
+    </>
   );
 };
 

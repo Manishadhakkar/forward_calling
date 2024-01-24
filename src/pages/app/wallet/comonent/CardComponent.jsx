@@ -36,11 +36,14 @@ const CardComponent = ({ invoice_data }) => {
       base: {
         width: "100%",
         fontSize: "14px",
-        color: "#FFFFFF",
+        color: "#FFFFFF", 
         "::placeholder": { color: "#aab7c4" },
         border: "1px solid #9e2146",
       },
       invalid: { color: "#9e2146" },
+      InputElement: {
+         color: "#FFFFFF" 
+      }
     },
   };
 
