@@ -30,7 +30,7 @@ const authTypeList = [
   },
   {
     value: 2,
-    label: "Second key authentication",
+    label: "Two key authentication",
   },
   {
     value: 3,
@@ -172,12 +172,12 @@ const IvrForm = (props) => {
           <Grid container spacing={1}>
             <Grid item xs={12} md={6}>
               <FormTextDropdown
-                Value={authType.value}
-                onSelect={handleChangeAuthType}
-                label={"Auth Type *"}
+                Value={ivrId.value}
+                onSelect={handleChangeIvr}
+                label={"Select Media *"}
                 CustomErrorLine={"Choose one"}
                 Required={true}
-                Options={authTypeList}
+                Options={ivr_option}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -204,23 +204,23 @@ const IvrForm = (props) => {
             </Grid>
             <Grid item xs={12} md={6}>
               <FormTextDropdown
-                Value={ivrId.value}
-                onSelect={handleChangeIvr}
+                Value={authType.value}
+                onSelect={handleChangeAuthType}
                 label={"Auth Type *"}
                 CustomErrorLine={"Choose one"}
                 Required={true}
-                Options={ivr_option}
+                Options={authTypeList}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <FormTextField
-                type="num"
+                type="number"
                 placeholder={"Enter connection time out"}
                 label={"Connection timeout"}
                 Value={timeOut.value}
                 onChangeText={handleChangeTimeout}
                 Required={false}
-                CustomErrorLine={"Enter proper description"}
+                CustomErrorLine={"Enter proper number"}
               />
             </Grid>
           </Grid>

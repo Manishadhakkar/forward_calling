@@ -122,7 +122,7 @@ export const createIvrReq = (body) => {
 export const updateIvrReq = (body) => {
   return axios({
     method: "PUT",
-    url: `ivr-options/${body.id}`,
+    url: `/ivr-options/${body.id}`,
     data: body.data,
   });
 };
@@ -130,6 +130,14 @@ export const updateIvrReq = (body) => {
 export const removeIvrReq = (id) => {
   return axios({
     method: "DELETE",
-    url: `ivr-options/remove/${id}`
+    url: `/ivr-options/remove/${id}`
+  });
+};
+
+export const setCampaignIvrReq = (body) => {
+  return axios({
+    method: "POST",
+    url: `/campaign/ivrAssignToCampaign`,
+    data: body,
   });
 };

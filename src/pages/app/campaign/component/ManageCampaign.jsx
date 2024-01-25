@@ -32,7 +32,13 @@ import {
 import { TbAssembly, TbBrandCampaignmonitor, TbHome2 } from "react-icons/tb";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
 import { tokens } from "../../../../assets/color/theme";
-import { MdDeleteForever, MdExpandMore } from "react-icons/md";
+import {
+  MdDeleteForever,
+  MdExpandMore,
+  MdRemove,
+  MdSave,
+  MdUpdate,
+} from "react-icons/md";
 import { FcCallTransfer } from "react-icons/fc";
 import {
   assignCampaignTargetReq,
@@ -45,6 +51,7 @@ import {
   getCompanyTargetAndRemainsReq,
   removeCampaignTargetReq,
   removeIvrReq,
+  setCampaignIvrReq,
   updateCampaignRequest,
   updateIvrReq,
   updateTargetPriorityReq,
@@ -351,6 +358,15 @@ const UpdateCampaign = () => {
   const [targetList, setTargetList] = useState([]);
   const [campaignTarget, setCampaignTarget] = useState([]);
 
+  const [campaignIvr, setCampaignIvr] = useState({
+    value: "",
+    error: false,
+    success: false,
+  });
+
+  const is_Ivr_disable =
+    campaignIvr.value === "" || initialValue.ivr_id == campaignIvr.value;
+
   const { vertical, horizontal, open } = snackbarOpen;
 
   const handleClose = (event, reason) => {
@@ -446,14 +462,12 @@ const UpdateCampaign = () => {
             ? res.data?.data.map((ele) => ({
                 ...ele,
                 input_digits: ele.input_digit,
-                ivrSelect: ele.ivr_id,
                 destination: ele.destination_type,
                 destination_id: ele.destination_id,
               }))
             : [
                 {
                   input_digits: "",
-                  ivrSelect: "",
                   destination: "",
                   destination_id: "",
                 },
@@ -557,6 +571,7 @@ const UpdateCampaign = () => {
         setIsWaiting(data.call_waiting !== 1 ? false : true);
         setIsSilent(data.trim_silence);
         setDialAttempt(data.dial_attempt_target);
+        setCampaignIvr({ value: data?.ivr_id, success: true });
       } catch (error) {
         setIsLoader(false);
       } finally {
@@ -801,9 +816,16 @@ const UpdateCampaign = () => {
     setDialAttempt((prevValue) => prevValue + 1);
   };
 
+  const handleChangeSelectIvr = (value) => {
+    setErrorMessage("");
+    setCampaignIvr(value);
+  };
+
   const handleUpdateCampaign = async (e) => {
     e.preventDefault();
-    const did_value = tfnList.find((no) => no.label === tfnNo.value);
+
+    const did_value = tfnList.find((ele) => ele.label == tfnNo.value);
+
     const data = {
       data: {
         name: name.value,
@@ -933,17 +955,6 @@ const UpdateCampaign = () => {
     setIvrRow(addDigits);
   };
 
-  const handleChangeSelectIvr = (data, id) => {
-    const addDestination = ivrRow?.map((item, index) => {
-      if (index + 1 === id) {
-        return { ...item, ivrSelect: data };
-      } else {
-        return item;
-      }
-    });
-    setIvrRow(addDestination);
-  };
-
   const handleChangeDestinationType = (data, id) => {
     const addDestination = ivrRow?.map((item, index) => {
       if (index + 1 === id) {
@@ -966,6 +977,30 @@ const UpdateCampaign = () => {
     setIvrRow(result);
   };
 
+  const handleClickSaveSelectIvr = async (event) => {
+    event.preventDefault();
+
+    setIsLoader(true);
+    try {
+      const reqData = {
+        ivr_id: campaignIvr.value,
+        campaign_id: campaign_id,
+      };
+      const res = await setCampaignIvrReq(reqData);
+      getCampaignData(campaign_id);
+      setBarVariant("success");
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+    }
+  };
+
   const handleClickSaveIvr = async (e, index) => {
     e.preventDefault();
     const foundObject = ivrRow.find((item, i) => i === index);
@@ -973,7 +1008,7 @@ const UpdateCampaign = () => {
     try {
       const reqData = {
         campaign_id: campaign_id,
-        ivr_id: foundObject.ivrSelect,
+        ivr_id: campaignIvr?.value,
         input_digit: foundObject.input_digits,
         destination_type: foundObject.destination,
         destination_id: foundObject.destination_id,
@@ -1007,10 +1042,10 @@ const UpdateCampaign = () => {
       const reqData = {
         id: foundObject.id,
         data: {
-          campaign_id: foundObject.campaign_id,
-          ivr_id: foundObject.ivrSelect,
+          campaign_id: campaign_id,
+          ivr_id: campaignIvr?.value,
           input_digit: foundObject.input_digits,
-          destination_type: foundObject.destination_type,
+          destination_type: foundObject.destination,
           destination_id: foundObject.destination_id,
         },
       };
@@ -1176,10 +1211,10 @@ const UpdateCampaign = () => {
                       Value={numberFormat.value}
                       onSelect={handleChangeFormat}
                       placeholder={"Select one"}
-                      label={"Number Format *"}
+                      label={"Number Format"}
                       CustomErrorLine={"Choose one"}
                       multiSelect={false}
-                      Required={true}
+                      Required={false}
                       disable={false}
                       Options={format_list}
                     />
@@ -1204,7 +1239,7 @@ const UpdateCampaign = () => {
                       Value={timeout.value}
                       onChangeText={handleChangeTimeout}
                       Required={false}
-                      CustomErrorLine={"Enter proper description"}
+                      CustomErrorLine={"Enter proper number"}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
@@ -1212,10 +1247,10 @@ const UpdateCampaign = () => {
                       Value={callsType.value}
                       onSelect={handleChangeCallsType}
                       placeholder={"Select one"}
-                      label={"Send duplicate calls to *"}
+                      label={"Send duplicate calls to"}
                       CustomErrorLine={"Choose one"}
                       multiSelect={false}
-                      Required={true}
+                      Required={false}
                       disable={false}
                       Options={calls_types}
                     />
@@ -1381,8 +1416,8 @@ const UpdateCampaign = () => {
                 id="panel1a-header"
               >
                 <Typography variant="h6">{"Call Routing"}</Typography>
-                <Divider />
               </AccordionSummary>
+              <Divider />
               <AccordionDetails>
                 <Box sx={{ width: "100%" }}>
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -1397,7 +1432,7 @@ const UpdateCampaign = () => {
                           backgroundColor: colors.primary[700],
                           textTransform: "none",
                         }}
-                        label="Select Target"
+                        label="Set Target"
                         {...a11yProps(0)}
                       />
                       <Tab
@@ -1410,7 +1445,7 @@ const UpdateCampaign = () => {
                           backgroundColor: colors.primary[700],
                           textTransform: "none",
                         }}
-                        label="Create Ivr"
+                        label="Set Ivr"
                         {...a11yProps(1)}
                       />
                     </Tabs>
@@ -1845,35 +1880,87 @@ const UpdateCampaign = () => {
                     </Grid>
                   </CustomTabPanel>
                   <CustomTabPanel value={tabValue} index={1}>
-                    <Box display={"flex"} justifyContent={"end"}>
-                      <div>
-                        <Fab
-                          aria-label="add"
-                          size="small"
+                    <Box
+                      display={"flex"}
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                      mb={1}
+                    >
+                      <Grid container spacing={1} className="GridIvrContainer">
+                        <Grid item xs={12} md={12}>
+                          <FormTextDropdown
+                            Value={campaignIvr.value}
+                            onSelect={handleChangeSelectIvr}
+                            label={"Choose Ivr*"}
+                            CustomErrorLine={"Choose one"}
+                            Required={true}
+                            Options={ivrList}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                          <Stack
+                            alignContent={"center"}
+                            alignItems={"flex-end"}
+                          >
+                            <Button
+                              size="small"
+                              variant="contained"
+                              sx={{
+                                backgroundColor: colors.greenAccent[600],
+                                width: "30%",
+                                textDecoration: "none",
+                              }}
+                              onClick={handleClickSaveSelectIvr}
+                              disabled={is_Ivr_disable}
+                            >
+                              {initialValue?.ivr_id !== "" ? "Save" : "Update"}
+                            </Button>
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                    {initialValue.ivr_id && (
+                      <Box>
+                        <Box
                           sx={{
-                            boxShadow: "none",
-                            backgroundColor: colors.greenAccent[500],
-                          }}
-                          onClick={() => {
-                            addRowTable();
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "end",
+                            mb: 1,
                           }}
                         >
-                          <Tooltip title="Add">
-                            <Add />
-                          </Tooltip>
-                        </Fab>
-                      </div>
-                    </Box>
-                    <Box>
-                      <Grid container spacing={1}>
-                        {ivrRow?.length ? (
-                          ivrRow?.map((obj, index) => {
+                          <div>
+                            <Typography variant="subtitle1">
+                              Ivr Options
+                            </Typography>
+                          </div>
+                          <div>
+                            <Fab
+                              aria-label="add"
+                              size="small"
+                              sx={{
+                                boxShadow: "none",
+                                backgroundColor: colors.greenAccent[500],
+                              }}
+                              onClick={() => {
+                                addRowTable();
+                              }}
+                            >
+                              <Tooltip title="Add">
+                                <Add />
+                              </Tooltip>
+                            </Fab>
+                          </div>
+                        </Box>
+                        <Divider />
+                        <Grid container spacing={1}>
+                          {ivrRow?.map((obj, index) => {
                             const key = index;
                             return (
                               <>
                                 <Grid item xs={6} md={2}>
                                   <FormTextField
-                                    type="num"
+                                    type="number"
                                     placeholder={"Enter digit"}
                                     label={"Digit"}
                                     Value={obj.input_digits}
@@ -1883,21 +1970,7 @@ const UpdateCampaign = () => {
                                     Required={true}
                                     CustomErrorLine={"Enter proper digits"}
                                   />
-                                </Grid>
-
-                                <Grid item xs={6} md={2}>
-                                  <FormTextDropdown
-                                    Value={obj.ivrSelect}
-                                    onSelect={(e) =>
-                                      handleChangeSelectIvr(e.value, index + 1)
-                                    }
-                                    label={"Ivr No.*"}
-                                    CustomErrorLine={"Choose one"}
-                                    Required={true}
-                                    Options={ivrList}
-                                  />
-                                </Grid>
-
+                                </Grid>{" "}
                                 <Grid item xs={6} md={3}>
                                   <FormTextDropdown
                                     Value={obj.destination}
@@ -1913,7 +1986,6 @@ const UpdateCampaign = () => {
                                     Options={desinationTypeList}
                                   />
                                 </Grid>
-
                                 <Grid item xs={6} md={3}>
                                   <FormTextDropdown
                                     Value={obj.destination_id}
@@ -1934,82 +2006,110 @@ const UpdateCampaign = () => {
                                     }
                                   />
                                 </Grid>
-
                                 <Grid
                                   item
                                   xs={6}
-                                  md={2}
-                                  sx={{ display: "flex", alignItems: "center" }}
+                                  md={4}
+                                  display={"flex"}
+                                  alignItems={"end"}
                                 >
-                                  <Stack spacing={2} direction="row">
-                                    {obj.id ? (
-                                      <Button
-                                        size="small"
-                                        variant="contained"
-                                        sx={{
-                                          backgroundColor:
-                                            colors.greenAccent[600],
-                                        }}
-                                        onClick={(e) =>
-                                          handleClickUpdateIvr(e, obj)
-                                        }
-                                      >
-                                        Update
-                                      </Button>
-                                    ) : (
-                                      <Button
-                                        size="small"
-                                        variant="contained"
-                                        sx={{
-                                          backgroundColor:
-                                            colors.greenAccent[600],
-                                        }}
-                                        onClick={(e) =>
-                                          handleClickSaveIvr(e, key)
-                                        }
-                                      >
-                                        Save
-                                      </Button>
-                                    )}
-                                    {obj.id ? (
-                                      <Button
-                                        size="small"
-                                        variant="contained"
-                                        sx={{
-                                          backgroundColor:
-                                            colors.redAccent[500],
-                                        }}
-                                        onClick={(e) =>
-                                          handleClickDeleteIvr(e, obj.id)
-                                        }
-                                      >
-                                        Delete
-                                      </Button>
-                                    ) : (
-                                      <Button
-                                        size="small"
-                                        variant="contained"
-                                        sx={{
-                                          backgroundColor:
-                                            colors.redAccent[500],
-                                        }}
-                                        onClick={(e) =>
-                                          handleClickRemoveIvr(e, key)
-                                        }
-                                      >
-                                        Remove
-                                      </Button>
-                                    )}
-                                  </Stack>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      width: "100%",
+                                      justifyContent: "flex-end",
+                                      alignContent: "center",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <Stack spacing={1} direction={"row"}>
+                                      {obj.id ? (
+                                        <Tooltip
+                                          title="Update"
+                                          arrow
+                                          placement="right-start"
+                                          TransitionComponent={Zoom}
+                                        >
+                                          <IconButton
+                                            sx={{
+                                              backgroundColor:
+                                                colors.greenAccent[600],
+                                            }}
+                                            onClick={(e) =>
+                                              handleClickUpdateIvr(e, obj)
+                                            }
+                                          >
+                                            <MdUpdate />
+                                          </IconButton>
+                                        </Tooltip>
+                                      ) : (
+                                        <Tooltip
+                                          title="Save"
+                                          arrow
+                                          placement="right-start"
+                                          TransitionComponent={Zoom}
+                                        >
+                                          <IconButton
+                                            sx={{
+                                              backgroundColor:
+                                                colors.greenAccent[600],
+                                            }}
+                                            onClick={(e) =>
+                                              handleClickSaveIvr(e, key)
+                                            }
+                                          >
+                                            <MdSave />
+                                          </IconButton>
+                                        </Tooltip>
+                                      )}
+                                      {obj.id ? (
+                                        <Tooltip
+                                          title="Delete"
+                                          arrow
+                                          placement="right-start"
+                                          TransitionComponent={Zoom}
+                                        >
+                                          <IconButton
+                                            sx={{
+                                              backgroundColor:
+                                                colors.redAccent[500],
+                                            }}
+                                            onClick={(e) =>
+                                              handleClickDeleteIvr(e, obj.id)
+                                            }
+                                          >
+                                            <MdDeleteForever />
+                                          </IconButton>
+                                        </Tooltip>
+                                      ) : (
+                                        <Tooltip
+                                          title="Remove"
+                                          arrow
+                                          placement="right-start"
+                                          TransitionComponent={Zoom}
+                                        >
+                                          <IconButton
+                                            sx={{
+                                              backgroundColor:
+                                                colors.redAccent[500],
+                                            }}
+                                            onClick={(e) =>
+                                              handleClickRemoveIvr(e, key)
+                                            }
+                                          >
+                                            <MdRemove />
+                                          </IconButton>
+                                        </Tooltip>
+                                      )}
+                                    </Stack>
+                                  </Box>
                                 </Grid>
                               </>
                             );
-                          })
-                        ) : (
-                          <h5>No records found</h5>
-                        )}
-                      </Grid>
-                    </Box>
+                          })}
+                        </Grid>
+                      </Box>
+                    )}
                   </CustomTabPanel>
                 </Box>
               </AccordionDetails>

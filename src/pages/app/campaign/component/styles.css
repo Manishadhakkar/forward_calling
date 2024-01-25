@@ -33,3 +33,15 @@
     background-color: "inherit";
     box-shadow: none;
   }
+
+  .GridIvrContainer {
+    width: 100%;
+    max-width: 40%;
+  }
+  
+  /* Media query for screens smaller than 600px */
+  @media only screen and (max-width: 600px) {
+    .GridIvrContainer {
+      max-width: 100%;
+    }
+  }

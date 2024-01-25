@@ -15,9 +15,7 @@ import FormTextField from "../../textfield/FormTextField";
 import { tokens } from "../../../assets/color/theme";
 import FormTextDropdown from "../../dropdown/FormTextDropdown";
 import SwitchCall from "../../chip/SwichCall";
-import {
-  getAllActiveNumber
-} from "../../../pages/app/campaign/service/campaign.request";
+import { getAllActiveNumber } from "../../../pages/app/campaign/service/campaign.request";
 import Loader from "../../Loader/Loader";
 import "./styles.css";
 import NumberDropdown from "../../dropdown/SearchableDropdown";
@@ -208,13 +206,13 @@ const CampaignForm = (props) => {
             </Grid>
             <Grid item xs={12} md={6}>
               <FormTextField
-                type="num"
+                type="number"
                 placeholder={"Enter connection time out"}
                 label={"Connection timeout"}
                 Value={timeout.value}
                 onChangeText={handleChangeTimeout}
                 Required={false}
-                CustomErrorLine={"Enter proper description"}
+                CustomErrorLine={"Enter proper number"}
               />
             </Grid>
             <Grid item xs={6} md={3}>
