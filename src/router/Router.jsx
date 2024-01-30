@@ -20,6 +20,7 @@ import {
   GET_TARGET,
   GET_USER,
 } from "../utility/constant";
+import LiveCalls from "../pages/app/liveCalls/component/LiveCalls";
 
 const Dashboard = lazy(() =>
   import("../pages/app/dashboard/component/Dasboard")
@@ -113,6 +114,10 @@ const SuccessPage = lazy(() =>
 
 const ChangePassword = lazy(() =>
   import("../pages/auth/changePassword/component/ChangePassword")
+);
+
+const InboundReportPage = lazy(() =>
+  import("../pages/app/reboundReport/component/InboundReport")
 );
 
 const Router = () => {
@@ -226,6 +231,13 @@ const Router = () => {
                     {isAuthorizedFunc(GET_NUMBER) && (
                       <Route path="/did-numbers" element={<ManageNumber />} />
                     )}
+
+                    <Route
+                      path="/report/inbound"
+                      element={<InboundReportPage />}
+                    />
+
+                    <Route path="/report/live-calls" element={<LiveCalls />} />
 
                     <Route path="/group" element={<ManageGroup />} />
 

@@ -148,8 +148,7 @@ const NumberList = () => {
               data={rows}
               column={columns}
               isSearchable={false}
-              isView={true}
-              handleViewChange={handleView}
+              isEditing={false}
             />
             <Pagination
               style={{

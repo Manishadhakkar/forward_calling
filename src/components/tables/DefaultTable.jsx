@@ -34,6 +34,7 @@ const DefaultTable = (props) => {
     isAssignable = false,
     isView = false,
     isDownload = false,
+    isEditing = true,
   } = props;
 
   const theme = useTheme();
@@ -98,7 +99,7 @@ const DefaultTable = (props) => {
         sx: { minWidth: "50px" },
         variant: "standard",
       }}
-      enableEditing
+      enableEditing={isEditing}
       enableColumnFilters={false}
       enableColumnActions={false}
       enableFullScreenToggle={false}

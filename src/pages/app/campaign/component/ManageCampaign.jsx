@@ -74,6 +74,7 @@ import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { Add } from "iconsax-react";
+import MaterialReactTable from "material-react-table";
 
 const blue = {
   100: "#daecff",
@@ -237,8 +238,8 @@ const paths = [
 ];
 
 const desinationTypeList = [
-  { label: "Ivr", value: 1 },
-  { label: "Target", value: 2 },
+  { label: "Ivr", value: "Ivr" },
+  { label: "Target", value: "Target" },
 ];
 
 const UpdateCampaign = () => {
@@ -1920,6 +1921,10 @@ const UpdateCampaign = () => {
                       </Grid>
                     </Box>
                     {initialValue.ivr_id && (
+                      // <Box>
+                      //   <MaterialReactTable table={table} />
+                      // </Box>
+
                       <Box>
                         <Box
                           sx={{
@@ -1993,14 +1998,14 @@ const UpdateCampaign = () => {
                                       handleChangeRemainsIvr(e.value, index + 1)
                                     }
                                     label={
-                                      obj.destination === 1
+                                      obj.destination === "Ivr"
                                         ? "Select Ivr *"
                                         : "Select Target *"
                                     }
                                     CustomErrorLine={"Choose one"}
                                     Required={true}
                                     Options={
-                                      obj.destination === 1
+                                      obj.destination === "Ivr"
                                         ? ivrList
                                         : ivrTargets
                                     }
@@ -2140,3 +2145,41 @@ const UpdateCampaign = () => {
 };
 
 export default UpdateCampaign;
+
+
+function useCreateUser() {
+  console.log("Hit ivr add")
+}
+function useGetUsers() {
+  console.log("Get Ivr")
+  // return useQuery({
+  //   queryKey: ['users'],
+  //   queryFn: async () => {
+  //     //send api request here
+  //     await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+  //     return Promise.resolve(fakeData);
+  //   },
+  //   refetchOnWindowFocus: false,
+  // });
+}
+function useUpdateUser() {
+  console.log("Update IVR")
+  // const queryClient = useQueryClient();
+  // return useMutation({
+  //   mutationFn: async (user) => {
+  //     console.info('update user', user);
+  //     //send api update request here
+  //     await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+  //     return Promise.resolve();
+  //   },
+  //   //client side optimistic update
+  //   onMutate: (newUserInfo) => {
+  //     queryClient.setQueryData(['users'], (prevUsers) => {
+  //       let user = findUserInTree(newUserInfo.id, prevUsers);
+  //       user = { ...user, ...newUserInfo };
+  //       return [...prevUsers];
+  //     });
+  //   },
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+  // });
+}

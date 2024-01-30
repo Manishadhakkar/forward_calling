@@ -3,14 +3,12 @@ import { Pagination } from "rsuite";
 import { Box, Typography, useTheme } from "@mui/material";
 import { TbHome2 } from "react-icons/tb";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
-import StatusChip from "../../../../components/chip/StatusChip";
 import { tokens } from "../../../../assets/color/theme";
 import Loader from "../../../../components/Loader/Loader";
 import DefaultTable from "../../../../components/tables/DefaultTable";
 import Copyright from "../../../../components/footer/Footer";
 import { RiFolderHistoryFill } from "react-icons/ri";
 import { getWalletHistory } from "../service/wallet.request";
-import CustomCell from "../../../../components/tableCell/DateCell";
 import DateCell from "../../../../components/tableCell/DateCell";
 import AmountCell from "../../../../components/tableCell/AmountCell";
 
@@ -127,9 +125,6 @@ const WalletContainer = () => {
     getAllHistory(activePage, limit);
   }, [activePage, limit]);
 
-  const handleViewHistory = (e) => {
-    console.log(e);
-  };
 
   return (
     <>
@@ -169,8 +164,7 @@ const WalletContainer = () => {
               data={rows}
               column={columns}
               isSearchable={true}
-              handleViewChange={handleViewHistory}
-              isView={true}
+              isEditing={false}
             />
             <Pagination
               style={{

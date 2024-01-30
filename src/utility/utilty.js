@@ -59,3 +59,31 @@ export const concatenateDidNumbers = (data) => {
   const result = didNumbers.join("-");
   return result;
 };
+
+export const convertIvrArray = (inputArray, propertyNames) => {
+  const map = {};
+  const result = [];
+
+  inputArray.forEach((item) => {
+    const node = {};
+
+    propertyNames.forEach((prop) => {
+      if (item[prop] !== undefined) {
+        node[prop] = item[prop];
+      }
+    });
+
+    node.children = [];
+    map[node.id] = node;
+
+    if (node.parentValue === null) {
+      result.push(node);
+    } else {
+      const parentNode = map[node.parentValue] || { children: [] };
+      parentNode.children.push(node);
+      map[node.parentValue] = parentNode;
+    }
+  });
+
+  return result;
+};

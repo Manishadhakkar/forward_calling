@@ -1,12 +1,6 @@
 import React from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../../../assets/color/theme";
-import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
-import PaymentStepper from "../../../../components/stepper/PaymentStepper";
-import Copyright from "../../../../components/footer/Footer";
-import { TbHome2 } from "react-icons/tb";
-import { MdOutlinePriceChange } from "react-icons/md";
-import { PiHandCoinsFill } from "react-icons/pi";
 import { TickCircle } from "iconsax-react";
 import { useNavigate } from "react-router-dom";
 

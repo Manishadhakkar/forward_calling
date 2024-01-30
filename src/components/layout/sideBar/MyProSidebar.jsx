@@ -9,7 +9,13 @@ import {
 } from "react-pro-sidebar";
 import { tokens } from "../../../assets/color/theme";
 import { useTheme, Box, Typography, Tooltip, Zoom } from "@mui/material";
-import { TbBrandCampaignmonitor, TbHome2, TbTargetArrow } from "react-icons/tb";
+import {
+  TbBrandCampaignmonitor,
+  TbHome2,
+  TbReportSearch,
+  TbTargetArrow,
+} from "react-icons/tb";
+import { BiSolidReport } from "react-icons/bi";
 import { SidebarHeader } from "./SidebarHeader";
 import { Aave, Buildings2, Profile2User, Setting4 } from "iconsax-react";
 import { HiOutlineHashtag } from "react-icons/hi2";
@@ -17,11 +23,15 @@ import { IoServerOutline } from "react-icons/io5";
 import { LiaGoogleWallet } from "react-icons/lia";
 import { RiFolderHistoryFill } from "react-icons/ri";
 import { BsFileEarmarkMusic } from "react-icons/bs";
-import { MdRecordVoiceOver } from "react-icons/md";
+import { MdRecordVoiceOver, MdReport } from "react-icons/md";
 // import { SiGroupme } from "react-icons/si";
 import { IoMdRecording } from "react-icons/io";
 import { SlWallet } from "react-icons/sl";
-import { GiCarrier, GiSecurityGate } from "react-icons/gi";
+import {
+  GiCarrier,
+  GiSatelliteCommunication,
+  GiSecurityGate,
+} from "react-icons/gi";
 import {
   MdAppBlocking,
   MdOutlinePriceChange,
@@ -77,6 +87,10 @@ const MyProSidebar = () => {
 
   let is_wallet_active =
     location.pathname === "/wallet" || location.pathname === "/wallet/add";
+
+  let is_report_active =
+    location.pathname === "/report/live-calls" ||
+    location.pathname === "/report/inbound";
 
   let is_ivr_active =
     location.pathname === "/ivr/media" ||
@@ -368,6 +382,41 @@ const MyProSidebar = () => {
                         )}
                       </SubMenu>
                     )}
+                  </Tooltip>
+                )}
+                {roleData !== 1 && (
+                  <Tooltip
+                    title={collapsed && "Reports"}
+                    placement="right"
+                    arrow
+                    TransitionComponent={Zoom}
+                  >
+                    <SubMenu
+                      label="Report"
+                      active={is_report_active}
+                      defaultOpen={is_report_active}
+                      icon={<BiSolidReport size="25" variant="Outline" />}
+                    >
+                      <MenuItem
+                        active={url === "/report/inbound"}
+                        component={<Link to="/report/inbound" />}
+                        icon={<TbReportSearch size="20" variant="Outline" />}
+                      >
+                        Inbound Reports
+                      </MenuItem>
+                      <MenuItem
+                        active={url === "/report/live-calls"}
+                        component={<Link to="/report/live-calls" />}
+                        icon={
+                          <GiSatelliteCommunication
+                            size="20"
+                            variant="Outline"
+                          />
+                        }
+                      >
+                        Live Calls
+                      </MenuItem>
+                    </SubMenu>
                   </Tooltip>
                 )}
                 {roleData !== 1 && (
