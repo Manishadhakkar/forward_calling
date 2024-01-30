@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import { ColorModeContext, tokens } from "../../../assets/color/theme";
 import {
@@ -39,6 +39,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { logoutRequest } from "./logout.request";
 import Loader from "../../Loader/Loader";
+import { getBalanceRemainsReq } from "../../../pages/app/wallet/service/wallet.request";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -48,13 +49,28 @@ const Topbar = () => {
   const userData = JSON.parse(localStorage.getItem("user"));
   const roleData = userData?.user_data?.roles[0]?.role_id;
   const user_details = userData?.user_data;
+  const currency_symbol = userData?.user_data?.country?.currency_symbol;
 
   const { toggleSidebar, collapseSidebar, broken, collapsed } = useProSidebar();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(false);
   const [isLoader, setIsLoader] = useState(false);
 
-  const [age, setAge] = React.useState("");
+  const [age, setAge] = useState("");
+  const [amount, setAmount] = useState(0);
+
+  useEffect(() => {
+    const myFunction = async () => {
+      try {
+        const res = await getBalanceRemainsReq();
+        setAmount(res.data?.data[0]?.balance);
+      } catch (err) {
+      } finally {
+      }
+    };
+    const intervalId = setInterval(myFunction, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   const handleChange = (event) => {
     setAge(event.target.value);
@@ -250,6 +266,28 @@ const Topbar = () => {
 
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <Typography
+              variant="h4"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                color: colors.blue[100],
+              }}
+            >
+              {currency_symbol}
+            </Typography>
+            <Typography
+              variant="h5"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                color: colors.layoutColor[200],
+                mr: 1,
+                ml: 1,
+              }}
+            >
+              {amount}
+            </Typography>
             <Tooltip
               title={theme.palette.mode === "dark" ? "Light Mode" : "Dark Mode"}
               placement="bottom"
@@ -324,7 +362,9 @@ const Topbar = () => {
                   </MenuItem>
 
                   <FormControl fullWidth size="small">
-                    <InputLabel id="demo-simple-select-label">Switch</InputLabel>
+                    <InputLabel id="demo-simple-select-label">
+                      Switch
+                    </InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"

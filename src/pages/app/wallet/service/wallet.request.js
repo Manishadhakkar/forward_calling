@@ -14,3 +14,11 @@ export const createPaymentWallet = (body) => {
     data: body,
   });
 };
+
+//For showing balance on topbar
+export const getBalanceRemainsReq = () => {
+  return axios({
+    method: "GET",
+    url: `/user/balance`,
+  });
+};
