@@ -63,7 +63,7 @@ const Topbar = () => {
     const myFunction = async () => {
       try {
         const res = await getBalanceRemainsReq();
-        setAmount(res.data?.data[0]?.balance);
+        setAmount(res.data?.data?.balance);
       } catch (err) {
       } finally {
       }
