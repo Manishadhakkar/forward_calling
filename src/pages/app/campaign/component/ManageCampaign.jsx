@@ -29,7 +29,6 @@ import {
   Fab,
   Stack,
 } from "@mui/material";
-import { TbAssembly, TbBrandCampaignmonitor, TbHome2 } from "react-icons/tb";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
 import { tokens } from "../../../../assets/color/theme";
 import {
@@ -70,68 +69,24 @@ import { FaCircle } from "react-icons/fa";
 import "./styles.css";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { Add } from "iconsax-react";
-import MaterialReactTable from "material-react-table";
+import CustomTabPanel, {
+  a11yProps,
+} from "../../../../components/customPanel/CustomTabPanel";
+import {
+  calls_types,
+  desinationTypeList,
+  format_list,
+  paths,
+} from "../container/CustomFunction";
+import { Table as IVRTable } from "rsuite";
+import { FormModal as Modal } from "../../../../components/modal/FormModal";
+import { convertIvrArray } from "../../../../utility/utilty";
+import AssignIvrForm from "../../../../components/form/campaignForm/AssignIvr";
 
-const blue = {
-  100: "#daecff",
-  200: "#b6daff",
-  300: "#66b2ff",
-  400: "#3399ff",
-  500: "#007fff",
-  600: "#0072e5",
-  700: "#0059B2",
-  800: "#004c99",
-};
-
-const grey = {
-  50: "#F3F6F9",
-  100: "#E5EAF2",
-  200: "#DAE2ED",
-  300: "#C7D0DD",
-  400: "#B0B8C4",
-  500: "#9DA8B7",
-  600: "#6B7A90",
-  700: "#434D5B",
-  800: "#303740",
-  900: "#1C2025",
-};
-
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
+const { Column, HeaderCell, Cell } = IVRTable;
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -158,9 +113,9 @@ const StyledInput = styled("input")(
   font-family: inherit;
   font-weight: 200;
   line-height: 0.5;
-  color: ${theme.palette.mode === "dark" ? grey[300] : grey[900]};
-  background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-  border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]};
+  color: ${theme.palette.mode === "dark" ? "#C7D0DD" : "#1C2025"};
+  background: ${theme.palette.mode === "dark" ? "#1C2025" : "#fff"};
+  border: 1px solid ${theme.palette.mode === "dark" ? "#434D5B" : "#DAE2ED"};
   box-shadow: 0px 2px 4px ${
     theme.palette.mode === "dark" ? "rgba(0,0,0, 0.5)" : "rgba(0,0,0, 0.05)"
   };
@@ -172,12 +127,12 @@ const StyledInput = styled("input")(
   width: 2.5rem;
   text-align: center;
   &:hover {
-    border-color: ${blue[400]};
+    border-color: "#3399ff";
   }
   &:focus {
-    border-color: ${blue[400]};
+    border-color: "#3399ff";
     box-shadow: 0 0 0 3px ${
-      theme.palette.mode === "dark" ? blue[700] : blue[200]
+      theme.palette.mode === "dark" ? "#0059B2" : "#b6daff"
     };
   }
   &:focus-visible {
@@ -194,9 +149,9 @@ const StyledButton = styled("button")(
   line-height: 1.5;
   border: 1px solid;
   border-radius: 999px;
-  border-color: ${theme.palette.mode === "dark" ? grey[800] : grey[200]};
-  background: ${theme.palette.mode === "dark" ? grey[900] : grey[50]};
-  color: ${theme.palette.mode === "dark" ? grey[200] : grey[900]};
+  border-color: ${theme.palette.mode === "dark" ? "#303740" : "#DAE2ED"};
+  background: ${theme.palette.mode === "dark" ? "#1C2025" : "#F3F6F9"};
+  color: ${theme.palette.mode === "dark" ? "#DAE2ED" : "#1C2025"};
   width: 25px;
   height: 25px;
   display: flex;
@@ -209,9 +164,9 @@ const StyledButton = styled("button")(
 
   &:hover {
     cursor: pointer;
-    background: ${theme.palette.mode === "dark" ? blue[700] : blue[500]};
-    border-color: ${theme.palette.mode === "dark" ? blue[500] : blue[400]};
-    color: ${grey[50]};
+    background: ${theme.palette.mode === "dark" ? "#0059B2" : "#007fff"};
+    border-color: ${theme.palette.mode === "dark" ? "#007fff" : "#3399ff"};
+    color: F3F6F9;
   }
 
   &:focus-visible {
@@ -220,27 +175,47 @@ const StyledButton = styled("button")(
 `
 );
 
-const paths = [
-  {
-    name: "Dashboard",
-    path: "",
-    icon: <TbHome2 />,
-  },
-  {
-    name: "Campaign",
-    icon: <TbBrandCampaignmonitor />,
-    path: "campaigns",
-  },
-  {
-    name: "Update Campaign",
-    icon: <TbAssembly />,
-  },
-];
+const ActionCell = ({
+  rowData,
+  dataKey,
+  onClickEdit,
+  onClickAdd,
+  onClickDelete,
+  style,
+  ...props
+}) => {
+  return (
+    <Cell {...props} style={style}>
+      {rowData.destination_type === "Ivr" && (
+        <Button
+          appearance="link"
+          onClick={() => {
+            onClickAdd(rowData.id);
+          }}
+        >
+          {"Add"}
+        </Button>
+      )}
+      <Button
+        appearance="link"
+        onClick={() => {
+          onClickEdit(rowData.id);
+        }}
+      >
+        {"Edit"}
+      </Button>
 
-const desinationTypeList = [
-  { label: "Ivr", value: "Ivr" },
-  { label: "Target", value: "Target" },
-];
+      <Button
+        appearance="link"
+        onClick={() => {
+          onClickDelete(rowData.id);
+        }}
+      >
+        {"Delete"}
+      </Button>
+    </Cell>
+  );
+};
 
 const UpdateCampaign = () => {
   const location = useLocation();
@@ -263,39 +238,19 @@ const UpdateCampaign = () => {
   const [ivrList, setIvrList] = useState([]);
   const [searchTargetParams, setSearchTargetParams] = useState("");
   const [searchCampaignParams, setSearchCampaignParams] = useState("");
-  const [errorMessage, setErrorMessage] = useState();
-
   const [initialValue, setInitValue] = useState({});
-  const [ivrRow, setIvrRow] = useState([
-    {
-      input_digits: "",
-      ivrSelect: "",
-      destination: "",
-      destination_id: "",
-    },
-  ]);
+  const [ivrRawData, setIvrRawData] = useState([]);
+  const [ivrRow, setIvrRow] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [clickedBtn, setClickedBtn] = useState("");
+  const [currentType, setCurrentType] = useState();
+  const [ivtBtnType, setBtnType] = useState(1);
 
-  const campaign_id = location?.state?.campaign_id;
-
-  const addRowTable = () => {
-    const data = {
-      input_digits: "",
-      ivrSelect: "",
-      destination: "",
-      destination_id: "",
-    };
-    setIvrRow([...ivrRow, data]);
+  const handleModalClose = () => {
+    setIsOpen(false);
   };
 
-  const format_list = [
-    { id: 1, label: "(###) #### ### ###", value: "(###) #### ### ###" },
-    { id: 2, label: "(##) ### ### ####", value: "(##) ### ### ####" },
-  ];
-  const calls_types = [
-    { id: 1, label: "Same target", value: "Same target" },
-    { id: 2, label: "Different target", value: "Different target" },
-    { id: 3, label: "Random", value: "Random" },
-  ];
+  const campaign_id = location?.state?.campaign_id;
 
   const [snackbarOpen, setSnackbarOpen] = useState({
     open: false,
@@ -303,53 +258,43 @@ const UpdateCampaign = () => {
     horizontal: "right",
   });
   const [barVariant, setBarVariant] = useState("");
-
   const [openClip, setOpenClip] = useState(false);
   const [isLoader, setIsLoader] = useState(false);
-
   const [randomId, setRandomId] = useState({
     value: "",
   });
-
   const [name, setName] = useState({
     value: "",
     error: false,
     success: false,
   });
-
   const [description, setDescription] = useState({
     value: "",
     error: false,
     success: false,
   });
-
   const [timeout, setTimeout] = useState({
     value: "",
     error: false,
     success: false,
   });
-
   const [tfnList, setTFNList] = useState([]);
   const [tfnNo, setTFNNo] = useState({
     value: "",
     error: false,
     success: false,
   });
-
   const [callsType, setCallsType] = useState({
     value: null,
     error: false,
     success: false,
   });
-
   const [numberFormat, setNumberFormat] = useState({
     value: "",
     error: false,
     success: false,
   });
-
   const [isRecording, setIsRecording] = useState(false);
-
   const [isStrict, setIsStrict] = useState(false);
   const [isDuplicatesCalls, setIsDuplicatesCalls] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
@@ -358,13 +303,11 @@ const UpdateCampaign = () => {
   const [ivrTargets, setIvrTargets] = useState([]);
   const [targetList, setTargetList] = useState([]);
   const [campaignTarget, setCampaignTarget] = useState([]);
-
   const [campaignIvr, setCampaignIvr] = useState({
     value: "",
     error: false,
     success: false,
   });
-
   const is_Ivr_disable =
     campaignIvr.value === "" || initialValue.ivr_id == campaignIvr.value;
 
@@ -453,32 +396,18 @@ const UpdateCampaign = () => {
     }
   }, [expanded, tabValue]);
 
-  const getIvrRows = () => {
-    setIsLoader(true);
-    getAllIvrReq(campaign_id)
-      .then((res) => {
-        setIsLoader(false);
-        const resultData =
-          res.data?.data.length > 0
-            ? res.data?.data.map((ele) => ({
-                ...ele,
-                input_digits: ele.input_digit,
-                destination: ele.destination_type,
-                destination_id: ele.destination_id,
-              }))
-            : [
-                {
-                  input_digits: "",
-                  destination: "",
-                  destination_id: "",
-                },
-              ];
-        setIvrRow(resultData);
-      })
-
-      .catch(() => {
-        setIsLoader(false);
-      });
+  const getIvrRows = async () => {
+    try {
+      setIsLoader(true);
+      const res = await getAllIvrReq(campaign_id);
+      setIsLoader(false);
+      const data =
+        res.data.data.length > 0 ? convertIvrArray(res.data.data) : [];
+      setIvrRow(data);
+      setIvrRawData(res.data.data);
+    } catch (error) {
+      setIsLoader(false);
+    }
   };
 
   useEffect(() => {
@@ -526,7 +455,6 @@ const UpdateCampaign = () => {
   const handleChangeFormat = (value) => {
     setNumberFormat(value);
   };
-
   useEffect(() => {
     if (expanded === "panel1") {
       (async () => {
@@ -542,14 +470,12 @@ const UpdateCampaign = () => {
           setBarVariant("error");
           setMessage(err.message);
           setSnackbarOpen((prev) => ({ ...prev, open: true }));
-          setErrorMessage("");
         } finally {
           setIsLoader(false);
         }
       })();
     }
   }, [expanded]);
-
   const getCampaignData = async (campaign_id) => {
     if (expanded === "panel1") {
       setIsLoader(true);
@@ -557,6 +483,7 @@ const UpdateCampaign = () => {
         const res = await getCampaignByIdRequest(campaign_id);
         const data = res.data.data[0];
         setInitValue(data);
+        setTabValue(data.ivr_id === null ? 0 : 1);
         setRandomId({ value: data?.campaign_random_id });
         setName({ value: data?.name });
         setDescription({ value: data?.description });
@@ -580,13 +507,11 @@ const UpdateCampaign = () => {
       }
     }
   };
-
   useEffect(() => {
     if (campaign_id) {
       getCampaignData(campaign_id);
     }
   }, [campaign_id]);
-
   useEffect(() => {
     if (expanded === "panel2") {
       (async () => {
@@ -619,19 +544,16 @@ const UpdateCampaign = () => {
           setBarVariant("error");
           setMessage(err.message);
           setSnackbarOpen((prev) => ({ ...prev, open: true }));
-          setErrorMessage("");
         } finally {
           setIsLoader(false);
         }
       })();
     }
   }, [expanded, timer]);
-
   const handleClick = () => {
     setOpenClip(true);
     navigator.clipboard.writeText(randomId.value);
   };
-
   const handleChangePriority = (e, id) => {
     setCampaignTarget((prevData) =>
       prevData.map((item) =>
@@ -639,7 +561,6 @@ const UpdateCampaign = () => {
       )
     );
   };
-
   const handleUpdatePriority = async (e, row) => {
     if (e.target.value !== row.priority) {
       try {
@@ -659,13 +580,11 @@ const UpdateCampaign = () => {
         setBarVariant("error");
         setMessage(err.message);
         setSnackbarOpen({ ...snackbarOpen, open: true });
-        setErrorMessage("");
       } finally {
         setIsLoader(false);
       }
     }
   };
-
   const handleDecrementPriority = async (row) => {
     if (row.priority === 0) {
       return;
@@ -687,12 +606,10 @@ const UpdateCampaign = () => {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
     } finally {
       setIsLoader(false);
     }
   };
-
   const handleIncrementPriority = async (row) => {
     try {
       setIsLoader(true);
@@ -711,12 +628,10 @@ const UpdateCampaign = () => {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
     } finally {
       setIsLoader(false);
     }
   };
-
   const handleDecrementWeightage = async (row) => {
     if (row.weightage === 0) {
       return;
@@ -738,12 +653,10 @@ const UpdateCampaign = () => {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
     } finally {
       setIsLoader(false);
     }
   };
-
   const handleIncrementWeightage = async (row) => {
     try {
       setIsLoader(true);
@@ -762,12 +675,10 @@ const UpdateCampaign = () => {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
     } finally {
       setIsLoader(false);
     }
   };
-
   const handleChangeWeightage = (e, id) => {
     setCampaignTarget((prevData) =>
       prevData.map((item) =>
@@ -775,7 +686,6 @@ const UpdateCampaign = () => {
       )
     );
   };
-
   const handleUpdateWeightage = async (e, row) => {
     if (e.target.value !== row.weightage) {
       try {
@@ -795,38 +705,29 @@ const UpdateCampaign = () => {
         setBarVariant("error");
         setMessage(err.message);
         setSnackbarOpen({ ...snackbarOpen, open: true });
-        setErrorMessage("");
       } finally {
         setIsLoader(false);
       }
     }
   };
-
   const handleChangeAttempt = (e) => {
     e.preventDefault();
     setDialAttempt(e.target.value);
   };
-
   const handleDecrementAttempt = (e) => {
     e.preventDefault();
     setDialAttempt((prevValue) => prevValue - 1);
   };
-
   const handleInrementAttempt = (e) => {
     e.preventDefault();
     setDialAttempt((prevValue) => prevValue + 1);
   };
-
   const handleChangeSelectIvr = (value) => {
-    setErrorMessage("");
     setCampaignIvr(value);
   };
-
   const handleUpdateCampaign = async (e) => {
     e.preventDefault();
-
     const did_value = tfnList.find((ele) => ele.label == tfnNo.value);
-
     const data = {
       data: {
         name: name.value,
@@ -854,12 +755,13 @@ const UpdateCampaign = () => {
       setSnackbarOpen({ ...snackbarOpen, open: true });
     } catch (err) {
       setIsLoader(false);
-      setErrorMessage(err.message);
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
     } finally {
       setIsLoader(false);
     }
   };
-
   const handleClickCart = async (val) => {
     setIsLoader(true);
     try {
@@ -878,12 +780,10 @@ const UpdateCampaign = () => {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
     } finally {
       setIsLoader(false);
     }
   };
-
   const handleClickRemove = async (val) => {
     try {
       setIsLoader(true);
@@ -897,12 +797,10 @@ const UpdateCampaign = () => {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
     } finally {
       setIsLoader(false);
     }
   };
-
   useEffect(() => {
     if (expanded === "panel2" && tabValue === 0) {
       const myFunction = async () => {
@@ -935,7 +833,6 @@ const UpdateCampaign = () => {
           setBarVariant("error");
           setMessage(err.message);
           setSnackbarOpen((prev) => ({ ...prev, open: true }));
-          setErrorMessage("");
         } finally {
           setIsLoader(false);
         }
@@ -944,7 +841,6 @@ const UpdateCampaign = () => {
       return () => clearInterval(intervalId);
     }
   }, [expanded, tabValue]);
-
   const handleChangeDigits = (data, id) => {
     const addDigits = ivrRow?.map((item, index) => {
       if (index + 1 === id) {
@@ -955,7 +851,6 @@ const UpdateCampaign = () => {
     });
     setIvrRow(addDigits);
   };
-
   const handleChangeDestinationType = (data, id) => {
     const addDestination = ivrRow?.map((item, index) => {
       if (index + 1 === id) {
@@ -966,7 +861,6 @@ const UpdateCampaign = () => {
     });
     setIvrRow(addDestination);
   };
-
   const handleChangeRemainsIvr = (data, id) => {
     const result = ivrRow?.map((item, index) => {
       if (index + 1 === id) {
@@ -977,10 +871,8 @@ const UpdateCampaign = () => {
     });
     setIvrRow(result);
   };
-
   const handleClickSaveSelectIvr = async (event) => {
     event.preventDefault();
-
     setIsLoader(true);
     try {
       const reqData = {
@@ -989,6 +881,7 @@ const UpdateCampaign = () => {
       };
       const res = await setCampaignIvrReq(reqData);
       getCampaignData(campaign_id);
+      getIvrRows();
       setBarVariant("success");
       setMessage(res.data.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
@@ -996,12 +889,10 @@ const UpdateCampaign = () => {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
     } finally {
       setIsLoader(false);
     }
   };
-
   const handleClickSaveIvr = async (e, index) => {
     e.preventDefault();
     const foundObject = ivrRow.find((item, i) => i === index);
@@ -1023,61 +914,112 @@ const UpdateCampaign = () => {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
     } finally {
       setIsLoader(false);
     }
   };
 
-  const handleClickRemoveIvr = async (e, index) => {
-    e.preventDefault();
-    const foundObject = ivrRow.filter((item, i) => i !== index);
-    setIvrRow(foundObject);
+  const selectModal = () => {
+    return (
+      <AssignIvrForm
+        onHandleClose={handleModalClose}
+        clickedBtn={clickedBtn}
+        initialValue={clickedBtn === "edit" ? currentType : {}}
+        handleFormData={
+          clickedBtn === "add" ? handleAddAssignIvr : handleUpdateAssignIvr
+        }
+        desinationTypeList={desinationTypeList}
+        ivrList={ivrList}
+        ivrTargets={ivrTargets}
+      />
+    );
   };
 
-  const handleClickUpdateIvr = async (e, data) => {
-    e.preventDefault();
-    const foundObject = ivrRow.find((item) => item.id === data.id);
+  const handleAddIvrOpt = (id) => {
+    const filterData = ivrRawData.find((ele) => ele.id === id);
+    setClickedBtn("add");
+    setCurrentType(filterData);
+    setIsOpen(true);
+    setBtnType(2);
+  };
+
+  const handleEditIvrOpt = (id) => {
+    const filterData = ivrRawData.find((ele) => ele.id === id);
+    setClickedBtn("edit");
+    setCurrentType(filterData);
+    setIsOpen(true);
+  };
+
+  const handleAddAssignIvr = async (value) => {
     setIsLoader(true);
     try {
       const reqData = {
-        id: foundObject.id,
-        data: {
-          campaign_id: campaign_id,
-          ivr_id: campaignIvr?.value,
-          input_digit: foundObject.input_digits,
-          destination_type: foundObject.destination,
-          destination_id: foundObject.destination_id,
-        },
+        campaign_id: campaign_id,
+        input_digit: value.input_digit,
+        destination_type: value.destination_type,
+        destination_id: value.destination_id,
+        parent_id: ivtBtnType === 1 ? 0 : currentType.id,
+        ivr_id: ivtBtnType === 1 ? campaignIvr.value : currentType?.ivr_id,
       };
-      const res = await updateIvrReq(reqData);
+      const res = await createIvrReq(reqData);
+      setIsOpen(false);
       setBarVariant("success");
+      getIvrRows();
       setMessage(res.data.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
     } catch (err) {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
     } finally {
       setIsLoader(false);
+      setCurrentType({});
     }
   };
 
-  const handleClickDeleteIvr = async (e, id) => {
-    e.preventDefault();
+  const handleUpdateAssignIvr = async (value) => {
     setIsLoader(true);
     try {
-      const res = await removeIvrReq(id);
-      getIvrRows();
+      const reqData = {
+        id: currentType.id,
+        data: {
+          campaign_id: campaign_id,
+          ivr_id: currentType?.ivr_id,
+          input_digit: value.input_digit,
+          destination_type: value.destination_type,
+          destination_id: value.destination_id,
+          parent_id: currentType.parent_id,
+        },
+      };
+      const res = await updateIvrReq(reqData);
+      setIsOpen(false);
       setBarVariant("success");
+      getIvrRows();
       setMessage(res.data.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
     } catch (err) {
       setBarVariant("error");
       setMessage(err.message);
       setSnackbarOpen({ ...snackbarOpen, open: true });
-      setErrorMessage("");
+    } finally {
+      setIsLoader(false);
+      setCurrentType({});
+    }
+  };
+
+  const handleDeleteIvrOpt = async (id) => {
+    setIsLoader(true);
+    try {
+      const res = await removeIvrReq(id);
+      setIsOpen(false);
+      setBarVariant("success");
+      getIvrRows();
+      setMessage(res.data.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
+    } catch (err) {
+      setBarVariant("error");
+      setMessage(err.message);
+      setSnackbarOpen({ ...snackbarOpen, open: true });
     } finally {
       setIsLoader(false);
     }
@@ -1086,6 +1028,9 @@ const UpdateCampaign = () => {
   return (
     <>
       {isLoader && <Loader />}
+      <Modal modal_width={"50%"} isOpen={isOpen}>
+        {selectModal()}
+      </Modal>
       <Snackbar
         open={open}
         anchorOrigin={{ vertical, horizontal }}
@@ -1920,266 +1865,156 @@ const UpdateCampaign = () => {
                         </Grid>
                       </Grid>
                     </Box>
-                    {initialValue.ivr_id && (
-                      // <Box>
-                      //   <MaterialReactTable table={table} />
-                      // </Box>
-
+                    <Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "end",
+                          mb: 1,
+                        }}
+                      >
+                        <div>
+                          <Typography variant="subtitle1">
+                            Ivr Options
+                          </Typography>
+                        </div>
+                        <div>
+                          <Fab
+                            aria-label="add"
+                            size="small"
+                            sx={{
+                              boxShadow: "none",
+                              backgroundColor: colors.greenAccent[500],
+                            }}
+                            onClick={() => {
+                              setClickedBtn("add");
+                              setBtnType(1);
+                              setIsOpen(true);
+                            }}
+                          >
+                            <Tooltip title="Add">
+                              <Add />
+                            </Tooltip>
+                          </Fab>
+                        </div>
+                      </Box>
                       <Box>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "end",
-                            mb: 1,
+                        <IVRTable
+                          isTree
+                          defaultExpandAllRows
+                          rowKey="id"
+                          height={350}
+                          data={ivrRow}
+                          shouldUpdateScroll={false}
+                          renderTreeToggle={(icon, rowData) => {
+                            if (
+                              rowData.children &&
+                              rowData.children.length === 0
+                            ) {
+                              return;
+                            }
+                            return icon;
+                          }}
+                          style={{
+                            borderRadius: "10px",
+                            overflow: "hidden",
+                            color: colors.layoutColor[200],
+                            backgroundColor: colors.primary[700],
+                            borderBottom: "none",
                           }}
                         >
-                          <div>
-                            <Typography variant="subtitle1">
-                              Ivr Options
-                            </Typography>
-                          </div>
-                          <div>
-                            <Fab
-                              aria-label="add"
-                              size="small"
-                              sx={{
-                                boxShadow: "none",
-                                backgroundColor: colors.greenAccent[500],
-                              }}
-                              onClick={() => {
-                                addRowTable();
+                          <Column width={250}>
+                            <HeaderCell
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[400],
+                                textAlign: "center",
                               }}
                             >
-                              <Tooltip title="Add">
-                                <Add />
-                              </Tooltip>
-                            </Fab>
-                          </div>
-                        </Box>
-                        <Divider />
-                        <Grid container spacing={1}>
-                          {ivrRow?.map((obj, index) => {
-                            const key = index;
-                            return (
-                              <>
-                                <Grid item xs={6} md={2}>
-                                  <FormTextField
-                                    type="number"
-                                    placeholder={"Enter digit"}
-                                    label={"Digit"}
-                                    Value={obj.input_digits}
-                                    onChangeText={(e) =>
-                                      handleChangeDigits(e.value, index + 1)
-                                    }
-                                    Required={true}
-                                    CustomErrorLine={"Enter proper digits"}
-                                  />
-                                </Grid>{" "}
-                                <Grid item xs={6} md={3}>
-                                  <FormTextDropdown
-                                    Value={obj.destination}
-                                    onSelect={(e) =>
-                                      handleChangeDestinationType(
-                                        e.value,
-                                        index + 1
-                                      )
-                                    }
-                                    label={"Destination Type *"}
-                                    CustomErrorLine={"Choose one"}
-                                    Required={true}
-                                    Options={desinationTypeList}
-                                  />
-                                </Grid>
-                                <Grid item xs={6} md={3}>
-                                  <FormTextDropdown
-                                    Value={obj.destination_id}
-                                    onSelect={(e) =>
-                                      handleChangeRemainsIvr(e.value, index + 1)
-                                    }
-                                    label={
-                                      obj.destination === "Ivr"
-                                        ? "Select Ivr *"
-                                        : "Select Target *"
-                                    }
-                                    CustomErrorLine={"Choose one"}
-                                    Required={true}
-                                    Options={
-                                      obj.destination === "Ivr"
-                                        ? ivrList
-                                        : ivrTargets
-                                    }
-                                  />
-                                </Grid>
-                                <Grid
-                                  item
-                                  xs={6}
-                                  md={4}
-                                  display={"flex"}
-                                  alignItems={"end"}
-                                >
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      width: "100%",
-                                      justifyContent: "flex-end",
-                                      alignContent: "center",
-                                      alignItems: "center",
-                                    }}
-                                  >
-                                    <Stack spacing={1} direction={"row"}>
-                                      {obj.id ? (
-                                        <Tooltip
-                                          title="Update"
-                                          arrow
-                                          placement="right-start"
-                                          TransitionComponent={Zoom}
-                                        >
-                                          <IconButton
-                                            sx={{
-                                              backgroundColor:
-                                                colors.greenAccent[600],
-                                            }}
-                                            onClick={(e) =>
-                                              handleClickUpdateIvr(e, obj)
-                                            }
-                                          >
-                                            <MdUpdate />
-                                          </IconButton>
-                                        </Tooltip>
-                                      ) : (
-                                        <Tooltip
-                                          title="Save"
-                                          arrow
-                                          placement="right-start"
-                                          TransitionComponent={Zoom}
-                                        >
-                                          <IconButton
-                                            sx={{
-                                              backgroundColor:
-                                                colors.greenAccent[600],
-                                            }}
-                                            onClick={(e) =>
-                                              handleClickSaveIvr(e, key)
-                                            }
-                                          >
-                                            <MdSave />
-                                          </IconButton>
-                                        </Tooltip>
-                                      )}
-                                      {obj.id ? (
-                                        <Tooltip
-                                          title="Delete"
-                                          arrow
-                                          placement="right-start"
-                                          TransitionComponent={Zoom}
-                                        >
-                                          <IconButton
-                                            sx={{
-                                              backgroundColor:
-                                                colors.redAccent[500],
-                                            }}
-                                            onClick={(e) =>
-                                              handleClickDeleteIvr(e, obj.id)
-                                            }
-                                          >
-                                            <MdDeleteForever />
-                                          </IconButton>
-                                        </Tooltip>
-                                      ) : (
-                                        <Tooltip
-                                          title="Remove"
-                                          arrow
-                                          placement="right-start"
-                                          TransitionComponent={Zoom}
-                                        >
-                                          <IconButton
-                                            sx={{
-                                              backgroundColor:
-                                                colors.redAccent[500],
-                                            }}
-                                            onClick={(e) =>
-                                              handleClickRemoveIvr(e, key)
-                                            }
-                                          >
-                                            <MdRemove />
-                                          </IconButton>
-                                        </Tooltip>
-                                      )}
-                                    </Stack>
-                                  </Box>
-                                </Grid>
-                              </>
-                            );
-                          })}
-                        </Grid>
+                              Digits
+                            </HeaderCell>
+                            <Cell
+                              dataKey="input_digit"
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[700],
+                                textAlign: "center",
+                              }}
+                            />
+                          </Column>
+                          <Column width={250}>
+                            <HeaderCell
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[400],
+                                textAlign: "center",
+                              }}
+                            >
+                              Destination Type
+                            </HeaderCell>
+                            <Cell
+                              dataKey="destination_type"
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[700],
+                                textAlign: "center",
+                              }}
+                            />
+                          </Column>
+                          <Column flexGrow={1}>
+                            <HeaderCell
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[400],
+                                textAlign: "center",
+                                borderBottom: "none",
+                              }}
+                            >
+                              Destination
+                            </HeaderCell>
+                            <Cell
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[700],
+                                textAlign: "center",
+                              }}
+                              dataKey="destination_name"
+                            />
+                          </Column>
+                          <Column flexGrow={1}>
+                            <HeaderCell
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[400],
+                                textAlign: "center",
+                              }}
+                            >
+                              Action
+                            </HeaderCell>
+                            <ActionCell
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[200],
+                                textAlign: "right",
+                              }}
+                              dataKey="id"
+                              onClickEdit={handleEditIvrOpt}
+                              onClickAdd={handleAddIvrOpt}
+                              onClickDelete={handleDeleteIvrOpt}
+                            />
+                          </Column>
+                        </IVRTable>
                       </Box>
-                    )}
+                    </Box>
                   </CustomTabPanel>
                 </Box>
               </AccordionDetails>
             </Accordion>
-            <CardActions sx={{ justifyContent: "space-between", m: 1 }}>
-              <Button
-                size="small"
-                variant="contained"
-                onClick={() => navigate("/campaigns")}
-              >
-                {"Cancel"}
-              </Button>
-              <Button
-                size="small"
-                type="submit"
-                onClick={() => {}}
-                sx={{ backgroundColor: colors.greenAccent[500] }}
-                variant="contained"
-              >
-                Update
-              </Button>
-            </CardActions>
           </Box>
         </Box>
       </Box>
     </>
   );
 };
-
 export default UpdateCampaign;
-
-
-function useCreateUser() {
-  console.log("Hit ivr add")
-}
-function useGetUsers() {
-  console.log("Get Ivr")
-  // return useQuery({
-  //   queryKey: ['users'],
-  //   queryFn: async () => {
-  //     //send api request here
-  //     await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-  //     return Promise.resolve(fakeData);
-  //   },
-  //   refetchOnWindowFocus: false,
-  // });
-}
-function useUpdateUser() {
-  console.log("Update IVR")
-  // const queryClient = useQueryClient();
-  // return useMutation({
-  //   mutationFn: async (user) => {
-  //     console.info('update user', user);
-  //     //send api update request here
-  //     await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-  //     return Promise.resolve();
-  //   },
-  //   //client side optimistic update
-  //   onMutate: (newUserInfo) => {
-  //     queryClient.setQueryData(['users'], (prevUsers) => {
-  //       let user = findUserInTree(newUserInfo.id, prevUsers);
-  //       user = { ...user, ...newUserInfo };
-  //       return [...prevUsers];
-  //     });
-  //   },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
-  // });
-}

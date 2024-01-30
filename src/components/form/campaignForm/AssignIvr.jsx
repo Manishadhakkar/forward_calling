@@ -13,6 +13,8 @@ import {
 import { MdClose } from "react-icons/md";
 import { tokens } from "../../../assets/color/theme";
 import "../styles.css";
+import FormTextField from "../../textfield/FormTextField";
+import FormTextDropdown from "../../dropdown/FormTextDropdown";
 
 const AssignIvrForm = (props) => {
   const {
@@ -20,16 +22,52 @@ const AssignIvrForm = (props) => {
     handleFormData,
     onHandleClose,
     clickedBtn,
+    desinationTypeList,
+    ivrList,
+    ivrTargets,
   } = props;
+  console.log(initialValue);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  const [input_digit, setInput_digit] = useState({
+    value: initialValue ? initialValue.input_digit : "",
+    error: false,
+    success: false,
+  });
+
+  const [destination_type, setDestination_type] = useState({
+    value: initialValue ? initialValue.destination_type : "",
+    error: false,
+    success: false,
+  });
+
+  const [destination_id, setDestination_id] = useState({
+    value: initialValue ? initialValue.destination_id : "",
+    error: false,
+    success: false,
+  });
+
+  const handleChangeDigits = (value) => {
+    setInput_digit(value);
+  };
+
+  const handleChangeDestinationType = (value) => {
+    setDestination_type(value);
+  };
+
+  const handleChangeRemainsIvr = (value) => {
+    setDestination_id(value);
+  };
+
   const handleClick = (e) => {
     e.preventDefault();
-    // const data = {
-
-    // };
-    // handleFormData(data);
+    const data = {
+      input_digit: input_digit.value,
+      destination_type: destination_type.value,
+      destination_id: destination_id.value,
+    };
+    handleFormData(data);
   };
 
   return (
@@ -69,9 +107,44 @@ const AssignIvrForm = (props) => {
           className={"formResponsiveHeight"}
           noValidate={true}
         >
-          {/* {errorMessage && <span className="error_msg">{errorMessage}</span>} */}
           <Grid container spacing={1}>
-            Form
+            <Grid item xs={6} md={4}>
+              <FormTextField
+                type="number"
+                placeholder={"Enter digit"}
+                label={"Digit"}
+                Value={input_digit.value}
+                onChangeText={handleChangeDigits}
+                Required={true}
+                CustomErrorLine={"Enter proper digits"}
+              />
+            </Grid>
+            <Grid item xs={6} md={4}>
+              <FormTextDropdown
+                Value={destination_type.value}
+                onSelect={handleChangeDestinationType}
+                label={"Destination Type *"}
+                CustomErrorLine={"Choose one"}
+                Required={true}
+                Options={desinationTypeList}
+              />
+            </Grid>
+            <Grid item xs={6} md={4}>
+              <FormTextDropdown
+                Value={destination_id.value}
+                onSelect={handleChangeRemainsIvr}
+                label={
+                  destination_type.value === "Ivr"
+                    ? "Select Ivr *"
+                    : "Select Target *"
+                }
+                CustomErrorLine={"Choose one"}
+                Required={true}
+                Options={
+                  destination_type.value === "Ivr" ? ivrList : ivrTargets
+                }
+              />
+            </Grid>
           </Grid>
         </Box>
       </CardContent>

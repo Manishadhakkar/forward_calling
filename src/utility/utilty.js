@@ -60,14 +60,24 @@ export const concatenateDidNumbers = (data) => {
   return result;
 };
 
-export const convertIvrArray = (inputArray, propertyNames) => {
+export const convertIvrArray = (inputArray) => {
+  const query = [
+    "id",
+    "campaign_id",
+    "destination_id",
+    "destination_type",
+    "input_digit",
+    "ivr_id",
+    "parent_id",
+    "destination_name"
+  ];
   const map = {};
   const result = [];
 
   inputArray.forEach((item) => {
     const node = {};
 
-    propertyNames.forEach((prop) => {
+    query.forEach((prop) => {
       if (item[prop] !== undefined) {
         node[prop] = item[prop];
       }
@@ -76,12 +86,12 @@ export const convertIvrArray = (inputArray, propertyNames) => {
     node.children = [];
     map[node.id] = node;
 
-    if (node.parentValue === null) {
+    if (node.parent_id === 0) {
       result.push(node);
     } else {
-      const parentNode = map[node.parentValue] || { children: [] };
+      const parentNode = map[node.parent_id] || { children: [] };
       parentNode.children.push(node);
-      map[node.parentValue] = parentNode;
+      map[node.parent_id] = parentNode;
     }
   });
 

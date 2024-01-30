@@ -68,14 +68,13 @@ const LiveCalls = () => {
     setClickedBtn("edit");
     setCurrentType(id);
     setIsOpen(true);
-    // const nextData = Object.assign([], rows);
-    // const activeItem = nextData.find((item) => item.id === id);
-    // activeItem.status = activeItem.status ? null : "EDIT";
-    // setRows(nextData);
   };
 
   const selectModal = () => {
-    return <AssignIvrForm />;
+    return <AssignIvrForm
+    onHandleClose={handleModalClose}
+    clickedBtn={clickedBtn}
+    />;
   };
 
   return (
