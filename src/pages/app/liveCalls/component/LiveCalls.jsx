@@ -1,117 +1,167 @@
-import React, { useEffect, useState } from "react";
-import { Table, Button } from "rsuite";
-import "./styles.css";
+import React, { useEffect, useMemo, useState } from "react";
+import Loader from "../../../../components/Loader/Loader";
+import { Box, Typography, useTheme } from "@mui/material";
+import { tokens } from "../../../../assets/color/theme";
+import { TbHome2 } from "react-icons/tb";
+import { GiSatelliteCommunication } from "react-icons/gi";
+import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
+import DefaultTable from "../../../../components/tables/DefaultTable";
+import Copyright from "../../../../components/footer/Footer";
+import { totalCallsReq } from "../service/livecalls.request";
 
-import { convertIvrArray } from "../../../../utility/utilty";
-import { FormModal as Modal } from "../../../../components/modal/FormModal";
-import AssignIvrForm from "../../../../components/form/campaignForm/AssignIvr";
-
-const fakeData = [
-  { id: 1, destination: "Targets", value: 10, parentValue: null },
-  { id: 2, destination: "Targets", value: 11, parentValue: null },
-  { id: 3, destination: "IVR", value: 12, parentValue: null },
-  { id: 4, destination: "Targets", value: 13, parentValue: 3 },
-  { id: 5, destination: "Targets", value: 14, parentValue: 3 },
-  { id: 6, destination: "Targets", value: 15, parentValue: null },
-  { id: 7, destination: "IVR", value: 16, parentValue: 6 },
-  { id: 8, destination: "IVR", value: 17, parentValue: 7 },
-  { id: 9, destination: "IVR", value: 18, parentValue: 8 },
-  { id: 10, destination: "IVR", value: 19, parentValue: null },
-  { id: 11, destination: "IVR", value: 20, parentValue: null },
+const paths = [
+  {
+    name: "Dashboard",
+    path: "",
+    icon: <TbHome2 />,
+  },
+  {
+    name: "Live Calls",
+    icon: <GiSatelliteCommunication />,
+  },
 ];
 
-const { Column, HeaderCell, Cell } = Table;
-
-const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: "6px" }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData.id);
-        }}
-      >
-        {rowData.status === "EDIT" ? "Save" : "Edit"}
-      </Button>
-    </Cell>
-  );
-};
-
 const LiveCalls = () => {
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "did_number",
+        header: "DID Number",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        size: 50,
+      },
+      {
+        accessorKey: "target_number",
+        header: "Target Number",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        size: 50,
+      },
+      {
+        accessorKey: "ivr_name",
+        header: "Ivr Name",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        size: 50,
+      },
+      {
+        accessorKey: "channel",
+        header: "Channel",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        size: 50,
+      },
+      {
+        accessorKey: "caller_id",
+        header: "Caller Id",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        size: 50,
+      },
+    ],
+    []
+  );
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
+  const [isLoader, setLoader] = useState(false);
   const [rows, setRows] = useState([]);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [clickedBtn, setClickedBtn] = useState("");
-  const [currentType, setCurrentType] = useState();
-
-  const openAddModal = () => {
-    setIsOpen(true);
+  const fetchData = async () => {
+    try {
+      // setLoader(true);
+      const res = await totalCallsReq();
+      const fetchedData = res.data.data || [];
+      setRows(fetchedData);
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+    } finally {
+      // setLoader(false);
+    }
   };
-  const handleModalClose = () => {
-    setIsOpen(false);
-  };
-  const handleSelectBtn = (btn) => {
-    setClickedBtn(btn);
-  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useEffect(() => {
-    const query = ["id", "destination", "value", "parentValue"];
-    setRows(convertIvrArray(fakeData, query));
-  }, [fakeData]);
-
-  const handleChange = (id, key, value) => {
-    const nextData = Object.assign([], rows);
-    nextData.find((item) => item.id === id)[key] = value;
-    setRows(nextData);
-  };
-  const handleEditState = (id) => {
-    setClickedBtn("edit");
-    setCurrentType(id);
-    setIsOpen(true);
-  };
-
-  const selectModal = () => {
-    return <AssignIvrForm
-    onHandleClose={handleModalClose}
-    clickedBtn={clickedBtn}
-    />;
-  };
+    const intervalId = setInterval(fetchData, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <>
-      <Modal modal_width={"50%"} isOpen={isOpen}>
-        {selectModal()}
-      </Modal>
-
-      <Table
-        isTree
-        defaultExpandAllRows
-        bordered
-        cellBordered
-        rowKey="value"
-        height={400}
-        data={rows}
-        shouldUpdateScroll={false}
-        renderTreeToggle={(icon, rowData) => {
-          if (rowData.children && rowData.children.length === 0) {
-            return;
-          }
-          return icon;
+      {isLoader && <Loader />}
+      <Box
+        sx={{
+          "& .rs-pagination-group": {
+            color: colors.layoutColor[200],
+          },
+          "& .MuiTypography-root": {
+            color: colors.layoutColor[200],
+          },
+          mt: 1,
+          ml: 2,
+          mr: 2,
+          mb: 2,
+          height: "80%",
+          backgroundColor: "inherit",
         }}
       >
-        {rows.length > 0 ? (
-          <>
-            <Column width={150}>
-              <HeaderCell>First Name</HeaderCell>
-              <Cell dataKey="destination" />
-            </Column>
-            <Column flexGrow={1}>
-              <HeaderCell>...</HeaderCell>
-              <ActionCell dataKey="id" onClick={handleEditState} />
-            </Column>
-          </>
-        ) : null}
-      </Table>
+        <Breadcrumb pathList={paths} />
+        <Box>
+          <Typography mt={1} mb={1} variant="h5">{"Live Calls History"}</Typography>
+          <Box>
+            <DefaultTable
+              data={rows}
+              column={columns}
+              isSearchable={true}
+              isEditing={false}
+            />
+          </Box>
+        </Box>
+      </Box>
+      <Copyright />
     </>
   );
 };

@@ -15,9 +15,7 @@ import "rsuite/dist/rsuite.css";
 import VerifyBadge from "../../../../components/chip/VerifyBadge";
 import { isAuthorizedFunc } from "../../../../utility/utilty";
 import {
-  CREATE_USER,
-  STATUS_USER,
-  UPDATE_USER,
+  CREATE_USER
 } from "../../../../utility/constant";
 import BuyerForm from "../../../../components/form/buyerForm/BuyerForm";
 import {
@@ -168,7 +166,6 @@ const AuthBuyer = () => {
   };
 
   const handleStatusChange = (body) => {
-    console.log(body);
     const data = {
       id: body.id,
       status: body.status === 1 ? 0 : 1,

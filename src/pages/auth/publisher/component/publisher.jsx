@@ -14,12 +14,14 @@ import { Pagination } from "rsuite";
 import "rsuite/dist/rsuite.css";
 import VerifyBadge from "../../../../components/chip/VerifyBadge";
 import { isAuthorizedFunc } from "../../../../utility/utilty";
+import { CREATE_USER } from "../../../../utility/constant";
+import PublisherForm from "../../../../components/form/publisherForm/PublisherForm";
 import {
-  CREATE_USER,
-  STATUS_USER,
-  UPDATE_USER,
-} from "../../../../utility/constant";
-import BuyerForm from "../../../../components/form/buyerForm/BuyerForm";
+  createPublisherRequest,
+  getAllPublisherReq,
+  updatePublisherStatusRequest,
+} from "../service/publisher.request";
+import { Buildings2 } from "iconsax-react";
 
 const paths = [
   {
@@ -28,8 +30,8 @@ const paths = [
     icon: <TbHome2 />,
   },
   {
-    name: "Buyer",
-    icon: <TbUsers />,
+    name: "Publisher",
+    icon: <Buildings2 size="10" variant="Outline" />,
   },
 ];
 
@@ -38,11 +40,9 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const AuthPublisher = () => {
-  const getId = JSON.parse(localStorage.getItem("user"));
-  const company_id = getId.user_data.company_id;
-
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
   const [rows, setRows] = useState([]);
   const [isLoader, setLoader] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -132,123 +132,83 @@ const AuthPublisher = () => {
     setSnackbarOpen({ ...snackbarOpen, open: false });
   };
 
-  const getAllBuyers = (activePage, limit) => {
-    // setLoader(true);
-    // getAllUsersRequest(activePage, limit)
-    //   .then((res) => {
-    //     let getData = res.data.data.length === 0 ? [] : res.data.data.data;
-    //     setRows(getData);
-    //     setTotal(res.data.data.length === 0 ? 0 : res.data.data?.total);
-    //     setLoader(false);
-    //   })
-    //   .catch(() => {
-    //     setLoader(false);
-    //   });
+  const getAllPublisher = (activePage, limit) => {
+    setLoader(true);
+    getAllPublisherReq(activePage, limit)
+      .then((res) => {
+        let getData = res.data.data.data.length === 0 ? [] : res.data.data.data;
+        setRows(getData);
+        setTotal(res.data.data.data.length === 0 ? 0 : res.data.data?.total);
+        setLoader(false);
+      })
+      .catch(() => {
+        setLoader(false);
+      });
   };
   useEffect(() => {
-    getAllBuyers(activePage, limit);
+    getAllPublisher(activePage, limit);
   }, [activePage, limit]);
 
   const openAddModal = () => {
+    setErrorMessage("");
     setIsOpen(true);
   };
   const handleModalClose = () => {
+    setErrorMessage("");
     setIsOpen(false);
   };
   const handleSelectBtn = (btn) => {
     setClickedBtn(btn);
   };
 
-  const handleChangeEdit = (ele) => {
-    setClickedBtn("edit");
-    setCurrentType(ele);
-    setIsOpen(true);
-  };
   const handleStatusChange = (body) => {
     const data = {
       id: body.id,
       status: body.status === 1 ? 0 : 1,
     };
-    // setLoader(true);
-    // updateUsersStatusRequest(data)
-    //   .then((res) => {
-    //     getAllUsers(activePage, limit);
-    //     setBarVariant("success");
-    //     setMessage(res.data.message);
-    //     setSnackbarOpen({ ...snackbarOpen, open: true });
-    //     setErrorMessage("");
-    //     setIsOpen(false);
-    //     setLoader(false);
-    //   })
-    //   .catch((err) => {
-    //     setLoader(false);
-    //   });
+    setLoader(true);
+    updatePublisherStatusRequest(data)
+      .then((res) => {
+        getAllPublisher(activePage, limit);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setErrorMessage("");
+        setIsOpen(false);
+        setLoader(false);
+      })
+      .catch((err) => {
+        setLoader(false);
+      });
   };
 
-  const handleAddBuyer = (value) => {
-    // setLoader(true);
-    // createUserRequest(value)
-    //   .then((res) => {
-    //     getAllUsers(activePage, limit);
-    //     setErrorMessage("");
-    //     setLoader(false);
-    //     setBarVariant("success");
-    //     setMessage(res.data.message);
-    //     setSnackbarOpen({ ...snackbarOpen, open: true });
-    //     setIsOpen(false);
-    //   })
-    //   .catch((err) => {
-    //     setLoader(false);
-    //     setErrorMessage(err.message);
-    //   });
-  };
-
-  const handleUpdateBuyer = (value) => {
-    // const updateData = {
-    //   data: {
-    //     name: value.name,
-    //     email: value.email,
-    //     role_id: value.role_id,
-    //     country_id: value.country_id,
-    //     state_id: value.state_id,
-    //     city: value.city,
-    //     zip: value.zip,
-    //     mobile: value.mobile,
-    //     address: value.address,
-    //     company_id: value.company_id,
-    //     status: currentType.status,
-    //   },
-    //   id: currentType.id,
-    // };
-    // setLoader(true);
-    // updateUsersRequest(updateData)
-    //   .then((res) => {
-    //     getAllUsers(activePage, limit);
-    //     setErrorMessage("");
-    //     setIsOpen(false);
-    //     setBarVariant("success");
-    //     setMessage(res.data.message);
-    //     setSnackbarOpen({ ...snackbarOpen, open: true });
-    //     setLoader(false);
-    //   })
-    //   .catch((err) => {
-    //     setLoader(false);
-    //     setErrorMessage(err.message);
-    //   });
+  const handleAddPublisher = (value) => {
+    setLoader(true);
+    createPublisherRequest(value)
+      .then((res) => {
+        getAllPublisher(activePage, limit);
+        setErrorMessage("");
+        setLoader(false);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setIsOpen(false);
+      })
+      .catch((err) => {
+        setLoader(false);
+        setErrorMessage(err.message);
+      });
   };
 
   const selectModal = () => {
     return (
-      <BuyerForm
-        handleFormData={
-          clickedBtn === "add" ? handleAddBuyer : handleUpdateBuyer
-        }
+      <PublisherForm
+        handleFormData={clickedBtn === "add" ? handleAddPublisher : null}
         onHandleClose={handleModalClose}
         clickedBtn={clickedBtn}
         initialValue={clickedBtn === "edit" ? currentType : {}}
         errorMessage={errorMessage}
         setErrorMessage={setErrorMessage}
-        company_id={company_id}
       />
     );
   };
@@ -328,12 +288,11 @@ const AuthPublisher = () => {
             <DefaultTable
               data={rows}
               column={columns}
-              handleEditAction={handleChangeEdit}
               handleStatusAction={handleStatusChange}
               isSearchable={true}
-              isEditable={isAuthorizedFunc(UPDATE_USER)}
+              isEditable={false}
               isDeletable={false}
-              isStatusChangable={isAuthorizedFunc(STATUS_USER)}
+              isStatusChangable={true}
             />
             <Pagination
               style={{

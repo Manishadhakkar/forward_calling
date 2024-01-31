@@ -37,7 +37,7 @@ import {
   FcBusinessman,
 } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-import { logoutRequest } from "./logout.request";
+import { liveCallsReq, logoutRequest, totalCallsReq } from "./logout.request";
 import Loader from "../../Loader/Loader";
 import { getBalanceRemainsReq } from "../../../pages/app/wallet/service/wallet.request";
 
@@ -59,16 +59,38 @@ const Topbar = () => {
   const [age, setAge] = useState("");
   const [amount, setAmount] = useState(0);
 
+  const [liveCalls, setLiveCalls] = useState(0);
+  const [totalCalls, setTotalCalls] = useState(0);
+
+  const getUserBalance = async () => {
+    try {
+      const res = await getBalanceRemainsReq();
+      setAmount(res.data?.data?.balance);
+    } catch (err) {
+    } finally {
+    }
+  };
+
+  getUserBalance();
+
   useEffect(() => {
-    const myFunction = async () => {
-      try {
-        const res = await getBalanceRemainsReq();
-        setAmount(res.data?.data?.balance);
-      } catch (err) {
-      } finally {
-      }
-    };
-    const intervalId = setInterval(myFunction, 10000);
+    const intervalId = setInterval(getUserBalance, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const getUserLiveCalls = async () => {
+    try {
+      const res = await totalCallsReq();
+      const total_call =
+        res.data.data.length === 0 ? 0 : res.data.data.livecalls;
+      setLiveCalls(total_call);
+    } catch (err) {
+    } finally {
+    }
+  };
+  getUserLiveCalls();
+  useEffect(() => {
+    const intervalId = setInterval(getUserLiveCalls, 5000);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -251,7 +273,7 @@ const Topbar = () => {
                 <CallCalling color={colors.green[100]} variant="Bold" />
               </IconButton>
             }
-            title="1"
+            title={liveCalls}
             subheader="Live"
           />
           <CardHeader
@@ -260,7 +282,7 @@ const Topbar = () => {
                 <CallReceived color={colors.blue[100]} variant="Bold" />
               </IconButton>
             }
-            title="1"
+            title={totalCalls}
             subheader="Completed"
           />
 

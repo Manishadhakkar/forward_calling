@@ -20,7 +20,6 @@ import {
   GET_TARGET,
   GET_USER,
 } from "../utility/constant";
-import LiveCalls from "../pages/app/liveCalls/component/LiveCalls";
 
 const Dashboard = lazy(() =>
   import("../pages/app/dashboard/component/Dasboard")
@@ -37,6 +36,8 @@ const AuthCompany = lazy(() =>
   import("../pages/auth/companies/component/companies")
 );
 const AuthBuyer = lazy(() => import("../pages/auth/buyer/component/buyer"));
+const AuthPublisher = lazy(() => import("../pages/auth/publisher/component/publisher"));
+
 
 const RoleFunctionMapping = lazy(() =>
   import("../pages/auth/roleFunctions/component/roleFunction")
@@ -120,6 +121,10 @@ const InboundReportPage = lazy(() =>
   import("../pages/app/reboundReport/component/InboundReport")
 );
 
+const LiveCallPage = lazy(() =>
+  import("../pages/app/liveCalls/component/LiveCalls")
+);
+
 const Router = () => {
   const [theme, colorMode] = useMode();
   const colors = tokens(theme.palette.mode);
@@ -163,8 +168,9 @@ const Router = () => {
                     {isAuthorizedFunc(GET_BUYER) && (
                       <Route path="/access/buyer" element={<AuthBuyer />} />
                     )}
-                    {isAuthorizedFunc(GET_PUBLISHER) && (
-                      <Route path="/access/publisher" element={<AuthBuyer />} />
+                    {/* {isAuthorizedFunc(GET_PUBLISHER) && ( */}
+                    {isAuthorizedFunc(GET_BUYER) && (
+                      <Route path="/access/publisher" element={<AuthPublisher />} />
                     )}
                     {isAuthorizedFunc(GET_ROLE) && (
                       <Route path="/auth/roles" element={<UsersRole />} />
@@ -237,7 +243,7 @@ const Router = () => {
                       element={<InboundReportPage />}
                     />
 
-                    <Route path="/report/live-calls" element={<LiveCalls />} />
+                    <Route path="/report/live-calls" element={<LiveCallPage />} />
 
                     <Route path="/group" element={<ManageGroup />} />
 

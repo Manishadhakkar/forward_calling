@@ -164,7 +164,7 @@ const DefaultTable = (props) => {
           {isDeletable && (
             <Tooltip
               arrow
-              placement="right"
+              placement="top"
               title={row.original.deleted_at === null ? "Delete" : "Restore"}
             >
               <IconButton onClick={() => handleChangeDelete(row.original)}>
@@ -177,21 +177,21 @@ const DefaultTable = (props) => {
             </Tooltip>
           )}
           {isAssignable && (
-            <Tooltip arrow placement="right" title={"Assign to"}>
+            <Tooltip arrow placement="top" title={"Assign to"}>
               <IconButton onClick={() => handleChangeAssign(row.original)}>
                 <MdAssignmentInd />
               </IconButton>
             </Tooltip>
           )}
           {isView && (
-            <Tooltip arrow placement="left" title="Vies">
+            <Tooltip arrow placement="top" title="Vies">
               <IconButton onClick={() => handleChangeView(row.original)}>
                 <MdRemoveRedEye />
               </IconButton>
             </Tooltip>
           )}
           {isDownload && (
-            <Tooltip arrow placement="left" title="Download">
+            <Tooltip arrow placement="top" title="Download">
               <IconButton onClick={() => handleDownload(row.original)}>
                 <MdDownload />
               </IconButton>

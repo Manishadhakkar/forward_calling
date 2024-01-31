@@ -79,7 +79,8 @@ const MyProSidebar = () => {
   let is_access_active =
     location.pathname === "/access/users" ||
     location.pathname === "/access/company" ||
-    location.pathname === "/access/buyer";
+    location.pathname === "/access/buyer" ||
+    location.pathname === "/access/publisher";
 
   let is_authorized_active =
     location.pathname === "/auth/roles" ||
@@ -501,7 +502,8 @@ const MyProSidebar = () => {
                           Buyer
                         </MenuItem>
                       )}
-                      {isAuthorizedFunc(GET_PUBLISHER) && (
+                      {/* {isAuthorizedFunc(GET_PUBLISHER) && ( */}
+                      {isAuthorizedFunc(GET_BUYER) && (
                         <MenuItem
                           active={url === "/access/publisher"}
                           component={<Link to="/access/publisher" />}

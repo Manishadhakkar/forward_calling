@@ -1,0 +1,50 @@
+.calender-input {
+  color: black !important;
+  background-color: azure;
+  border-radius: 10px;
+  border: none;
+  padding: 5px;
+}
+.react-datepicker__view-calendar-icon input {
+  padding: 6px 25px 5px 25px !important;
+}
+.calender-input :focus-within ::-moz-focus-outer ::-moz-focus-inner {
+  border: none !important;
+  outline: none !important;
+}
+
+.css-b62m3t-container {
+  z-index: 9;
+  color: black;
+  width: 220px !important;
+}
+
+.css-1jqq78o-placeholder {
+  color: rgb(46, 45, 45);
+}
+.css-13cymwt-control {
+  background-color: azure;
+  min-height: auto;
+  border-radius: 10px !important;
+}
+.css-t3ipsp-control:hover {
+  border-color: none !important;
+  border-radius: 10px !important;
+}
+.css-t3ipsp-control {
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  border-width: none !important;
+}
+.css-1xc3v61-indicatorContainer {
+  padding: 5px;
+}
+.css-tj5bde-Svg {
+  color: #216ba5;
+}
+.css-tj5bde-Svg:hover {
+  color: #216ba5;
+}
+.css-1fdsijx-ValueContainer {
+  padding: 0px 5px !important;
+}

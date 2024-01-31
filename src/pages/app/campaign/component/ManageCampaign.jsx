@@ -32,7 +32,9 @@ import {
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
 import { tokens } from "../../../../assets/color/theme";
 import {
+  MdAdd,
   MdDeleteForever,
+  MdEdit,
   MdExpandMore,
   MdRemove,
   MdSave,
@@ -186,33 +188,64 @@ const ActionCell = ({
 }) => {
   return (
     <Cell {...props} style={style}>
-      {rowData.destination_type === "Ivr" && (
-        <Button
-          appearance="link"
+      <Stack
+        direction="row"
+        spacing={1}
+        alignItems="center"
+        justifyContent="flex-end"
+        width={"100%"}
+      >
+        {rowData.destination_type === "Ivr" && (
+          <Fab
+            aria-label="add"
+            size="small"
+            sx={{
+              boxShadow: "none",
+              backgroundColor: "#0f2922",
+              color: "white",
+            }}
+            onClick={() => {
+              onClickAdd(rowData.id);
+            }}
+          >
+            <Tooltip arrow placement="top" title={"Add"}>
+              <MdAdd />
+            </Tooltip>
+          </Fab>
+        )}
+        <Fab
+          aria-label="add"
+          size="small"
+          sx={{
+            boxShadow: "none",
+            backgroundColor: "#6870fa",
+            color: "white",
+          }}
           onClick={() => {
-            onClickAdd(rowData.id);
+            onClickEdit(rowData.id);
           }}
         >
-          {"Add"}
-        </Button>
-      )}
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClickEdit(rowData.id);
-        }}
-      >
-        {"Edit"}
-      </Button>
-
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClickDelete(rowData.id);
-        }}
-      >
-        {"Delete"}
-      </Button>
+          <Tooltip arrow placement="top" title={"Edit"}>
+            <MdEdit />
+          </Tooltip>
+        </Fab>
+        <Fab
+          aria-label="add"
+          size="small"
+          sx={{
+            boxShadow: "none",
+            backgroundColor: "#af3f3b",
+            color: "white",
+          }}
+          onClick={() => {
+            onClickDelete(rowData.id);
+          }}
+        >
+          <Tooltip arrow placement="top" title={"Delete"}>
+            <MdDeleteForever />
+          </Tooltip>
+        </Fab>
+      </Stack>
     </Cell>
   );
 };
@@ -358,7 +391,7 @@ const UpdateCampaign = () => {
 
   useEffect(() => {
     if (expanded === "panel2") {
-      setIsLoader(true);
+      // setIsLoader(true);
       getAllTargetReq()
         .then((res) => {
           const result = res.data?.data?.map((ele) => {
@@ -378,7 +411,7 @@ const UpdateCampaign = () => {
 
   useEffect(() => {
     if (expanded === "panel2" && tabValue === 1) {
-      setIsLoader(true);
+      // setIsLoader(true);
       getAllIvrListReq()
         .then((res) => {
           const result = res.data?.data?.map((ele) => {
@@ -398,7 +431,7 @@ const UpdateCampaign = () => {
 
   const getIvrRows = async () => {
     try {
-      setIsLoader(true);
+      // setIsLoader(true);
       const res = await getAllIvrReq(campaign_id);
       setIsLoader(false);
       const data =
@@ -459,7 +492,7 @@ const UpdateCampaign = () => {
     if (expanded === "panel1") {
       (async () => {
         try {
-          setIsLoader(true);
+          // setIsLoader(true);
           const res = await getAllActiveNumber();
           const result = res?.data?.data?.map((ele) => ({
             value: ele.id,
@@ -541,9 +574,7 @@ const UpdateCampaign = () => {
           );
           setTargetList(targetList !== undefined ? targetList : []);
         } catch (err) {
-          setBarVariant("error");
-          setMessage(err.message);
-          setSnackbarOpen((prev) => ({ ...prev, open: true }));
+          setIsLoader(false);
         } finally {
           setIsLoader(false);
         }
@@ -564,7 +595,7 @@ const UpdateCampaign = () => {
   const handleUpdatePriority = async (e, row) => {
     if (e.target.value !== row.priority) {
       try {
-        setIsLoader(true);
+        // setIsLoader(true);
         const reqData = {
           id: row.id,
           data: {
@@ -590,7 +621,7 @@ const UpdateCampaign = () => {
       return;
     }
     try {
-      setIsLoader(true);
+      // setIsLoader(true);
       const reqData = {
         id: row.id,
         data: {
@@ -612,7 +643,7 @@ const UpdateCampaign = () => {
   };
   const handleIncrementPriority = async (row) => {
     try {
-      setIsLoader(true);
+      // setIsLoader(true);
       const reqData = {
         id: row.id,
         data: {
@@ -637,7 +668,7 @@ const UpdateCampaign = () => {
       return;
     }
     try {
-      setIsLoader(true);
+      // setIsLoader(true);
       const reqData = {
         id: row.id,
         data: {
@@ -659,7 +690,7 @@ const UpdateCampaign = () => {
   };
   const handleIncrementWeightage = async (row) => {
     try {
-      setIsLoader(true);
+      // setIsLoader(true);
       const reqData = {
         id: row.id,
         data: {
@@ -689,7 +720,7 @@ const UpdateCampaign = () => {
   const handleUpdateWeightage = async (e, row) => {
     if (e.target.value !== row.weightage) {
       try {
-        setIsLoader(true);
+        // setIsLoader(true);
         const reqData = {
           id: row.id,
           data: {
@@ -747,7 +778,7 @@ const UpdateCampaign = () => {
     };
 
     try {
-      setIsLoader(true);
+      // setIsLoader(true);
       const res = await updateCampaignRequest(data);
       getCampaignData(campaign_id);
       setBarVariant("success");
@@ -763,7 +794,7 @@ const UpdateCampaign = () => {
     }
   };
   const handleClickCart = async (val) => {
-    setIsLoader(true);
+    // setIsLoader(true);
     try {
       const reqData = {
         campaign_id: campaign_id,
@@ -786,7 +817,7 @@ const UpdateCampaign = () => {
   };
   const handleClickRemove = async (val) => {
     try {
-      setIsLoader(true);
+      // setIsLoader(true);
       const res = await removeCampaignTargetReq(val.id);
       setTimer((prevTimer) => prevTimer + 1);
       setBarVariant("success");
@@ -805,7 +836,7 @@ const UpdateCampaign = () => {
     if (expanded === "panel2" && tabValue === 0) {
       const myFunction = async () => {
         try {
-          setIsLoader(true);
+          // setIsLoader(true);
           const res = await getCompanyTargetAndRemainsReq(campaign_id);
           const targetList = res.data.data.AllTargets?.map((ele) => ({
             id: ele.id,
@@ -830,9 +861,7 @@ const UpdateCampaign = () => {
           );
           setTargetList(targetList !== undefined ? targetList : []);
         } catch (err) {
-          setBarVariant("error");
-          setMessage(err.message);
-          setSnackbarOpen((prev) => ({ ...prev, open: true }));
+          setIsLoader(false);
         } finally {
           setIsLoader(false);
         }
@@ -841,39 +870,39 @@ const UpdateCampaign = () => {
       return () => clearInterval(intervalId);
     }
   }, [expanded, tabValue]);
-  const handleChangeDigits = (data, id) => {
-    const addDigits = ivrRow?.map((item, index) => {
-      if (index + 1 === id) {
-        return { ...item, input_digits: data };
-      } else {
-        return item;
-      }
-    });
-    setIvrRow(addDigits);
-  };
-  const handleChangeDestinationType = (data, id) => {
-    const addDestination = ivrRow?.map((item, index) => {
-      if (index + 1 === id) {
-        return { ...item, destination: data };
-      } else {
-        return item;
-      }
-    });
-    setIvrRow(addDestination);
-  };
-  const handleChangeRemainsIvr = (data, id) => {
-    const result = ivrRow?.map((item, index) => {
-      if (index + 1 === id) {
-        return { ...item, destination_id: data };
-      } else {
-        return item;
-      }
-    });
-    setIvrRow(result);
-  };
+  // const handleChangeDigits = (data, id) => {
+  //   const addDigits = ivrRow?.map((item, index) => {
+  //     if (index + 1 === id) {
+  //       return { ...item, input_digits: data };
+  //     } else {
+  //       return item;
+  //     }
+  //   });
+  //   setIvrRow(addDigits);
+  // };
+  // const handleChangeDestinationType = (data, id) => {
+  //   const addDestination = ivrRow?.map((item, index) => {
+  //     if (index + 1 === id) {
+  //       return { ...item, destination: data };
+  //     } else {
+  //       return item;
+  //     }
+  //   });
+  //   setIvrRow(addDestination);
+  // };
+  // const handleChangeRemainsIvr = (data, id) => {
+  //   const result = ivrRow?.map((item, index) => {
+  //     if (index + 1 === id) {
+  //       return { ...item, destination_id: data };
+  //     } else {
+  //       return item;
+  //     }
+  //   });
+  //   setIvrRow(result);
+  // };
   const handleClickSaveSelectIvr = async (event) => {
     event.preventDefault();
-    setIsLoader(true);
+    // setIsLoader(true);
     try {
       const reqData = {
         ivr_id: campaignIvr.value,
@@ -881,31 +910,6 @@ const UpdateCampaign = () => {
       };
       const res = await setCampaignIvrReq(reqData);
       getCampaignData(campaign_id);
-      getIvrRows();
-      setBarVariant("success");
-      setMessage(res.data.message);
-      setSnackbarOpen({ ...snackbarOpen, open: true });
-    } catch (err) {
-      setBarVariant("error");
-      setMessage(err.message);
-      setSnackbarOpen({ ...snackbarOpen, open: true });
-    } finally {
-      setIsLoader(false);
-    }
-  };
-  const handleClickSaveIvr = async (e, index) => {
-    e.preventDefault();
-    const foundObject = ivrRow.find((item, i) => i === index);
-    setIsLoader(true);
-    try {
-      const reqData = {
-        campaign_id: campaign_id,
-        ivr_id: campaignIvr?.value,
-        input_digit: foundObject.input_digits,
-        destination_type: foundObject.destination,
-        destination_id: foundObject.destination_id,
-      };
-      const res = await createIvrReq(reqData);
       getIvrRows();
       setBarVariant("success");
       setMessage(res.data.message);
@@ -951,7 +955,7 @@ const UpdateCampaign = () => {
   };
 
   const handleAddAssignIvr = async (value) => {
-    setIsLoader(true);
+    // setIsLoader(true);
     try {
       const reqData = {
         campaign_id: campaign_id,
@@ -978,7 +982,7 @@ const UpdateCampaign = () => {
   };
 
   const handleUpdateAssignIvr = async (value) => {
-    setIsLoader(true);
+    // setIsLoader(true);
     try {
       const reqData = {
         id: currentType.id,
@@ -1008,7 +1012,7 @@ const UpdateCampaign = () => {
   };
 
   const handleDeleteIvrOpt = async (id) => {
-    setIsLoader(true);
+    // setIsLoader(true);
     try {
       const res = await removeIvrReq(id);
       setIsOpen(false);
@@ -1920,7 +1924,10 @@ const UpdateCampaign = () => {
                             borderRadius: "10px",
                             overflow: "hidden",
                             color: colors.layoutColor[200],
-                            backgroundColor: colors.primary[700],
+                            backgroundColor:
+                              theme.palette.mode === "dark"
+                                ? "#0c101b"
+                                : "#a1a4ab",
                             borderBottom: "none",
                           }}
                         >
@@ -1938,7 +1945,10 @@ const UpdateCampaign = () => {
                               dataKey="input_digit"
                               style={{
                                 color: colors.layoutColor[200],
-                                backgroundColor: colors.primary[700],
+                                backgroundColor:
+                                  theme.palette.mode === "dark"
+                                    ? "#0c101b"
+                                    : "#a1a4ab",
                                 textAlign: "center",
                               }}
                             />
@@ -1957,7 +1967,10 @@ const UpdateCampaign = () => {
                               dataKey="destination_type"
                               style={{
                                 color: colors.layoutColor[200],
-                                backgroundColor: colors.primary[700],
+                                backgroundColor:
+                                  theme.palette.mode === "dark"
+                                    ? "#0c101b"
+                                    : "#a1a4ab",
                                 textAlign: "center",
                               }}
                             />
@@ -1976,7 +1989,10 @@ const UpdateCampaign = () => {
                             <Cell
                               style={{
                                 color: colors.layoutColor[200],
-                                backgroundColor: colors.primary[700],
+                                backgroundColor:
+                                  theme.palette.mode === "dark"
+                                    ? "#0c101b"
+                                    : "#a1a4ab",
                                 textAlign: "center",
                               }}
                               dataKey="destination_name"
@@ -1995,8 +2011,11 @@ const UpdateCampaign = () => {
                             <ActionCell
                               style={{
                                 color: colors.layoutColor[200],
-                                backgroundColor: colors.primary[200],
-                                textAlign: "right",
+                                backgroundColor:
+                                  theme.palette.mode === "dark"
+                                    ? "#0c101b"
+                                    : "#a1a4ab",
+                                display: "flex",
                               }}
                               dataKey="id"
                               onClickEdit={handleEditIvrOpt}

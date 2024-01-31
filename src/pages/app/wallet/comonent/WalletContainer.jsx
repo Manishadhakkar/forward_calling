@@ -154,6 +154,7 @@ const WalletContainer = () => {
               justifyContent: "space-between",
               alignItems: "center",
               mb: 1,
+              mt: 1
             }}
           >
             <Typography variant="h5">{"Wallet History"}</Typography>

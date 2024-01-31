@@ -7,3 +7,17 @@ export const logoutRequest = (body) => {
     });
   };
 
+  export const liveCallsReq = (body) => {
+    return axios({
+      method: "GET",
+      url: "/livecalls",
+    });
+  };
+
+  export const totalCallsReq = (body) => {
+    return axios({
+      method: "GET",
+      url: "/livecalls/total-livecalls",
+    });
+  };
+  

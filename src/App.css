@@ -25,17 +25,6 @@ input::-webkit-inner-spin-button {
   z-index: 999 !important;
 }
 
-.calender-input {
-  color: black !important;
-  background-color: azure;
-  border-radius: 10px;
-  border: none;
-  padding: 5px;
-}
-.calender-input :focus-within ::-moz-focus-outer ::-moz-focus-inner {
-  border: none !important;
-  outline: none !important;
-}
 .rs-table {
   color: black;
 }
