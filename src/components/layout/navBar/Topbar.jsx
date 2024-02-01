@@ -138,10 +138,12 @@ const Topbar = () => {
     logoutRequest()
       .then(() => {
         setIsLoader(false);
+        navigate("/");
         localStorage.clear();
       })
       .catch(() => {
         setIsLoader(false);
+        navigate("/");
         localStorage.clear();
       });
   };
