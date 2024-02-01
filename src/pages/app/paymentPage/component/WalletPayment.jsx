@@ -23,6 +23,9 @@ import Snackbar from "@mui/material/Snackbar";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
 import Loader from "../../../../components/Loader/Loader";
 import PaymentStepper from "../../../../components/stepper/PaymentStepper";
+import { createWalletPaymentReq } from "../service/payment.request";
+import { useLocation, useNavigate } from "react-router-dom/dist";
+import { concatenateDidNumbers } from "../../../../utility/utilty";
 
 const paths = [
   {
@@ -44,6 +47,10 @@ const paths = [
 const WalletPayment = ({ type }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const invoice_data = location?.state;
+
   const [isLoader, setIsLoader] = useState(false);
   const [errorMessage, setErrorMessage] = useState();
   const [message, setMessage] = useState("");
@@ -62,6 +69,30 @@ const WalletPayment = ({ type }) => {
       return;
     }
     setSnackbarOpen({ ...snackbarOpen, open: false });
+  };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setIsLoader(true);
+    const data = {
+      invoice_id: invoice_data?.id,
+      invoice_number: invoice_data?.invoice_id,
+      item_numbers: concatenateDidNumbers(invoice_data?.invoice_items),
+      payment_currency: invoice_data.invoice_currency,
+      payment_price: invoice_data.invoice_amount,
+    };
+    createWalletPaymentReq(data)
+      .then((res) => {
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        navigate("/purchase-number/invoice-number/success");
+      })
+      .catch((err) => {
+        setIsLoader(false);
+        setBarVariant("error");
+        setMessage(err.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+      });
   };
 
   return (
@@ -112,7 +143,6 @@ const WalletPayment = ({ type }) => {
                 width: "40%",
               }}
               component="form"
-              // onSubmit={(e) => handleSubmit(e)}
             >
               <CardHeader title="Payment Form" />
               <Divider />
@@ -130,26 +160,33 @@ const WalletPayment = ({ type }) => {
                   >
                     <ListItem>
                       <ListItemText primary="Invoice No." />
-                      <Typography variant="h6">INV/2024/00074</Typography>
+                      <Typography variant="h6">
+                        {invoice_data?.invoice_id}
+                      </Typography>
                     </ListItem>
                     <ListItem>
                       <ListItemText primary="Price" />
-                      <Typography variant="h6">40,000.00</Typography>
+                      <Typography variant="h6">
+                        {invoice_data?.countries?.currency_symbol}
+                        {invoice_data?.invoice_amount}
+                      </Typography>
                     </ListItem>
                     <ListItem>
                       <ListItemText primary="Currency" />
-                      <Typography variant="h6">USD</Typography>
+                      <Typography variant="h6">
+                        {invoice_data?.countries?.currency}
+                      </Typography>
                     </ListItem>
                     <ListItem>
                       <ListItemText primary="Name" />
                       <Typography variant="h6">
-                        Textricks solutions (p) ltd.
+                        {invoice_data?.company?.company_name}
                       </Typography>
                     </ListItem>
                     <ListItem>
                       <ListItemText primary="Email" />
                       <Typography variant="h6">
-                        superadmin@textricks.com
+                        {invoice_data?.company?.email}
                       </Typography>
                     </ListItem>
                   </List>
@@ -167,8 +204,9 @@ const WalletPayment = ({ type }) => {
                     color: theme.palette.mode === "dark" ? "white" : "black",
                   }}
                   variant="contained"
+                  onClick={handleSubmit}
                 >
-                  Pay with Wallet
+                  Checkout
                 </Button>
               </CardActions>
             </Card>

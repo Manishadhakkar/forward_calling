@@ -7,3 +7,10 @@ export const createCardPayment = (body) => {
     data: body,
   });
 };
+export const createWalletPaymentReq = (body) => {
+  return axios({
+    method: "POST",
+    url: `/payment/pay-with-wallet`,
+    data: body,
+  });
+};

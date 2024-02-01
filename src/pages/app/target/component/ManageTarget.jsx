@@ -289,7 +289,10 @@ const ManageTarget = () => {
       })
       .catch((err) => {
         setLoader(false);
+        setBarVariant("error");
         setErrorMessage(err.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setIsOpen(false);
       });
   };
 

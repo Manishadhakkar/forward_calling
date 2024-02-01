@@ -139,12 +139,10 @@ const Topbar = () => {
       .then(() => {
         setIsLoader(false);
         localStorage.clear();
-        window.location.href = "/";
       })
       .catch(() => {
         setIsLoader(false);
         localStorage.clear();
-        window.location.href = "/";
       });
   };
 
