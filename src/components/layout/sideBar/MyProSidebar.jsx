@@ -161,7 +161,7 @@ const MyProSidebar = () => {
               flex: 1,
               marginBottom: "32px",
               borderTop: `1px solid ${colors.borderColor[100]}`,
-              overflowY: "scroll",
+              overflowY: "auto",
             }}
           >
             <Box sx={{ color: colors.layoutColor[200] }}>

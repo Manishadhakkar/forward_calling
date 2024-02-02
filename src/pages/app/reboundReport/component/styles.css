@@ -36,6 +36,12 @@
   box-shadow: none !important;
   border-width: none !important;
 }
+.css-t3ipsp-control:focus {
+  display: block;
+}
+.select__control:focus {
+  display: block;
+}
 .css-1xc3v61-indicatorContainer {
   padding: 5px;
 }

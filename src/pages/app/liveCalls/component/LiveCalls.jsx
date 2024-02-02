@@ -8,6 +8,7 @@ import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
 import DefaultTable from "../../../../components/tables/DefaultTable";
 import Copyright from "../../../../components/footer/Footer";
 import { totalCallsReq } from "../service/livecalls.request";
+import TimeChip from "../../../../components/chip/TimeChip";
 
 const paths = [
   {
@@ -55,23 +56,24 @@ const LiveCalls = () => {
         size: 50,
       },
       {
-        accessorKey: "ivr_name",
-        header: "Ivr Name",
+        accessorKey: "timestamp",
+        header: "Duration",
+        size: 100,
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
+        Cell: ({ cell }) => <TimeChip value={cell.getValue()} />,
+        muiTableHeadCell: {
+          align: "left",
+        },
         muiTableBodyCellProps: {
           align: "left",
         },
-        muiTableHeadCellProps: {
-          align: "left",
-        },
-        size: 50,
       },
       {
-        accessorKey: "channel",
-        header: "Channel",
+        accessorKey: "campaigns.name",
+        header: "Campaign Name",
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
@@ -102,6 +104,7 @@ const LiveCalls = () => {
     ],
     []
   );
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -110,14 +113,13 @@ const LiveCalls = () => {
 
   const fetchData = async () => {
     try {
-      // setLoader(true);
       const res = await totalCallsReq();
-      const fetchedData = res.data.data || [];
+      const fetchedData = res.data?.data || [];
       setRows(fetchedData);
     } catch (error) {
       console.error("Error fetching data:", error.message);
     } finally {
-      // setLoader(false);
+      setLoader(false);
     }
   };
   useEffect(() => {
@@ -125,7 +127,7 @@ const LiveCalls = () => {
   }, []);
 
   useEffect(() => {
-    const intervalId = setInterval(fetchData, 10000);
+    const intervalId = setInterval(fetchData, 5000);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -150,7 +152,9 @@ const LiveCalls = () => {
       >
         <Breadcrumb pathList={paths} />
         <Box>
-          <Typography mt={1} mb={1} variant="h5">{"Live Calls History"}</Typography>
+          <Typography mt={1} mb={1} variant="h5">
+            {"Live Calls History"}
+          </Typography>
           <Box>
             <DefaultTable
               data={rows}

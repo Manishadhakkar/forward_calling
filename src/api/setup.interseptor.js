@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 const user = JSON.parse(localStorage.getItem("user"));
 
 let headers = {
-  "Content-Type": "application/json"
+  "Content-Type": "application/json",
 };
 if (user && user.token) {
   headers["Authorization"] = `Bearer ${user.token}`;
@@ -35,14 +35,16 @@ instance.interceptors.response.use(
   },
   async (error) => {
     if (error?.response?.status === 401) {
-      Swal.fire({
-        icon: "warning",
-        title: "Session Expired",
-        text: "Login again",
-      }).then(() => {
-        localStorage.clear();
-        window.location.href = "/";
-      });
+      localStorage.clear();
+      window.location.href = "/";
+      // Swal.fire({
+      //   icon: "warning",
+      //   title: "Session Expired",
+      //   text: "Login again",
+      // }).then(() => {
+      //   localStorage.clear();
+      //   window.location.href = "/";
+      // });
     }
     const err = {
       url: error?.toJSON().config.baseURL,

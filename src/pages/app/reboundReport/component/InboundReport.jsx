@@ -10,11 +10,15 @@ import DefaultTable from "../../../../components/tables/DefaultTable";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 import {
-  getActiveTargetsRequest,
+  getForwardTargetsRequest,
   getAllIvrRequest,
   getAllNumbersRequest,
+  getInboundRequest,
 } from "../service/inbound.request";
 import "./styles.css";
+import { ivrList } from "../../../../utility/config";
+import DateChip from "../../../../components/chip/DateChip";
+import moment from "moment";
 
 const paths = [
   {
@@ -28,32 +32,13 @@ const paths = [
   },
 ];
 
-const data = [
-  {
-    id: 1,
-    did_no: "18001500500",
-  },
-  {
-    id: 2,
-    did_no: "18001500501",
-  },
-  {
-    id: 3,
-    did_no: "18001500502",
-  },
-  {
-    id: 4,
-    did_no: "18001500503",
-  },
-];
-
 const InboundReport = () => {
   const columns = useMemo(
     () => [
       {
-        accessorKey: "did_no",
-        header: "Serial No",
-        size: 50,
+        accessorKey: "uniqueid",
+        header: "Unique No",
+        size: 100,
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
@@ -66,13 +51,14 @@ const InboundReport = () => {
         },
       },
       {
-        accessorKey: "did_no",
+        accessorKey: "call_date",
         header: "Date",
-        size: 50,
+        size: 100,
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
+        Cell: ({ cell }) => <DateChip value={cell.getValue()} />,
         muiTableHeadCell: {
           align: "left",
         },
@@ -81,22 +67,7 @@ const InboundReport = () => {
         },
       },
       {
-        accessorKey: "did_no",
-        header: "Status",
-        size: 50,
-        enableColumnDragging: false,
-        enableGlobalFilter: true,
-        enableColumnFilter: false,
-        enableColumnActions: false,
-        muiTableHeadCell: {
-          align: "left",
-        },
-        muiTableBodyCellProps: {
-          align: "left",
-        },
-      },
-      {
-        accessorKey: "did_no",
+        accessorKey: "did_number",
         header: "DID",
         size: 100,
         enableColumnDragging: false,
@@ -111,7 +82,7 @@ const InboundReport = () => {
         },
       },
       {
-        accessorKey: "did_no",
+        accessorKey: "destination",
         header: "Destination",
         size: 100,
         enableColumnDragging: false,
@@ -126,7 +97,7 @@ const InboundReport = () => {
         },
       },
       {
-        accessorKey: "did_no",
+        accessorKey: "calltype",
         header: "Type",
         size: 50,
         enableColumnDragging: false,
@@ -141,7 +112,7 @@ const InboundReport = () => {
         },
       },
       {
-        accessorKey: "did_no",
+        accessorKey: "duration",
         header: "Duration",
         size: 50,
         enableColumnDragging: false,
@@ -156,9 +127,9 @@ const InboundReport = () => {
         },
       },
       {
-        accessorKey: "did_no",
+        accessorKey: "cost",
         header: "Cost",
-        size: 100,
+        size: 50,
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
@@ -171,9 +142,9 @@ const InboundReport = () => {
         },
       },
       {
-        accessorKey: "did_no",
-        header: "Recording",
-        size: 50,
+        accessorKey: "campaigns.name",
+        header: "Campaign Name",
+        size: 100,
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
@@ -192,7 +163,7 @@ const InboundReport = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [rows, setRows] = useState(data);
+  const [rows, setRows] = useState([]);
   const [isLoader, setIsLoader] = useState(false);
   const [total, setTotal] = useState(0);
   const [activePage, setActivePage] = useState(1);
@@ -207,7 +178,6 @@ const InboundReport = () => {
   const [numberList, setNumberList] = useState([]);
   const [selectNumber, setSelectNumber] = useState(null);
 
-  const [ivrList, setIvrList] = useState([]);
   const [selectIvr, setSelectIvr] = useState(null);
 
   const handleStartDateChange = (date) => {
@@ -228,15 +198,17 @@ const InboundReport = () => {
 
   useEffect(() => {
     setIsLoader(true);
-    getActiveTargetsRequest()
+    getForwardTargetsRequest()
       .then((res) => {
         setIsLoader(false);
         let data =
           res.data.data.length === 0
             ? []
-            : res.data.data.map((ele) => ({ value: ele.id, label: ele.name }));
-        const updatedFetchData = [{ value: 0, label: "All" }, ...data];
-        setTargetList(updatedFetchData);
+            : res.data.data.map((ele) => ({
+                value: ele.id,
+                label: ele.target,
+              }));
+        setTargetList(data);
       })
       .catch((err) => {
         setIsLoader(false);
@@ -262,21 +234,93 @@ const InboundReport = () => {
       });
   }, []);
 
-  useEffect(() => {
+  const getAllCdrReportData = (
+    activePage,
+    limit,
+    selectedStartDate,
+    selectedEndDate,
+    selectNumber,
+    selectTarget,
+    selectIvr
+  ) => {
     setIsLoader(true);
-    getAllIvrRequest()
+    const start_date = moment(selectedStartDate).format("YYYY-MM-DD HH:mm:ss");
+    const end_date = moment(selectedEndDate).format("YYYY-MM-DD HH:mm:ss");
+    const type = selectIvr?.label === undefined ? "" : selectIvr?.value;
+    const destination =
+      selectTarget?.label === undefined ? "" : selectTarget?.label;
+    const number = selectNumber?.label === undefined ? "" : selectNumber?.label;
+
+    getInboundRequest(
+      activePage,
+      limit,
+      start_date,
+      end_date,
+      number,
+      destination,
+      type
+    )
       .then((res) => {
+        let getData = res.data.data.total === 0 ? [] : res.data.data.data;
+        setTotal(res.data.data.total);
+        setRows(getData);
         setIsLoader(false);
-        let data =
-          res.data.data.length === 0
-            ? []
-            : res.data.data.map((ele) => ({ value: ele.id, label: ele.name }));
-        setIvrList(data);
       })
       .catch((err) => {
         setIsLoader(false);
       });
-  }, []);
+  };
+
+  useEffect(() => {
+    getAllCdrReportData(
+      activePage,
+      limit,
+      selectedStartDate,
+      selectedEndDate,
+      selectNumber,
+      selectTarget,
+      selectIvr
+    );
+  }, [activePage, limit]);
+
+  const handleFilterCdr = (e) => {
+    e.preventDefault();
+    getAllCdrReportData(
+      activePage,
+      limit,
+      selectedStartDate,
+      selectedEndDate,
+      selectNumber,
+      selectTarget,
+      selectIvr
+    );
+  };
+
+  const handleClearCdr = (e) => {
+    e.preventDefault();
+    setSelectedStartDate(new Date());
+    setSelectedEndDate(new Date());
+    setSelectTarget(null);
+    setSelectNumber(null);
+    setSelectIvr(null);
+    setActivePage(1);
+
+    const selectedStartDate = new Date();
+    const selectedEndDate = new Date();
+    const selectNumber = { label: "", value: "" };
+    const selectTarget = { label: "", value: "" };
+    const selectIvr = { label: "", value: "" };
+
+    getAllCdrReportData(
+      1,
+      10,
+      selectedStartDate,
+      selectedEndDate,
+      selectNumber,
+      selectTarget,
+      selectIvr
+    );
+  };
 
   return (
     <>
@@ -392,17 +436,17 @@ const InboundReport = () => {
                       color: colors.textColor[100],
                     }}
                   >
-                    Target
+                    Destination
                   </Typography>
                   <Select
                     className="basic-single"
                     classNamePrefix="select"
-                    placeholder="Select Target"
+                    placeholder="Select Destination"
                     defaultValue={targetList[0]}
                     isLoading={isLoader}
                     isClearable={true}
                     isSearchable={true}
-                    name="target"
+                    name="destination"
                     options={targetList}
                     onChange={handleTargetChange}
                     value={selectTarget}
@@ -445,16 +489,16 @@ const InboundReport = () => {
                       color: colors.textColor[100],
                     }}
                   >
-                    Ivr
+                    Type
                   </Typography>
                   <Select
                     className="basic-single"
                     classNamePrefix="select"
-                    placeholder="Select Ivr"
+                    placeholder="Select type"
                     isLoading={isLoader}
                     isClearable={true}
                     isSearchable={true}
-                    name="ivr"
+                    name="type"
                     options={ivrList}
                     onChange={handleIvrChange}
                     value={selectIvr}
@@ -483,6 +527,7 @@ const InboundReport = () => {
                       },
                     }}
                     variant="contained"
+                    onClick={handleFilterCdr}
                   >
                     Search
                   </Button>
@@ -497,6 +542,7 @@ const InboundReport = () => {
                       },
                     }}
                     variant="contained"
+                    onClick={handleClearCdr}
                   >
                     Clear
                   </Button>

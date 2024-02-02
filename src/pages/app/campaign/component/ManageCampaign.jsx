@@ -1931,56 +1931,12 @@ const UpdateCampaign = () => {
                             borderBottom: "none",
                           }}
                         >
-                          <Column width={250}>
+                            <Column flexGrow={1}>
                             <HeaderCell
                               style={{
                                 color: colors.layoutColor[200],
                                 backgroundColor: colors.primary[400],
-                                textAlign: "center",
-                              }}
-                            >
-                              Digits
-                            </HeaderCell>
-                            <Cell
-                              dataKey="input_digit"
-                              style={{
-                                color: colors.layoutColor[200],
-                                backgroundColor:
-                                  theme.palette.mode === "dark"
-                                    ? "#0c101b"
-                                    : "#a1a4ab",
-                                textAlign: "center",
-                              }}
-                            />
-                          </Column>
-                          <Column width={250}>
-                            <HeaderCell
-                              style={{
-                                color: colors.layoutColor[200],
-                                backgroundColor: colors.primary[400],
-                                textAlign: "center",
-                              }}
-                            >
-                              Destination Type
-                            </HeaderCell>
-                            <Cell
-                              dataKey="destination_type"
-                              style={{
-                                color: colors.layoutColor[200],
-                                backgroundColor:
-                                  theme.palette.mode === "dark"
-                                    ? "#0c101b"
-                                    : "#a1a4ab",
-                                textAlign: "center",
-                              }}
-                            />
-                          </Column>
-                          <Column flexGrow={1}>
-                            <HeaderCell
-                              style={{
-                                color: colors.layoutColor[200],
-                                backgroundColor: colors.primary[400],
-                                textAlign: "center",
+                                textAlign: "start",
                                 borderBottom: "none",
                               }}
                             >
@@ -1993,9 +1949,53 @@ const UpdateCampaign = () => {
                                   theme.palette.mode === "dark"
                                     ? "#0c101b"
                                     : "#a1a4ab",
-                                textAlign: "center",
+                                textAlign: "start",
                               }}
                               dataKey="destination_name"
+                            />
+                          </Column>
+                        
+                          <Column width={250}>
+                            <HeaderCell
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[400],
+                                textAlign: "start",
+                              }}
+                            >
+                              Destination Type
+                            </HeaderCell>
+                            <Cell
+                              dataKey="destination_type"
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor:
+                                  theme.palette.mode === "dark"
+                                    ? "#0c101b"
+                                    : "#a1a4ab",
+                                textAlign: "start",
+                              }}
+                            />
+                          </Column>
+                        
+                            <Column width={250}>
+                            <HeaderCell
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor: colors.primary[400],
+                              }}
+                            >
+                              Digits
+                            </HeaderCell>
+                            <Cell
+                              dataKey="input_digit"
+                              style={{
+                                color: colors.layoutColor[200],
+                                backgroundColor:
+                                  theme.palette.mode === "dark"
+                                    ? "#0c101b"
+                                    : "#a1a4ab",
+                              }}
                             />
                           </Column>
                           <Column flexGrow={1}>

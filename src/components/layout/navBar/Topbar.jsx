@@ -37,9 +37,14 @@ import {
   FcBusinessman,
 } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-import { liveCallsReq, logoutRequest, totalCallsReq } from "./logout.request";
+import {
+  completedCallsReq,
+  logoutRequest,
+  totalCallsReq,
+} from "./logout.request";
 import Loader from "../../Loader/Loader";
 import { getBalanceRemainsReq } from "../../../pages/app/wallet/service/wallet.request";
+import TopDrawer from "../../drawer/CustomDrawer";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -56,23 +61,30 @@ const Topbar = () => {
   const [anchorElUser, setAnchorElUser] = useState(false);
   const [isLoader, setIsLoader] = useState(false);
 
-  const [age, setAge] = useState("");
+  const [role, setRole] = useState("");
   const [amount, setAmount] = useState(0);
 
   const [liveCalls, setLiveCalls] = useState(0);
   const [totalCalls, setTotalCalls] = useState(0);
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const getUserBalance = async () => {
     try {
       const res = await getBalanceRemainsReq();
-      setAmount(res.data?.data?.balance);
+      const newBalance = res.data?.data?.balance;
+      setAmount((prevAmount) => {
+        if (prevAmount !== newBalance) {
+          getUserAllCalls();
+        }
+        return newBalance;
+      });
     } catch (err) {
-    } finally {
+      console.log(err);
     }
   };
 
   getUserBalance();
-
   useEffect(() => {
     const intervalId = setInterval(getUserBalance, 10000);
     return () => clearInterval(intervalId);
@@ -94,8 +106,17 @@ const Topbar = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  const getUserAllCalls = async () => {
+    try {
+      const res = await completedCallsReq();
+      setTotalCalls(res.data?.data?.CompletedCalls);
+    } catch (err) {
+    } finally {
+    }
+  };
+
   const handleChange = (event) => {
-    setAge(event.target.value);
+    setRole(event.target.value);
   };
 
   const handleOpenUserMenu = (event) => {
@@ -138,14 +159,18 @@ const Topbar = () => {
     logoutRequest()
       .then(() => {
         setIsLoader(false);
-        navigate("/");
         localStorage.clear();
+        window.location.href = "/";
       })
       .catch(() => {
         setIsLoader(false);
-        navigate("/");
         localStorage.clear();
+        window.location.href = "/";
       });
+  };
+
+  const handleSwitchAccount = () => {
+    setIsOpen(true);
   };
 
   const mobileMenuId = "primary-search-account-menu-mobile";
@@ -232,6 +257,7 @@ const Topbar = () => {
 
   return (
     <>
+      <TopDrawer isOpen={isOpen} setIsOpen={setIsOpen} />
       {isLoader && <Loader />}
       <Box
         sx={{
@@ -383,22 +409,39 @@ const Topbar = () => {
                     <Typography textAlign="center">Account</Typography>
                   </MenuItem>
 
-                  <FormControl fullWidth size="small">
-                    <InputLabel id="demo-simple-select-label">
+                  <MenuItem onClick={handleSwitchAccount}>
+                    <Typography textAlign="center">Switch</Typography>
+                  </MenuItem>
+
+                  {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
+                    <InputLabel htmlFor="grouped-native-select">
                       Switch
                     </InputLabel>
                     <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={age}
-                      label="Switch"
-                      onChange={handleChange}
+                      native
+                      defaultValue=""
+                      id="grouped-native-select"
+                      label="Grouping"
+                      size="small"
                     >
-                      <MenuItem value={10}>Admin</MenuItem>
-                      <MenuItem value={20}>Publisher</MenuItem>
-                      <MenuItem value={30}>Buyer</MenuItem>
+                      <optgroup label="Company 1">
+                        <option value={1}>Admin</option>
+                      </optgroup>
+                      <optgroup label="Company 2">
+                        <option value={2}>Publisher</option>
+                        <option value={3}>Buyer</option>
+                      </optgroup>
+                      <optgroup label="Company 3">
+                        <option value={3}>Buyer</option>
+                      </optgroup>
+                      <optgroup label="Company 4">
+                        <option value={3}>Buyer</option>
+                      </optgroup>
+                      <optgroup label="Company 5">
+                        <option value={2}>Publisher</option>
+                      </optgroup>
                     </Select>
-                  </FormControl>
+                  </FormControl> */}
                 </>
               )}
               <MenuItem onClick={handleSettingPassword}>
