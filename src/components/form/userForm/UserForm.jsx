@@ -213,7 +213,7 @@ const UserForm = (props) => {
     const data = {
       name: name.value,
       email: userEmail.value,
-      role_id: isAdmin ? 11 : userRole.value,
+      role_id: isAdmin ? 7 : userRole.value,
       country_id: selectCountry.value,
       state_id: state.value,
       city: userCity.value,

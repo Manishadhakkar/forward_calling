@@ -63,6 +63,127 @@ const FormTextField = (props) => {
     event.preventDefault();
   };
 
+  const handleIvrChange = (e) => {
+    const text = e.target.value;
+    const data = text.trimStart();
+    if (Required) {
+      const alphaTest = /^[0-9*#]$/gm;
+      if (data.length > 0) {
+        if (!alphaTest.test(String(data).toLowerCase())) {
+          const value = {
+            value: data,
+            success: false,
+          };
+          onChangeText(value);
+          setName(value);
+        } else {
+          setError("");
+          const value = {
+            value: data,
+            success: true,
+          };
+          onChangeText(value);
+          setName(value);
+        }
+      } else {
+        setError(ERR_BLANK);
+        const value = {
+          value: data,
+          success: false,
+        };
+        onChangeText(value);
+        setName(value);
+      }
+    } else if (!Required) {
+      if (data.length > 0) {
+        const alphaTest = /^[0-9*#]$/gm;
+        if (!alphaTest.test(String(data).toLowerCase())) {
+          const value = {
+            value: data,
+            success: false,
+          };
+          onChangeText(value);
+          setName(value);
+        } else {
+          setError("");
+          const value = {
+            value: data,
+            success: true,
+          };
+          onChangeText(value);
+          setName(value);
+        }
+      } else {
+        setError("");
+        const value = {
+          value: data,
+          success: true,
+        };
+        onChangeText(value);
+        setName(value);
+      }
+    }
+  };
+
+  const handleIvrBlur = (e) => {
+    const text = e.target.value;
+    const data = text.trimStart();
+    if (Required) {
+      if (data.length <= 0) {
+        setError(ERR_BLANK);
+        const value = {
+          ...name,
+          error: true,
+          success: false,
+        };
+        setName(value);
+        onChangeText(value);
+      } else {
+        const ivrRegex = /^[0-9*#]$/gm;
+        if (!ivrRegex.test(String(data).toLowerCase())) {
+          setError(CustomErrorLine ? CustomErrorLine : ERR_EMAIL);
+          const value = {
+            ...name,
+            error: true,
+            success: false,
+          };
+          setName(value);
+          onChangeText(value);
+        } else {
+          setError("");
+          const value = {
+            ...name,
+            error: false,
+            success: true,
+          };
+          setName(value);
+          onChangeText(value);
+        }
+      }
+    } else if (!Required && data.length > 0) {
+      const ivrRegex = /^[0-9*#]$/gm;
+      if (!ivrRegex.test(String(data).toLowerCase())) {
+        setError(CustomErrorLine ? CustomErrorLine : ERR_EMAIL);
+        const value = {
+          ...name,
+          error: true,
+          success: false,
+        };
+        setName(value);
+        onChangeText(value);
+      } else {
+        setError("");
+        const value = {
+          ...name,
+          error: false,
+          success: true,
+        };
+        setName(value);
+        onChangeText(value);
+      }
+    }
+  };
+
   const handleChangeText = (e) => {
     const text = e.target.value;
     const data = text.trimStart();
@@ -805,123 +926,6 @@ const FormTextField = (props) => {
     }
   };
 
-  const handleChangePrice = (e) => {
-    const text = e.target.value;
-    const data = text.trimStart();
-    if (Required) {
-      const priceRegex = /^\d{1,3}(,\d{3})*(\.\d{2})?$/gm;
-      if (!priceRegex.test(String(data).toLowerCase())) {
-        setError(CustomErrorLine ? CustomErrorLine : "Error");
-        const value = {
-          value: data,
-          success: false,
-        };
-        onChangeText(value);
-        setName(value);
-      } else {
-        setError("");
-        const value = {
-          value: data,
-          success: true,
-        };
-        onChangeText(value);
-        setName(value);
-      }
-    } else if (!Required) {
-      if (data.length > 0) {
-        const priceRegex = /^\d{1,3}(,\d{3})*(\.\d{2})?$/gm;
-        if (!priceRegex.test(String(data).toLowerCase())) {
-          setError(CustomErrorLine ? CustomErrorLine : "Error");
-          const value = {
-            ...name,
-            error: true,
-            success: false,
-          };
-          setName(value);
-          onChangeText(value);
-        } else {
-          setError("");
-          const value = {
-            ...name,
-            error: false,
-            success: true,
-          };
-          setName(value);
-          onChangeText(value);
-        }
-      } else {
-        setError("");
-        const value = {
-          ...name,
-          error: false,
-          success: true,
-        };
-        setName(value);
-        onChangeText(value);
-      }
-    }
-  };
-
-  const handleBlurPrice = (e) => {
-    e.preventDefault();
-    const text = e.target.value;
-    const data = text.trimStart();
-    if (Required) {
-      if (data.length <= 0) {
-        setError(ERR_BLANK);
-        const value = {
-          ...name,
-          error: true,
-          success: false,
-        };
-        setName(value);
-        onChangeText(value);
-      } else {
-        const priceRegex = /^\d{1,3}(,\d{3})*(\.\d{2})?$/gm;
-        if (!priceRegex.test(String(data).toLowerCase())) {
-          setError(CustomErrorLine ? CustomErrorLine : ERR_EMAIL);
-          const value = {
-            ...name,
-            error: true,
-            success: false,
-          };
-          setName(value);
-          onChangeText(value);
-        } else {
-          setError("");
-          const value = {
-            ...name,
-            error: false,
-            success: true,
-          };
-          setName(value);
-          onChangeText(value);
-        }
-      }
-    } else if (!Required && data.length > 0) {
-      const priceRegex = /^\d{1,3}(,\d{3})*(\.\d{2})?$/gm;
-      if (!priceRegex.test(String(data).toLowerCase())) {
-        setError(CustomErrorLine ? CustomErrorLine : ERR_EMAIL);
-        const value = {
-          ...name,
-          error: true,
-          success: false,
-        };
-        setName(value);
-        onChangeText(value);
-      } else {
-        setError("");
-        const value = {
-          ...name,
-          error: false,
-          success: true,
-        };
-        setName(value);
-        onChangeText(value);
-      }
-    }
-  };
-
   return (
     <>
       {type === "formatNo" ? (
@@ -1068,7 +1072,7 @@ const FormTextField = (props) => {
                     : "#352F44 !important",
               },
               "& .MuiOutlinedInput-input": {
-                backgroundColor: "none !important"  
+                backgroundColor: "none !important",
               },
               display: isHidden ? "none" : "block",
             }}
@@ -1122,91 +1126,128 @@ const FormTextField = (props) => {
             <FormHelperText sx={{ color: "#FF0000" }}>{error}</FormHelperText>
           )}
         </>
-      )
-        : type === "capvalue" ? (
-          <>
-            <TextField
-              multiline={type === "textarea" ? true : false}
-              disabled={isDisable}
-              margin="none"
-              hidden={hidden}
-              fullWidth
-              label={label}
-              placeholder={placeholder}
-              type={type}
-              required={Required}
-              value={Value ? Value : name.value}
-              onChange={handleChangeText}
-              onBlur={(e) => {
-                handleBlurText(e);
-              }}
-              error={error ? true : false}
-              size="small"
-              sx={{
-                "& .MuiInputLabel-root": {
-                  color:
-                    theme.palette.mode === "dark"
-                      ? "#FAF0E6 !important"
-                      : "#352F44 !important",
-                },
-                "& .MuiOutlinedInput-input": {
-                  backgroundColor: "none !important",
-                },
-                display: isHidden ? "none" : "block",
-              }}
-              {...rest}
-            />
-            {error && (
-              <FormHelperText
-                style={{
-                  display: isHidden ? "none" : "block",
-                }}
-                sx={{ color: "#FF0000" }}
-              >
-                {error}
-              </FormHelperText>
-            )}
-          </>
-        ) : (
-          <>
-            <TextField
-              multiline={isMultiline}
-              disabled={isDisable}
-              margin="normal"
-              hidden={hidden}
-              fullWidth
-              label={label}
-              placeholder={placeholder}
-              type={type}
-              required={Required}
-              value={Value ? Value : name.value}
-              onChange={handleChangeText}
-              onBlur={(e) => {
-                handleBlurText(e);
-              }}
-              error={error ? true : false}
-              size="small"
-              sx={{
-                "& .MuiInputLabel-root": {
-                  color:
-                    theme.palette.mode === "dark"
-                      ? "#FAF0E6 !important"
-                      : "#352F44 !important",
-                },
-                "& .MuiOutlinedInput-input": {
-                  backgroundColor: "none !important",
-                },
-                "& .MuiOutlinedInput-notchedOutline": {},
+      ) : type === "ivrnumber" ? (
+        <>
+          <TextField
+            disabled={isDisable}
+            margin="normal"
+            hidden={hidden}
+            fullWidth
+            label={label}
+            placeholder={placeholder}
+            type={type}
+            required={Required}
+            value={Value ? Value : name.value}
+            onChange={handleIvrChange}
+            onBlur={(e) => {
+              handleIvrBlur(e);
+            }}
+            error={error ? true : false}
+            size="small"
+            sx={{
+              "& .MuiInputLabel-root": {
+                color:
+                  theme.palette.mode === "dark"
+                    ? "#FAF0E6 !important"
+                    : "#352F44 !important",
+              },
+              "& .MuiOutlinedInput-input": {
+                backgroundColor: "none !important",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {},
 
+              display: isHidden ? "none" : "block",
+            }}
+            {...rest}
+          />
+          {error && (
+            <FormHelperText sx={{ color: "#FF0000" }}>{error}</FormHelperText>
+          )}
+        </>
+      ) : type === "capvalue" ? (
+        <>
+          <TextField
+            multiline={type === "textarea" ? true : false}
+            disabled={isDisable}
+            margin="none"
+            hidden={hidden}
+            fullWidth
+            label={label}
+            placeholder={placeholder}
+            type={type}
+            required={Required}
+            value={Value ? Value : name.value}
+            onChange={handleChangeText}
+            onBlur={(e) => {
+              handleBlurText(e);
+            }}
+            error={error ? true : false}
+            size="small"
+            sx={{
+              "& .MuiInputLabel-root": {
+                color:
+                  theme.palette.mode === "dark"
+                    ? "#FAF0E6 !important"
+                    : "#352F44 !important",
+              },
+              "& .MuiOutlinedInput-input": {
+                backgroundColor: "none !important",
+              },
+              display: isHidden ? "none" : "block",
+            }}
+            {...rest}
+          />
+          {error && (
+            <FormHelperText
+              style={{
                 display: isHidden ? "none" : "block",
               }}
-              {...rest}
-            />
-            {error && (
-              <FormHelperText sx={{ color: "#FF0000" }}>{error}</FormHelperText>
-            )}
-          </>
-        )}
+              sx={{ color: "#FF0000" }}
+            >
+              {error}
+            </FormHelperText>
+          )}
+        </>
+      ) : (
+        <>
+          <TextField
+            multiline={isMultiline}
+            disabled={isDisable}
+            margin="normal"
+            hidden={hidden}
+            fullWidth
+            label={label}
+            placeholder={placeholder}
+            type={type}
+            required={Required}
+            value={Value ? Value : name.value}
+            onChange={handleChangeText}
+            onBlur={(e) => {
+              handleBlurText(e);
+            }}
+            error={error ? true : false}
+            size="small"
+            sx={{
+              "& .MuiInputLabel-root": {
+                color:
+                  theme.palette.mode === "dark"
+                    ? "#FAF0E6 !important"
+                    : "#352F44 !important",
+              },
+              "& .MuiOutlinedInput-input": {
+                backgroundColor: "none !important",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {},
+
+              display: isHidden ? "none" : "block",
+            }}
+            {...rest}
+          />
+          {error && (
+            <FormHelperText sx={{ color: "#FF0000" }}>{error}</FormHelperText>
+          )}
+        </>
+      )}
     </>
   );
 };

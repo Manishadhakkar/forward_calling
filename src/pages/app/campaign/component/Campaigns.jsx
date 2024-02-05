@@ -52,6 +52,7 @@ const Campaign = () => {
   const navigate = useNavigate();
   const getId = JSON.parse(localStorage.getItem("user"));
   const company_id = getId.user_data.company_id;
+
   const [rows, setRows] = useState([]);
   const [isLoader, setLoader] = useState(false);
   const [currentId, setCurrentId] = useState(null);
@@ -371,44 +372,6 @@ const Campaign = () => {
     getAllCampaigns(activePage, limit);
   }, [activePage, limit]);
 
-  const getTargetData = (id) => {
-    setLoader(true);
-    getCampaignByIdRequest(id)
-      .then((res) => {
-        setLoader(false);
-        const currentData = {
-          id: res.data.data[0].id,
-          company_id: res.data.data[0].company_id,
-          randomId: res.data.data[0].campaign_random_id,
-          name: res.data.data[0].name,
-          description: res.data.data[0].description,
-          campaign_rate: res.data.data[0].campaign_rate,
-          timeout: res.data.data[0].connection_timeout,
-          isRecording: res.data.data[0].recording === 0 ? false : true,
-          status: res.data.data[0].status,
-          ivr: {
-            id: res.data.data[0].dail_ivr_options,
-            name: res.data.data[0].dail_ivr_options,
-          },
-          targets:
-            res.data.data[0].campaign_members &&
-            res.data.data[0].campaign_members.map((ele) => ({
-              id: parseInt(ele.target_id),
-              name: ele.target_name,
-              weightage: ele.weightage,
-              priorities: ele.priority,
-            })),
-          number: res.data.data[0].did_number_id,
-        };
-        setCurrentType(currentData);
-        setIsOpen(true);
-      })
-      .catch((err) => {
-        setLoader(false);
-        setMessage(err.message);
-      });
-  };
-
   const getTargetCampaignList = () => {
     if (currentId !== null) {
       setLoader(true);
@@ -443,7 +406,6 @@ const Campaign = () => {
         })
         .catch((err) => {
           setLoader(false);
-          console.log(err);
         });
     }
   };
@@ -465,6 +427,7 @@ const Campaign = () => {
     // getTargetData(ele.id);
     navigate("update-campaigns", { state: { campaign_id: ele.id } });
   };
+
   const handleStatusChange = (value) => {
     setLoader(true);
     const params = {
@@ -487,6 +450,7 @@ const Campaign = () => {
         setErrorMessage(err.message);
       });
   };
+
   const handleAddCampaign = (value) => {
     setLoader(true);
     createCampRequest(value)
@@ -665,7 +629,7 @@ const Campaign = () => {
               isEditable={isAuthorizedFunc(UPDATE_CAMPAIGN)}
               isDeletable={false}
               isStatusChangable={isAuthorizedFunc(STATUS_CAMPAIGN)}
-              isAssignable={true}
+              isAssignable={company_id === "0" ? true : false}
               handleAssignChangable={handleChangeAssignTo}
             />
             <Pagination

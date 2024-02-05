@@ -304,7 +304,7 @@ const BuyerForm = (props) => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <FormTextField
-                        type="text"
+                        type="textarea"
                         label={"User Name"}
                         placeholder={"Enter User Name"}
                         CustomErrorLine="Please enter a full name"

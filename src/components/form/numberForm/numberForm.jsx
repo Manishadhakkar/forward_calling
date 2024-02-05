@@ -325,12 +325,12 @@ const NumberForm = (props) => {
               <Grid item xs={12} md={6}>
                 <FormTextField
                   type="price"
-                  placeholder={"Enter Connect Price"}
-                  label={"Connect Price"}
+                  placeholder={"Enter Connect Charge"}
+                  label={"Connect Charge"}
                   Value={connectPrice.value}
                   onChangeText={handleChangeConnectPrice}
                   Required={true}
-                  CustomErrorLine={"Enter proper price"}
+                  CustomErrorLine={"Enter proper charge"}
                   priceSymbol={priceSymbol}
                 />
               </Grid>
@@ -338,12 +338,12 @@ const NumberForm = (props) => {
               <Grid item xs={12} md={6}>
                 <FormTextField
                   type="price"
-                  placeholder={"Enter Selling Price"}
-                  label={"Selling Price"}
+                  placeholder={"Enter Selling Charge"}
+                  label={"Selling Charge"}
                   Value={sellingPrice.value}
                   onChangeText={handleChangeSellingPrice}
                   Required={true}
-                  CustomErrorLine={"Enter proper price"}
+                  CustomErrorLine={"Enter proper charge"}
                   priceSymbol={priceSymbol}
                 />
               </Grid>

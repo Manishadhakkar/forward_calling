@@ -110,13 +110,13 @@ const AssignIvrForm = (props) => {
           <Grid container spacing={1}>
             <Grid item xs={6} md={4}>
               <FormTextField
-                type="number"
+                type="ivrnumber"
                 placeholder={"Enter digit"}
                 label={"Digit"}
                 Value={input_digit.value}
                 onChangeText={handleChangeDigits}
                 Required={true}
-                CustomErrorLine={"Enter proper digits"}
+                CustomErrorLine={"Enter proper digits (0 - 9 * #)"}
               />
             </Grid>
             <Grid item xs={6} md={4}>

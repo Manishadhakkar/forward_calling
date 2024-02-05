@@ -21,9 +21,19 @@ export const logoutRequest = (body) => {
     });
   };
   
-  export const totalAccDataReq = () => {
+  export const totalAccDataReq = (body) => {
     return axios({
-      method: "GET",
+      method: "POST",
       url: "/account",
+      data: body
     });
   };
+
+  export const getPermissionReq = (slugId) => {
+    return axios({
+      method: "GET",
+      url: `/permission/permission-by-group/${slugId}`
+    });
+  };
+
+  

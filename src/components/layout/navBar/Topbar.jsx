@@ -171,6 +171,7 @@ const Topbar = () => {
 
   const handleSwitchAccount = () => {
     setIsOpen(true);
+    setAnchorElUser(false);
   };
 
   const mobileMenuId = "primary-search-account-menu-mobile";
@@ -257,7 +258,7 @@ const Topbar = () => {
 
   return (
     <>
-      <TopDrawer isOpen={isOpen} setIsOpen={setIsOpen} />
+      <TopDrawer isOpen={isOpen} setIsOpen={setIsOpen} data={user_details} />
       {isLoader && <Loader />}
       <Box
         sx={{

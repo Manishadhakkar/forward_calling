@@ -60,6 +60,7 @@ const SignIn = (props) => {
           token: res.data.data.token,
           user_data: res.data.data,
         };
+        console.log("Response>>>>>>", res.data.data);
         setUserDetail(user_details);
         setSlugId(res.data?.data?.roles[0]?.slug);
       })

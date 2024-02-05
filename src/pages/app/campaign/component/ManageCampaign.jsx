@@ -955,7 +955,7 @@ const UpdateCampaign = () => {
   };
 
   const handleAddAssignIvr = async (value) => {
-    // setIsLoader(true);
+    setIsLoader(true);
     try {
       const reqData = {
         campaign_id: campaign_id,

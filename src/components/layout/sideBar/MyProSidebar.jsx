@@ -502,8 +502,7 @@ const MyProSidebar = () => {
                           Buyer
                         </MenuItem>
                       )}
-                      {/* {isAuthorizedFunc(GET_PUBLISHER) && ( */}
-                      {isAuthorizedFunc(GET_BUYER) && (
+                      {isAuthorizedFunc(GET_PUBLISHER) && (
                         <MenuItem
                           active={url === "/access/publisher"}
                           component={<Link to="/access/publisher" />}
