@@ -60,7 +60,10 @@ const SignIn = (props) => {
           token: res.data.data.token,
           user_data: res.data.data,
         };
-        console.log("Response>>>>>>", res.data.data);
+        const select_role =
+          res.data?.data?.company?.company_name +
+          res.data?.data?.roles[0]?.role_id;
+        localStorage.setItem("select_role", JSON.stringify(select_role));
         setUserDetail(user_details);
         setSlugId(res.data?.data?.roles[0]?.slug);
       })
