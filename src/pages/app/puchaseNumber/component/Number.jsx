@@ -3,7 +3,6 @@ import { Box, Typography, useTheme } from "@mui/material";
 import { Pagination } from "rsuite";
 import { TbHome2 } from "react-icons/tb";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
-import { HiOutlineHashtag } from "react-icons/hi2";
 import { tokens } from "../../../../assets/color/theme";
 import DefaultTable from "../../../../components/tables/DefaultTable";
 import Copyright from "../../../../components/footer/Footer";
@@ -105,10 +104,6 @@ const NumberList = () => {
   useEffect(() => {
     getAllNumbers(activePage, limit);
   }, [activePage, limit]);
-
-  const handleView = (id) => {
-    console.log(id);
-  };
 
   return (
     <>

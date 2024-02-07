@@ -14,9 +14,6 @@ import {
 import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
 import { AiOutlineMenu, AiOutlineMenuUnfold } from "react-icons/ai";
 import { useProSidebar } from "react-pro-sidebar";
 import { FiMoreVertical } from "react-icons/fi";
@@ -45,6 +42,12 @@ import {
 import Loader from "../../Loader/Loader";
 import { getBalanceRemainsReq } from "../../../pages/app/wallet/service/wallet.request";
 import TopDrawer from "../../drawer/CustomDrawer";
+import { isAuthorizedFunc } from "../../../utility/utilty";
+import {
+  GET_BALANCE,
+  GET_COMPLETE_CALLS,
+  GET_COUNT_LIVE_CALLS,
+} from "../../../utility/constant";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -52,71 +55,94 @@ const Topbar = () => {
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   const userData = JSON.parse(localStorage.getItem("user"));
+
   const roleData = userData?.user_data?.roles[0]?.role_id;
   const user_details = userData?.user_data;
   const currency_symbol = userData?.user_data?.country?.currency_symbol;
 
   const { toggleSidebar, collapseSidebar, broken, collapsed } = useProSidebar();
+
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(false);
   const [isLoader, setIsLoader] = useState(false);
-
-  const [role, setRole] = useState("");
   const [amount, setAmount] = useState(0);
-
   const [liveCalls, setLiveCalls] = useState(0);
   const [totalCalls, setTotalCalls] = useState(0);
-
   const [isOpen, setIsOpen] = useState(false);
 
   const getUserBalance = async () => {
-    try {
-      const res = await getBalanceRemainsReq();
-      const newBalance = res.data?.data?.balance;
-      setAmount((prevAmount) => {
-        if (prevAmount !== newBalance) {
-          getUserAllCalls();
-        }
-        return newBalance;
-      });
-    } catch (err) {
-      console.log(err);
+    if (
+      roleData !== 1 &&
+      roleData !== 2 &&
+      roleData !== 3 &&
+      isAuthorizedFunc(GET_BALANCE)
+    ) {
+      try {
+        const res = await getBalanceRemainsReq();
+        const newBalance = res.data?.data?.balance;
+        setAmount((prevAmount) => {
+          if (prevAmount !== newBalance) {
+            getUserAllCalls();
+          }
+          return newBalance;
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
 
   getUserBalance();
+
   useEffect(() => {
-    const intervalId = setInterval(getUserBalance, 10000);
-    return () => clearInterval(intervalId);
-  }, []);
+    if (roleData !== 1 && roleData !== 2 && roleData !== 3) {
+      const intervalId = setInterval(getUserBalance, 10000);
+      return () => clearInterval(intervalId);
+    }
+  }, [roleData]);
 
   const getUserLiveCalls = async () => {
-    try {
-      const res = await totalCallsReq();
-      const total_call =
-        res.data.data.length === 0 ? 0 : res.data.data.livecalls;
-      setLiveCalls(total_call);
-    } catch (err) {
-    } finally {
+    if (
+      roleData !== 1 &&
+      roleData !== 2 &&
+      roleData !== 3 &&
+      isAuthorizedFunc(GET_COUNT_LIVE_CALLS)
+    ) {
+      try {
+        const res = await totalCallsReq();
+        const total_call =
+          res.data.data.length === 0 ? 0 : res.data.data.livecalls;
+        setLiveCalls(total_call);
+      } catch (err) {
+      } finally {
+      }
     }
   };
   getUserLiveCalls();
   useEffect(() => {
-    const intervalId = setInterval(getUserLiveCalls, 5000);
-    return () => clearInterval(intervalId);
-  }, []);
+    if (roleData !== 1 && roleData !== 2 && roleData !== 3) {
+      const intervalId = setInterval(getUserLiveCalls, 5000);
+      return () => clearInterval(intervalId);
+    }
+  }, [roleData]);
 
   const getUserAllCalls = async () => {
-    try {
-      const res = await completedCallsReq();
-      setTotalCalls(res.data?.data?.CompletedCalls);
-    } catch (err) {
-    } finally {
+    if (
+      roleData !== 1 &&
+      roleData !== 2 &&
+      roleData !== 3 &&
+      isAuthorizedFunc(GET_COMPLETE_CALLS)
+    ) {
+      try {
+        const res = await completedCallsReq();
+        const resultData =
+          res.data?.data.length === 0 ? 0 : res.data?.data?.CompletedCalls;
+        setTotalCalls(resultData);
+      } catch (err) {
+        setTotalCalls(0);
+      } finally {
+      }
     }
-  };
-
-  const handleChange = (event) => {
-    setRole(event.target.value);
   };
 
   const handleOpenUserMenu = (event) => {
@@ -266,9 +292,11 @@ const Topbar = () => {
           position: "sticky !important",
           top: 0,
           zIndex: 999,
-          borderBottom: `1px solid ${colors.borderColor[100]}`,
-        }}
-        bgcolor={colors.layoutColor[100]}
+          background: "linear-gradient(to right, #4d2920, #3e1641)"
+          // borderBottom: `1px solid ${colors.borderColor[100]}`,
+        }}       
+        
+        // bgcolor={colors.layoutColor[100]}
       >
         <Toolbar>
           {broken && (
@@ -290,70 +318,91 @@ const Topbar = () => {
               <AiOutlineMenuUnfold />
             </IconButton>
           )}
-          <CardHeader
-            avatar={
-              <IconButton
-                size="small"
-                edge="end"
-                sx={{ cursor: "not-allowed" }}
-              >
-                <CallCalling color={colors.green[100]} variant="Bold" />
-              </IconButton>
-            }
-            title={liveCalls}
-            subheader="Live"
-          />
-          <CardHeader
-            avatar={
-              <IconButton size="small" edge="end">
-                <CallReceived color={colors.blue[100]} variant="Bold" />
-              </IconButton>
-            }
-            title={totalCalls}
-            subheader="Completed"
-          />
+          {roleData !== 1 &&
+            roleData !== 2 &&
+            roleData !== 3 &&
+            isAuthorizedFunc(GET_COUNT_LIVE_CALLS) && (
+              <CardHeader
+                avatar={
+                  <IconButton
+                    size="small"
+                    edge="end"
+                    sx={{ cursor: "not-allowed" }}
+                  >
+                    <CallCalling color={colors.green[100]} variant="Bold" />
+                  </IconButton>
+                }
+                title={liveCalls}
+                subheader="Live"
+              />
+            )}
+          {roleData !== 1 &&
+            roleData !== 2 &&
+            roleData !== 3 &&
+            isAuthorizedFunc(GET_COMPLETE_CALLS) && (
+              <CardHeader
+                avatar={
+                  <IconButton size="small" edge="end">
+                    <CallReceived color={colors.blue[100]} variant="Bold" />
+                  </IconButton>
+                }
+                title={totalCalls}
+                subheader="Completed"
+              />
+            )}
 
           <Box sx={{ flexGrow: 1 }} />
+
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <Typography
-              variant="h4"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                color: colors.blue[100],
-              }}
-            >
-              {currency_symbol}
-            </Typography>
-            <Typography
-              variant="h5"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                color: colors.layoutColor[200],
-                mr: 1,
-                ml: 1,
-              }}
-            >
-              {amount}
-            </Typography>
-            <Tooltip
-              title={theme.palette.mode === "dark" ? "Light Mode" : "Dark Mode"}
-              placement="bottom"
-              arrow
-            >
-              <IconButton
-                onClick={handleChangeMode}
-                sx={{ padding: 2 }}
-                size="medium"
-              >
-                {theme.palette.mode === "dark" ? (
-                  <Sun1 size="20" />
-                ) : (
-                  <Moon size="20" />
-                )}
-              </IconButton>
-            </Tooltip>
+            {roleData !== 1 &&
+              roleData !== 2 &&
+              roleData !== 3 &&
+              isAuthorizedFunc(GET_BALANCE) && (
+                <>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      color: colors.blue[100],
+                    }}
+                  >
+                    {currency_symbol}
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      color: colors.layoutColor[200],
+                      mr: 1,
+                      ml: 1,
+                    }}
+                  >
+                    {amount}
+                  </Typography>
+                  <Tooltip
+                    title={
+                      theme.palette.mode === "dark" ? "Light Mode" : "Dark Mode"
+                    }
+                    placement="bottom"
+                    arrow
+                  >
+                    <IconButton
+                      onClick={handleChangeMode}
+                      sx={{ padding: 2 }}
+                      size="medium"
+                    >
+                      {theme.palette.mode === "dark" ? (
+                        <Sun1 size="20" />
+                      ) : (
+                        <Moon size="20" />
+                      )}
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
+
             <Tooltip title="Message" placement="bottom" arrow>
               <IconButton
                 sx={{ padding: 2 }}

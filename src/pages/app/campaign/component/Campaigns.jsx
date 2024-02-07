@@ -631,6 +631,10 @@ const Campaign = () => {
               isStatusChangable={isAuthorizedFunc(STATUS_CAMPAIGN)}
               isAssignable={company_id === "0" ? true : false}
               handleAssignChangable={handleChangeAssignTo}
+              isEditing={
+                isAuthorizedFunc(UPDATE_CAMPAIGN) ||
+                isAuthorizedFunc(STATUS_CAMPAIGN)
+              }
             />
             <Pagination
               style={{

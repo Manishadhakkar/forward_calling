@@ -20,6 +20,8 @@ import {
 import Loader from "../../../../components/Loader/Loader";
 import DefaultTable from "../../../../components/tables/DefaultTable";
 import Copyright from "../../../../components/footer/Footer";
+import { isAuthorizedFunc } from "../../../../utility/utilty";
+import { STATUS_Target, UPDATE_Target } from "../../../../utility/constant";
 
 const paths = [
   {
@@ -410,10 +412,13 @@ const ManageTarget = () => {
               handleDeleteAction={handleChangeDelete}
               handlePlayPause={handleStatusChange}
               isSearchable={true}
-              isEditable={true}
-              isDeletable={true}
-              isStatusChangable={false}
-              isPlayPause={true}
+              isEditable={isAuthorizedFunc(UPDATE_Target)}
+              isDeletable={isAuthorizedFunc(STATUS_Target)}
+              isPlayPause={isAuthorizedFunc(UPDATE_Target)}
+              isEditing={
+                isAuthorizedFunc(UPDATE_Target) ||
+                isAuthorizedFunc(STATUS_Target)
+              }
             />
             <Pagination
               style={{

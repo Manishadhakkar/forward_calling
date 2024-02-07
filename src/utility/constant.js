@@ -98,3 +98,12 @@ export const UPDATE_IVR_MEDIA = "updateIvrMedia";
 
 export const CREATE_WALLET_RECHARGE = "addToWallet";
 export const GET_WALLET_RECHARGE = "walletPaymentList";
+
+export const GET_BALANCE = "getBalance";
+
+export const GET_CDR_LIST = "getAllCdrList";
+export const GET_LIVE_CALLS = "getLiveCalls";
+
+export const GET_COMPLETE_CALLS = "getCountOfCompletedCalls";
+export const GET_COUNT_LIVE_CALLS = "getCountLivecalls";
+
