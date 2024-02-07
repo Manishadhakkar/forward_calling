@@ -1,0 +1,24 @@
+button {
+    outline: none !important;
+    border: none;
+  }
+  
+  button:hover {
+    cursor: pointer;
+  }
+  
+  .left_grid {
+    background-image: url("../../../assets//images/Register_banner.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+  .signup_div {
+    /* position: fixed; */
+    bottom: 0;
+  }
+  
+  .signup_right_box {
+    width: 100%;
+  }
+  

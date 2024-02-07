@@ -43,7 +43,9 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const AuthBuyer = () => {
   const getId = JSON.parse(localStorage.getItem("user"));
-  const company_id = getId.user_data.company_id;
+  const user_details = getId.user_data;
+
+  console.log(">>>>>>>>>",user_details)
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -187,9 +189,16 @@ const AuthBuyer = () => {
   };
 
   const handleAddBuyer = (value) => {
+    const query_data = {
+      company_id: user_details.company.id,
+      user_id: user_details.id,
+      email: value.email
+    }
+
     setLoader(true);
-    createBuyerRequest(value)
+    createBuyerRequest(query_data)
       .then((res) => {
+        console.log(">>>>>>>",res)
         getAllBuyers(activePage, limit);
         setErrorMessage("");
         setLoader(false);
@@ -207,10 +216,8 @@ const AuthBuyer = () => {
   const selectModal = () => {
     return (
       <BuyerForm
-        handleFormData={clickedBtn === "add" ? handleAddBuyer : null}
+        handleFormData={handleAddBuyer}
         onHandleClose={handleModalClose}
-        clickedBtn={clickedBtn}
-        initialValue={clickedBtn === "edit" ? currentType : {}}
         errorMessage={errorMessage}
         setErrorMessage={setErrorMessage}
       />

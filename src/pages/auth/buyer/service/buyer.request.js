@@ -28,10 +28,17 @@ export const getAllBuyersReq = (page, perpage) => {
 export const createBuyerRequest = (body) => {
   return axios({
     method: "POST",
-    url: "/buyer",
+    url: "/buyer/accountRequest",
     data: body,
   });
 };
+// export const createBuyerRequest = (body) => {
+//   return axios({
+//     method: "POST",
+//     url: "/buyer",
+//     data: body,
+//   });
+// };
 
 export const updateUsersStatusRequest = (body) => {
   return axios({

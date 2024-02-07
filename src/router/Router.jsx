@@ -137,7 +137,10 @@ const Router = () => {
           <CssBaseline />
           <MyProSidebarProvider>
             <main
-              style={{ width: "100%", backgroundColor: colors.container[100] }}
+              style={{
+                width: "100%",
+                backgroundColor: colors.primary[200]
+              }}
             >
               <Topbar />
               <Suspense fallback={<Loader />}>

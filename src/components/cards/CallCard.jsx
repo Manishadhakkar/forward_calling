@@ -15,7 +15,7 @@ const ReportCard = ({ title, value, percentage, captionTitle, icon }) => {
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Card sx={{ height: 100 }}>
+    <Card sx={{ height: 100, backgroundColor: colors.primary[400] }}>
       <CardContent>
         <Grid
           container

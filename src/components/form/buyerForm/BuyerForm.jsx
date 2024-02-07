@@ -12,6 +12,7 @@ import {
   useTheme,
   Button,
   InputLabel,
+  Stack,
 } from "@mui/material";
 import { MdClose } from "react-icons/md";
 import FormTextField from "../../textfield/FormTextField";
@@ -26,14 +27,8 @@ import { getAllCompanyRequest } from "../../../pages/auth/buyer/service/buyer.re
 import Loader from "../../Loader/Loader";
 
 const BuyerForm = (props) => {
-  const {
-    initialValue = {},
-    handleFormData,
-    onHandleClose,
-    clickedBtn,
-    errorMessage,
-    setErrorMessage,
-  } = props;
+  const { handleFormData, onHandleClose, errorMessage, setErrorMessage } =
+    props;
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -41,7 +36,7 @@ const BuyerForm = (props) => {
   const [isExist, setIsExist] = useState(true);
   const [companyList, setCompanyList] = useState([]);
   const [companyId, setCompanyId] = useState({
-    value: initialValue ? initialValue.company_id : "",
+    value: "",
     error: false,
     success: false,
   });
@@ -139,88 +134,92 @@ const BuyerForm = (props) => {
     setZipCode(value);
   };
 
-  useEffect(() => {
-    if (clickedBtn === "add") {
-      setLoader(true);
-      getAllCountryRequest()
-        .then((res) => {
-          const filterCountry = res.data.data.map((ele) => {
-            return {
-              value: ele.id,
-              label: ele.country_name,
-              phone_code: ele.phone_code,
-            };
-          });
-          setCountryList(filterCountry);
-          setLoader(false);
-        })
-        .catch((err) => {
-          setLoader(false);
-          console.log(err);
-        });
-    }
-  }, []);
-  useEffect(() => {
-    if (country.value !== "" && clickedBtn === "add") {
-      getStateByCountry(country.value)
-        .then((res) => {
-          const filterState = res.data.data.map((ele) => {
-            return {
-              value: ele.id,
-              label: ele.state_name,
-            };
-          });
-          setStateList(filterState);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [country]);
+  // useEffect(() => {
+  //   if (clickedBtn === "add") {
+  //     setLoader(true);
+  //     getAllCountryRequest()
+  //       .then((res) => {
+  //         const filterCountry = res.data.data.map((ele) => {
+  //           return {
+  //             value: ele.id,
+  //             label: ele.country_name,
+  //             phone_code: ele.phone_code,
+  //           };
+  //         });
+  //         setCountryList(filterCountry);
+  //         setLoader(false);
+  //       })
+  //       .catch((err) => {
+  //         setLoader(false);
+  //         console.log(err);
+  //       });
+  //   }
+  // }, []);
+  // useEffect(() => {
+  //   if (country.value !== "" && clickedBtn === "add") {
+  //     getStateByCountry(country.value)
+  //       .then((res) => {
+  //         const filterState = res.data.data.map((ele) => {
+  //           return {
+  //             value: ele.id,
+  //             label: ele.state_name,
+  //           };
+  //         });
+  //         setStateList(filterState);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   }
+  // }, [country]);
 
-  useEffect(() => {
-    getAllCompanyRequest()
-      .then((res) => {
-        const result = res.data?.data?.map((ele) => {
-          return {
-            value: ele.id,
-            label: ele.company_name,
-            email: ele.email,
-          };
-        });
-        setCompanyList(result);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  // useEffect(() => {
+  //   getAllCompanyRequest()
+  //     .then((res) => {
+  //       const result = res.data?.data?.map((ele) => {
+  //         return {
+  //           value: ele.id,
+  //           label: ele.company_name,
+  //           email: ele.email,
+  //         };
+  //       });
+  //       setCompanyList(result);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
 
   const handleSubmitForm = (e) => {
     e.preventDefault();
-    if (isExist) {
-      let filter_data = companyList?.find(
-        (item) => item.value === companyId.value
-      );
-      const data = {
-        company_id: companyId.value,
-        email: filter_data.email,
-      };
-      handleFormData(data);
-    } else {
-      const value = {
-        company_name: companyName.value,
-        name: fullName.value,
-        email: email.value,
-        mobile: phone.value,
-        address: address.value,
-        country_id: country.value,
-        state_id: state.value,
-        city: city.value,
-        zip: parseInt(zipCode.value),
-        status: 1,
-      };
-      handleFormData(value);
-    }
+    const formData = {
+      email: email.value,
+    };
+    handleFormData(formData);
+    // if (isExist) {
+    //   let filter_data = companyList?.find(
+    //     (item) => item.value === companyId.value
+    //   );
+    //   const data = {
+    //     company_id: companyId.value,
+    //     email: filter_data.email,
+    //   };
+    //   handleFormData(data);
+    // } else {
+    //   const value = {
+    //     company_name: companyName.value,
+    //     name: fullName.value,
+    //     email: email.value,
+    //     mobile: phone.value,
+    //     address: address.value,
+    //     country_id: country.value,
+    //     state_id: state.value,
+    //     city: city.value,
+    //     zip: parseInt(zipCode.value),
+    //     status: 1,
+    //   };
+    //   handleFormData(value);
+    // }
   };
 
   return (
@@ -237,17 +236,28 @@ const BuyerForm = (props) => {
         >
           <CardHeader
             action={
-              <IconButton aria-label="settings" onClick={onHandleClose}>
+              <IconButton aria-label="close" onClick={onHandleClose}>
                 <MdClose color={colors.form[100]} />
               </IconButton>
             }
-            title={clickedBtn === "add" ? "Add Buyer" : "Update Buyer"}
+            title={"Add Buyer"}
           />
           {errorMessage && <span className="error_msg">{errorMessage}</span>}
           <CardContent color={colors.form[100]}>
             <Box className={"formResponsiveHeight"}>
               <Grid container spacing={1}>
-                <Grid item xs={6} md={3}>
+                <Grid item xs={12} md={12}>
+                  <FormTextField
+                    type="email"
+                    label={"Email"}
+                    placeholder={"Enter Email"}
+                    CustomErrorLine="Please enter a proper email"
+                    value={email.value}
+                    onChangeText={handleChangeEmail}
+                    Required
+                  />
+                </Grid>
+                {/* <Grid item xs={6} md={3}>
                   <InputLabel
                     id="demo-select-small-label"
                     sx={{ color: colors.btn[100], marginTop: 1 }}
@@ -392,7 +402,7 @@ const BuyerForm = (props) => {
                       />
                     </Grid>
                   </>
-                )}
+                )} */}
               </Grid>
             </Box>
           </CardContent>
@@ -404,11 +414,15 @@ const BuyerForm = (props) => {
             <Button
               type="submit"
               size="small"
-              onClick={(e) => handleSubmitForm(e)}
-              sx={{ backgroundColor: colors.greenAccent[500] }}
-              variant="contained"
+              onClick={handleSubmitForm}
+              disableElevation
+              sx={{
+                backgroundColor: colors.greenAccent[500],
+                color: colors.grey[100],
+              }}
+              variant="outlined"
             >
-              {clickedBtn === "add" ? "Save" : "Update"}
+              {"Save"}
             </Button>
           </CardActions>
         </Card>

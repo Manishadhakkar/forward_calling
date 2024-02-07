@@ -121,13 +121,13 @@ const MyProSidebar = () => {
   return (
     <Box
       sx={{
+        background: `linear-gradient(to right, ${colors.primary[100]}, ${colors.primary[200]})`,
         position: "sticky",
         display: "flex",
         height: "100vh !important",
         top: 0,
         bottom: 0,
         zIndex: 99,
-        borderRight: `0.5px solid ${colors.borderColor[100]}`,
         "& .ps-sidebar-root": {
           border: "none",
         },
@@ -147,24 +147,29 @@ const MyProSidebar = () => {
           backgroundColor: "transparent !important",
         },
         "& .ps-submenu-content": {
-          backgroundColor: colors.layoutColor[100],
+          backgroundColor: "inherit",
         },
       }}
     >
-      <Sidebar breakPoint="md" backgroundColor={colors.layoutColor[100]}>
+      <Sidebar breakPoint="md">
         <div
-          style={{ display: "flex", flexDirection: "column", height: "100%" }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            background: `linear-gradient(to right, ${colors.primary[100]}, ${colors.primary[200]})`,
+            borderRight: `1px solid ${colors.grey[800]}`
+          }}
         >
           <SidebarHeader rtl={true} isBroken={broken} />
           <div
             style={{
               flex: 1,
               marginBottom: "32px",
-              borderTop: `1px solid ${colors.borderColor[100]}`,
               overflowY: "auto",
             }}
           >
-            <Box sx={{ color: colors.layoutColor[200] }}>
+            <Box>
               <Menu>
                 <Tooltip
                   title={collapsed && "Dashboard"}

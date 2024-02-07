@@ -4,6 +4,7 @@ import "rsuite/dist/rsuite.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Router from "./router/Router";
 import Loader from "./components/Loader/Loader";
+import BuyerSignUp from "./pages/auth/buyerSignUp/BuyerSignUp";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -38,6 +39,7 @@ const App = () => {
           <Route exact path="/verify" element={<VerifyPage />} />
           <Route exact path="/forgotpassword" element={<ForgotPassword />} />
           <Route exact path="*" element={<NotFoundPage />} />
+          <Route exact path="/buyersignup/:token" element={<BuyerSignUp />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

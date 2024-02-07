@@ -355,7 +355,7 @@ const PurchaseNumber = () => {
               <Typography variant="h5">{"Create Purchase Numbers"}</Typography>
             </Box>
             <Box>
-              <Grid container spacing={1}>
+              <Grid container spacing={1} component="form">
                 <Grid item xs={12} md={3}>
                   <FormTextDropdown
                     Value={selectCountry?.value}
@@ -383,7 +383,7 @@ const PurchaseNumber = () => {
                       label={"Starting with"}
                       Value={selectStartsNo.value}
                       onChangeText={handleChangeStartsNo}
-                      Required={true}
+                      Required={false}
                       CustomErrorLine={"Enter proper did_number"}
                     />
                   ) : (
@@ -403,11 +403,19 @@ const PurchaseNumber = () => {
                   <Button
                     size="small"
                     onClick={(e) => handleSearchForm(e)}
-                    sx={{
-                      backgroundColor: colors.greenAccent[500],
-                      width: "100%",
-                    }}
+                    // sx={{
+                    //   backgroundColor: colors.greenAccent[600],
+                    //   width: "100%",
+                    //   textTransform: "none",
+                    // }}
                     variant="contained"
+                    type="submit"
+                    sx={{
+                      backgroundColor: colors.greenAccent[700],
+                      textTransform: "none",
+                      width: "100%",
+                      color: colors.grey[100],
+                    }}
                   >
                     {"Search"}
                   </Button>

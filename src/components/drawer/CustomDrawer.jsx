@@ -11,13 +11,16 @@ import {
   CardContent,
   CardHeader,
   Divider,
+  IconButton,
   Stack,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
 import { Button, Placeholder, RadioGroup, Form, Radio } from "rsuite";
 import { tokens } from "../../assets/color/theme";
 import Drawer from "@mui/material/Drawer";
+import { PiUserSwitchDuotone } from "react-icons/pi";
 
 const TopDrawer = ({ isOpen, setIsOpen, data }) => {
   const theme = useTheme();
@@ -30,6 +33,12 @@ const TopDrawer = ({ isOpen, setIsOpen, data }) => {
   const [selectRole, setSelectRole] = useState("");
   const [value, setValue] = useState("");
   const [rows, setRows] = useState([]);
+
+  function stringAvatar({ selectRole }) {
+    return {
+      children: `${selectRole?.split(" ")[0][0]}`,
+    };
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -85,36 +94,44 @@ const TopDrawer = ({ isOpen, setIsOpen, data }) => {
           sx={{
             width: 400,
             height: "100%",
-            backgroundColor: `${colors.primary[700]} !important`,
+            // backgroundColor: `${colors.primary[700]} !important`,
+            background: `linear-gradient(to left, ${colors.primary[100]}, ${colors.primary[200]} )`,
           }}
         >
           <Card sx={{ width: "100%" }}>
             <CardHeader
               sx={{
-                backgroundColor: colors.primary[800],
-                color: colors.primary[200],
-                borderBottom: `1px solid ${colors.borderColor[100]}`,
+                backgroundColor: colors.primary[900],
+                color: colors.grey[100],
+                borderBottom: `1px solid ${colors.grey[800]}`,
                 height: "67px !important",
+                ".& MuiCardHeader-action": {
+                  margin: "auto !important",
+                },
               }}
+              avatar={<Avatar {...stringAvatar({ selectRole })} />}
               action={
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    onClick={() => setIsOpen(false)}
-                    style={{ color: "#000000" }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleClickSubmit}
-                    style={{ color: "#000000" }}
-                    appearance="primary"
-                  >
-                    Confirm
-                  </Button>
-                </Stack>
+                  <IconButton aria-label="switch" size="medium">
+                    <Button
+                      onClick={handleClickSubmit}
+                      style={{
+                        color: colors.grey[900],
+                        backgroundColor: colors.greenAccent[400],
+                      }}
+                      appearance="primary"
+                      size="sm"
+                      endIcon={<PiUserSwitchDuotone />}
+                    >
+                      Switch
+                    </Button>
+                  </IconButton>
               }
-              title="Switch Account"
-              subheader={selectRole}
+              title={"Switch Account"}
+              subheader={
+                <Typography variant="subtitle2" color={colors.green[100]}>
+                  {selectRole}
+                </Typography>
+              }
             />
             <CardContent
               sx={{

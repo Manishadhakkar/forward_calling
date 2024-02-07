@@ -43,7 +43,7 @@ export const SidebarHeader = (props) => {
   return (
     <StyledSidebarHeader
       style={{
-        backgroundColor: colors.layoutColor[100],
+        background: `linear-gradient(to right, ${colors.primary[100]}, ${colors.primary[200]})`,
       }}
       {...rest}
     >
@@ -79,8 +79,8 @@ export const SidebarHeader = (props) => {
                 alt="Call Analog"
                 style={{
                   objectFit: "cover",
-                  width: "100px",
-                  height: "55px",
+                  width: "150px",
+                  height: "100px",
                 }}
               />
             </NavLink>

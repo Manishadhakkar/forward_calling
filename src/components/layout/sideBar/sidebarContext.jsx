@@ -1,6 +1,8 @@
 import React, { useState, createContext, useContext } from "react";
 import { ProSidebarProvider } from "react-pro-sidebar";
 import MyProSidebar from "./MyProSidebar";
+import { useTheme } from "@mui/material";
+import { tokens } from "../../../assets/color/theme";
 
 const SidebarContext = createContext({});
 
@@ -20,7 +22,7 @@ export const MyProSidebarProvider = ({ children }) => {
           style={{
             display: "flex",
             flexDirection: "row",
-            color: "white"
+            color: "white",
           }}
         >
           <MyProSidebar />

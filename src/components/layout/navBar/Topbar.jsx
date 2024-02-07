@@ -292,11 +292,9 @@ const Topbar = () => {
           position: "sticky !important",
           top: 0,
           zIndex: 999,
-          background: "linear-gradient(to right, #4d2920, #3e1641)"
-          // borderBottom: `1px solid ${colors.borderColor[100]}`,
-        }}       
-        
-        // bgcolor={colors.layoutColor[100]}
+          background: `linear-gradient(to bottom, ${colors.primary[100]}, ${colors.primary[200]})`,
+          borderBottom: `1px solid ${colors.grey[800]}`
+        }}
       >
         <Toolbar>
           {broken && (
@@ -381,7 +379,9 @@ const Topbar = () => {
                   >
                     {amount}
                   </Typography>
-                  <Tooltip
+                </>
+              )}
+            {/* <Tooltip
                     title={
                       theme.palette.mode === "dark" ? "Light Mode" : "Dark Mode"
                     }
@@ -399,10 +399,7 @@ const Topbar = () => {
                         <Moon size="20" />
                       )}
                     </IconButton>
-                  </Tooltip>
-                </>
-              )}
-
+                  </Tooltip> */}
             <Tooltip title="Message" placement="bottom" arrow>
               <IconButton
                 sx={{ padding: 2 }}
