@@ -1167,6 +1167,7 @@ const FormTextField = (props) => {
       ) : type === "capvalue" ? (
         <>
           <TextField
+            id="standard-error"
             multiline={type === "textarea" ? true : false}
             disabled={isDisable}
             margin="none"
@@ -1226,6 +1227,7 @@ const FormTextField = (props) => {
               handleBlurText(e);
             }}
             error={error ? true : false}
+            helperText={error}
             size="small"
             sx={{
               "& .MuiInputLabel-root": {
@@ -1243,9 +1245,6 @@ const FormTextField = (props) => {
             }}
             {...rest}
           />
-          {error && (
-            <FormHelperText sx={{ color: "#FF0000" }}>{error}</FormHelperText>
-          )}
         </>
       )}
     </>

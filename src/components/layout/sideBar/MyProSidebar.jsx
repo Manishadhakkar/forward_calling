@@ -17,13 +17,19 @@ import {
 } from "react-icons/tb";
 import { BiSolidReport } from "react-icons/bi";
 import { SidebarHeader } from "./SidebarHeader";
-import { Aave, Buildings2, Profile2User, Setting4 } from "iconsax-react";
+import {
+  Aave,
+  Buildings2,
+  Profile2User,
+  Routing2,
+  Setting4,
+} from "iconsax-react";
 import { HiOutlineHashtag } from "react-icons/hi2";
 import { IoServerOutline } from "react-icons/io5";
 import { LiaGoogleWallet } from "react-icons/lia";
 import { RiFolderHistoryFill } from "react-icons/ri";
 import { BsFileEarmarkMusic } from "react-icons/bs";
-import { MdRecordVoiceOver, MdReport } from "react-icons/md";
+import { MdOutlineAltRoute, MdRecordVoiceOver, MdReport } from "react-icons/md";
 // import { SiGroupme } from "react-icons/si";
 import { IoMdRecording } from "react-icons/io";
 import { SlWallet } from "react-icons/sl";
@@ -95,6 +101,7 @@ const MyProSidebar = () => {
 
   let is_ivr_active =
     location.pathname === "/ivr/media" ||
+    location.pathname === "/ivr/ivr-route" ||
     location.pathname === "/ivr/manage-ivr";
 
   let is_number_active =
@@ -147,7 +154,8 @@ const MyProSidebar = () => {
           backgroundColor: "transparent !important",
         },
         "& .ps-submenu-content": {
-          backgroundColor: "inherit",
+          background: `linear-gradient(to right, ${colors.primary[100]}, ${colors.primary[200]})`,
+          borderRadius: "10px",
         },
       }}
     >
@@ -158,7 +166,7 @@ const MyProSidebar = () => {
             flexDirection: "column",
             height: "100%",
             background: `linear-gradient(to right, ${colors.primary[100]}, ${colors.primary[200]})`,
-            borderRight: `1px solid ${colors.grey[800]}`
+            borderRight: `1px solid ${colors.grey[800]}`,
           }}
         >
           <SidebarHeader rtl={true} isBroken={broken} />
@@ -438,7 +446,7 @@ const MyProSidebar = () => {
                         label="IVR"
                         active={is_ivr_active}
                         defaultOpen={is_ivr_active}
-                        icon={<MdRecordVoiceOver size="25" variant="Outline" />}
+                        icon={<MdOutlineAltRoute size="25" variant="Outline" />}
                       >
                         {isAuthorizedFunc(GET_IVR_MEDIA) && (
                           <MenuItem
@@ -448,18 +456,27 @@ const MyProSidebar = () => {
                               <BsFileEarmarkMusic size="20" variant="Outline" />
                             }
                           >
-                            Media
+                            Manage Media
                           </MenuItem>
                         )}
                         {isAuthorizedFunc(GET_IVR) && (
                           <MenuItem
                             active={url === "/ivr/manage-ivr"}
                             component={<Link to="/ivr/manage-ivr" />}
-                            icon={<IoMdRecording size="20" variant="Outline" />}
+                            icon={
+                              <MdRecordVoiceOver size="20" variant="Outline" />
+                            }
                           >
                             Manage Ivr
                           </MenuItem>
                         )}
+                        <MenuItem
+                          active={url === "/ivr/ivr-route"}
+                          component={<Link to="/ivr/ivr-route" />}
+                          icon={<Routing2 size="20" variant="Outline" />}
+                        >
+                          Ivr Target Route
+                        </MenuItem>
                       </SubMenu>
                     )}
                   </Tooltip>

@@ -13,3 +13,16 @@ export const getState = (id) => {
     url: `/states/${id}`,
   });
 };
+export const verifyBuyerTokenReq = (token) => {
+  return axios({
+    method: "GET",
+    url: `/verifyBuyerAccountToken/${token}`,
+  });
+};
+export const buyerRegisterReq = (body) => {
+  return axios({
+    method: "POST",
+    url: "/buyer",
+    data: body
+  });
+};

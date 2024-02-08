@@ -108,8 +108,16 @@ export const tokens = (mode) => ({
           100: "#141b2d",
           200: "#fcfcfc",
         },
+        tableRow: {
+          100: "#2a1814",
+          200: "#1f191f",
+        },
       }
     : {
+        tableRow: {
+          100: "#1f191f",
+          200: "#2a1814",
+        },
         container: {
           100: "#fcfcfc",
           200: "#141b2d",

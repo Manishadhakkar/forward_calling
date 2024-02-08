@@ -327,7 +327,7 @@ const Topbar = () => {
                     edge="end"
                     sx={{ cursor: "not-allowed" }}
                   >
-                    <CallCalling color={colors.green[100]} variant="Bold" />
+                    <CallCalling color={colors.greenAccent[500]} variant="Bold" />
                   </IconButton>
                 }
                 title={liveCalls}
@@ -341,7 +341,7 @@ const Topbar = () => {
               <CardHeader
                 avatar={
                   <IconButton size="small" edge="end">
-                    <CallReceived color={colors.blue[100]} variant="Bold" />
+                    <CallReceived color={colors.blue[600]} variant="Bold" />
                   </IconButton>
                 }
                 title={totalCalls}

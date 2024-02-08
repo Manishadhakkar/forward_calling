@@ -32,13 +32,6 @@ export const createBuyerRequest = (body) => {
     data: body,
   });
 };
-// export const createBuyerRequest = (body) => {
-//   return axios({
-//     method: "POST",
-//     url: "/buyer",
-//     data: body,
-//   });
-// };
 
 export const updateUsersStatusRequest = (body) => {
   return axios({

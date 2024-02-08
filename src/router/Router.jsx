@@ -82,6 +82,10 @@ const NumberListPage = lazy(() =>
   import("../pages/app/puchaseNumber/component/Number")
 );
 
+const IvrRoutingPage = lazy(()=> 
+  import("../pages/app/IvrRouting/component/IvrRouting")
+)
+
 const NumberInvoicePage = lazy(() =>
   import("../pages/app/puchaseNumber/component/NumberInvoice")
 );
@@ -203,6 +207,8 @@ const Router = () => {
                       element={<PurchaseNumberPage />}
                     />
                     <Route path="/numbers" element={<NumberListPage />} />
+
+
                     <Route
                       path="/purchase-number/invoice-report"
                       element={<NumberInvoicePage />}
@@ -224,6 +230,7 @@ const Router = () => {
 
                     <Route path="/ivr/media" element={<IvrMedia />} />
                     <Route path="/ivr/manage-ivr" element={<IvrManage />} />
+                    <Route path="/ivr/ivr-route" element={<IvrRoutingPage />} />
 
                     <Route
                       path="/purchase-number/invoice-number/card-payment"

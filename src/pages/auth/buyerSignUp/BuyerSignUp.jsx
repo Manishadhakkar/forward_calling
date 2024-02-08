@@ -10,12 +10,18 @@ import Loader from "../../../components/Loader/Loader.jsx";
 import { tokens } from "../../../assets/color/theme";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { useNavigate } from "react-router-dom";
-import { getCountry, getState } from "./buyer.signup.request.js";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  buyerRegisterReq,
+  getCountry,
+  getState,
+  verifyBuyerTokenReq,
+} from "./buyer.signup.request.js";
 import FormTextField from "../../../components/textfield/FormTextField.jsx";
 import FormTextDropdown from "../../../components/dropdown/FormTextDropdown.jsx";
-import { Avatar, Typography } from "@mui/material";
+import { Avatar, Button, Link, Typography } from "@mui/material";
 import { MdOutlineLock } from "react-icons/md";
+import FormButton from "../../../components/button/FormButton.jsx";
 const defaultTheme = createTheme();
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -25,18 +31,23 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const BuyerSignUp = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { token } = useParams();
+
   const colors = tokens(theme.palette.mode);
 
   const [snackbarOpen, setSnackbarOpen] = useState({
     open: false,
     vertical: "top",
-    horizontal: "left",
+    horizontal: "right",
   });
   const [barVariant, setBarVariant] = useState("");
   const [loader, setLoader] = useState(false);
   const [message, setMessage] = useState("");
   const [countryData, setCountryData] = useState([]);
   const [stateData, setStateData] = useState([]);
+
+  const [isValid, setIsValid] = useState(null);
+  const [companyData, setCompanyData] = useState({});
 
   const [companyName, setCompanyName] = useState({
     value: "",
@@ -98,6 +109,56 @@ const BuyerSignUp = () => {
 
   const { vertical, horizontal, open } = snackbarOpen;
 
+  let btnDisable =
+    companyName.error ||
+    fullName.error ||
+    userEmail.error ||
+    userPhone.error ||
+    userAddress.error ||
+    userCountry.error ||
+    state.error ||
+    userCity.error ||
+    zipCode.error ||
+    userPassword.error ||
+    userRepassword.error ||
+    companyName.value === "" ||
+    fullName.value === "" ||
+    userEmail.value === "" ||
+    userPhone.value === "" ||
+    userAddress.value === "" ||
+    userCountry.value === "" ||
+    state.value === "" ||
+    userCity.value === "" ||
+    zipCode.value === "" ||
+    userPassword.value === "" ||
+    userRepassword.value === "" ||
+    companyName.success === false ||
+    fullName.success === false ||
+    userEmail.success === false ||
+    userPhone.success === false ||
+    userAddress.success === false ||
+    userCountry.success === false ||
+    state.success === false ||
+    userCity.success === false ||
+    zipCode.success === false ||
+    userPassword.success === false ||
+    userRepassword.success === false;
+
+  useEffect(() => {
+    if (userPassword.value !== "") {
+      if (
+        userPassword.value !== userRepassword.value &&
+        userRepassword.value !== ""
+      ) {
+        setConfirmErr(true);
+      } else {
+        setConfirmErr(false);
+      }
+    } else {
+      setConfirmErr(false);
+    }
+  }, [userPassword, userRepassword]);
+
   const handleChangeCompanyName = (value) => {
     setCompanyName(value);
   };
@@ -115,7 +176,6 @@ const BuyerSignUp = () => {
   };
   const handleChangeCountry = (value) => {
     setUserCountry(value);
-    // userState(value.value);
   };
   const handleChangeState = (value) => {
     setState(value);
@@ -141,22 +201,37 @@ const BuyerSignUp = () => {
   };
 
   useEffect(() => {
-    setLoader(true);
-    getCountry()
+    verifyBuyerTokenReq(token)
       .then((res) => {
-        const filterCountry = res.data?.data?.map((ele) => {
-          return {
-            label: ele.country_name,
-            value: ele.id,
-          };
-        });
-        setCountryData(filterCountry);
-        setLoader(false);
+        setIsValid(res.data.status);
+        setMessage(res.data.message);
+        setCompanyData(res?.data?.data);
+        setUserEmail({ value: res?.data?.data?.email, success: true });
       })
-      .catch(() => {
-        setLoader(false);
+      .catch((err) => {
+        console.log(err);
       });
   }, []);
+
+  useEffect(() => {
+    if (isValid) {
+      setLoader(true);
+      getCountry()
+        .then((res) => {
+          const filterCountry = res.data?.data?.map((ele) => {
+            return {
+              label: ele.country_name,
+              value: ele.id,
+            };
+          });
+          setCountryData(filterCountry);
+          setLoader(false);
+        })
+        .catch(() => {
+          setLoader(false);
+        });
+    }
+  }, [isValid]);
 
   const userStateChange = (id) => {
     id &&
@@ -176,26 +251,44 @@ const BuyerSignUp = () => {
         });
   };
 
-  const handleRegister = (data) => {
+  useEffect(() => {
+    userStateChange(userCountry.value);
+  }, [userCountry]);
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    // const queryData = {
+    //   token: companyData.token,
+    //   user_id: companyData.companyData,
+    //   company_id: companyData.company_id,
+    //   company_name: companyName.value,
+    //   name: fullName.value,
+    //   email: userEmail.value,
+    //   mobile: userPhone.value,
+    //   address: userAddress.value,
+    //   country_id: userCountry.value,
+    //   state_id: state.value,
+    //   city: userCity.value,
+    //   zip: parseInt(zipCode.value),
+    // };
     // setLoader(true);
-    // userSignup(data)
+    // buyerRegisterReq(queryData)
     //   .then((res) => {
     //     setLoader(false);
-    //     const userData = {
-    //       login_id: res.data.data.email,
-    //     };
-    //     setMessage(res.data.message);
-    //     setBarVariant("success");
-    //     setSnackbarOpen({ ...snackbarOpen, open: true });
-    //     setTimeout(() => {
-    //       navigate("/verify", { state: userData });
-    //     }, 1000);
+    //     console.log(res.data);
+    //     // setMessage(res.data.message);
+    //     // setBarVariant("success");
+    //     // setSnackbarOpen({ ...snackbarOpen, open: true });
+    //     // setTimeout(() => {
+    //     //   navigate("/");
+    //     // }, 1000);
     //   })
     //   .catch((err) => {
     //     setLoader(false);
-    //     setMessage(err.message);
-    //     setBarVariant("error");
-    //     setSnackbarOpen({ ...snackbarOpen, open: true });
+    //     console.log(err);
+    //     // setMessage(err.message);
+    //     // setBarVariant("error");
+    //     // setSnackbarOpen({ ...snackbarOpen, open: true });
     //   });
   };
 
@@ -217,13 +310,7 @@ const BuyerSignUp = () => {
         </Alert>
       </Snackbar>
       <ThemeProvider theme={defaultTheme}>
-        <Grid
-          container
-          component="main"
-          sx={{
-            height: "100vh",
-          }}
-        >
+        <Grid container component="main" sx={{ height: "100vh" }}>
           <CssBaseline />
           <Grid
             className="left_grid"
@@ -231,17 +318,15 @@ const BuyerSignUp = () => {
             xs={false}
             sm={6}
             md={6}
-            sx={{
-              backgroundColor: colors.primary[500],
-            }}
+            bgcolor={colors.primary[500]}
           />
           <Grid
             item
             xs={12}
             sm={6}
             md={6}
-            component={Paper}
-            elevation={5}
+            // component={Paper}
+            // elevation={5}
             square
             sx={{
               boxShadow: "none",
@@ -250,148 +335,174 @@ const BuyerSignUp = () => {
               margin: "auto",
             }}
           >
-            <Box
-              sx={{
-                padding: 3,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                boxShadow: "none !important",
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              <Avatar sx={{ bgcolor: "secondary.main" }}>
-                <MdOutlineLock />
-              </Avatar>
-              <Typography variant="h6">{"Register"}</Typography>
-              <Box component="form" className="signup_right_box" noValidate>
-                <Grid container spacing={1}>
-                  <Grid item xs={12} sm={6}>
-                    <FormTextField
-                      type="textarea"
-                      label={"Company Name"}
-                      placeholder={"Enter company name"}
-                      CustomErrorLine="Please enter a company name"
-                      value={companyName.value}
-                      onChangeText={handleChangeCompanyName}
-                      Required
-                    />
+            {isValid ? (
+              <Box
+                sx={{
+                  padding: 3,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  boxShadow: "none !important",
+                  width: "100%",
+                }}
+              >
+                <Avatar sx={{ bgcolor: "secondary.main" }}>
+                  <MdOutlineLock />
+                </Avatar>
+                <Typography variant="h6">{"Register"}</Typography>
+                <Typography
+                  mt={2}
+                  variant="subtitle1"
+                  color={colors.blueAccent[200]}
+                >
+                  {userEmail.value}
+                </Typography>
+                <Box className="signup_right_box">
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextField
+                        type="textarea"
+                        label={"Company Name"}
+                        placeholder={"Enter company name"}
+                        CustomErrorLine="Please enter a company name"
+                        value={companyName.value}
+                        onChangeText={handleChangeCompanyName}
+                        Required
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextField
+                        type="textarea"
+                        label={"Full Name"}
+                        placeholder={"Enter full name"}
+                        CustomErrorLine="Please enter a full name"
+                        value={fullName.value}
+                        onChangeText={handleChangeFullName}
+                        Required
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextField
+                        type="phoneno"
+                        label={"Phone No"}
+                        placeholder={"Enter Phone No."}
+                        CustomErrorLine="Please enter a phone no."
+                        value={userPhone.value}
+                        onChangeText={handleChangeUserPhone}
+                        Required
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextField
+                        type="textarea"
+                        label={"Address"}
+                        placeholder={"Enter Address"}
+                        CustomErrorLine="Please enter address"
+                        value={userAddress.value}
+                        onChangeText={handleChangeAddress}
+                        Required
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextDropdown
+                        Value={userCountry.value}
+                        onSelect={handleChangeCountry}
+                        label={"Country *"}
+                        placeholder={"Enter Country Name"}
+                        CustomErrorLine={"Choose one"}
+                        Required={true}
+                        Options={countryData}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextDropdown
+                        Value={state.value}
+                        onSelect={handleChangeState}
+                        label={"State *"}
+                        placeholder={"Enter State Name"}
+                        CustomErrorLine={"Choose one"}
+                        Required={true}
+                        Options={stateData}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextField
+                        type="textarea"
+                        label={"City"}
+                        placeholder={"Enter City Name"}
+                        CustomErrorLine="Please enter a city name"
+                        value={userCity.value}
+                        onChangeText={handleChangeCity}
+                        Required
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextField
+                        type="num"
+                        label={"Zip"}
+                        placeholder={"Enter Zip Code"}
+                        CustomErrorLine="Please enter a zip code"
+                        value={zipCode.value}
+                        onChangeText={handleChangeZip}
+                        Required
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextField
+                        type="password"
+                        label={"Password"}
+                        placeholder={"Enter Password"}
+                        CustomErrorLine="Please enter a proper password"
+                        value={userPassword.value}
+                        onChangeText={handleChangePassword}
+                        Required
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormTextField
+                        type="password"
+                        label={"Confirm Password"}
+                        placeholder={"Re-enter Password"}
+                        CustomErrorLine="Please enter a proper same password"
+                        value={userRepassword.value}
+                        onChangeText={handleChangeRepassword}
+                        Required
+                        confirmErr={confirmErr}
+                      />
+                    </Grid>
+                    <Button
+                      fullWidth
+                      size="small"
+                      onClick={handleRegister}
+                      sx={{ backgroundColor: colors.greenAccent[500] }}
+                      variant="contained"
+                    >
+                      {"Sign Up"}
+                    </Button>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormTextField
-                      type="text"
-                      label={"Full Name"}
-                      placeholder={"Enter full name"}
-                      CustomErrorLine="Please enter a full name"
-                      value={fullName.value}
-                      onChangeText={handleChangeFullName}
-                      Required
-                    />
+                  <Grid container justifyContent={"flex-end"}>
+                    <Grid item>
+                      <Typography
+                        component="h5"
+                        variant="body2"
+                        gutterBottom
+                        align="center"
+                        mt={3}
+                        mb={2}
+                        textAlign="center"
+                      >
+                        {"Already have an account ?"}{" "}
+                        <Link sx={{ textDecoration: "none" }} href="/">
+                          {"Sign In"}
+                        </Link>
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormTextField
-                      type="email"
-                      label={"Email"}
-                      placeholder={"Enter Email"}
-                      CustomErrorLine="Please enter a proper email"
-                      value={userEmail.value}
-                      onChangeText={handleChangeEmail}
-                      Required
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormTextField
-                      type="phoneno"
-                      label={"Phone No"}
-                      placeholder={"Enter Phone No."}
-                      CustomErrorLine="Please enter a phone no."
-                      value={userPhone.value}
-                      onChangeText={handleChangeUserPhone}
-                      Required
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormTextField
-                      type="textarea"
-                      label={"Address"}
-                      placeholder={"Enter Address"}
-                      CustomErrorLine="Please enter address"
-                      value={userAddress.value}
-                      onChangeText={handleChangeAddress}
-                      Required
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormTextDropdown
-                      Value={userCountry.value}
-                      onSelect={handleChangeCountry}
-                      label={"Country *"}
-                      placeholder={"Enter Country Name"}
-                      CustomErrorLine={"Choose one"}
-                      Required={true}
-                      Options={countryData}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormTextDropdown
-                      Value={state.value}
-                      onSelect={handleChangeState}
-                      label={"State *"}
-                      placeholder={"Enter State Name"}
-                      CustomErrorLine={"Choose one"}
-                      Required={true}
-                      Options={stateData}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <FormTextField
-                      type="text"
-                      label={"City"}
-                      placeholder={"Enter City Name"}
-                      CustomErrorLine="Please enter a city name"
-                      value={userCity.value}
-                      onChangeText={handleChangeCity}
-                      Required
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={2}>
-                    <FormTextField
-                      type="num"
-                      label={"Zip"}
-                      placeholder={"Enter Zip Code"}
-                      CustomErrorLine="Please enter a zip code"
-                      value={zipCode.value}
-                      onChangeText={handleChangeZip}
-                      Required
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormTextField
-                      type="password"
-                      label={"Password"}
-                      placeholder={"Enter Password"}
-                      CustomErrorLine="Please enter a proper password"
-                      value={userPassword.value}
-                      onChangeText={handleChangePassword}
-                      Required
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormTextField
-                      type="password"
-                      label={"Confirm Password"}
-                      placeholder={"Re-enter Password"}
-                      CustomErrorLine="Please enter a proper same password"
-                      value={userRepassword.value}
-                      onChangeText={handleChangeRepassword}
-                      Required
-                      confirmErr={confirmErr}
-                    />
-                  </Grid>
-                </Grid>
+                </Box>
               </Box>
-            </Box>
+            ) : (
+              <Typography variant="h6">{message}</Typography>
+            )}
           </Grid>
         </Grid>
       </ThemeProvider>
