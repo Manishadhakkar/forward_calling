@@ -180,7 +180,7 @@ const WalletContainer = () => {
     setLoader(true);
     try {
       const response = await axios.post(
-        "http://139.84.169.123/portalforwarding/backend/public/api/ivr-media",
+        `${process.env.REACT_APP_BASE_URL}/ivr-media`,
         formData,
         {
           headers: {
@@ -200,21 +200,6 @@ const WalletContainer = () => {
       setLoader(false);
       setErrorMessage(error.response.data.message);
     }
-    // try {
-    //   setLoader(true);
-    //   const res = await createIvrMedia(formData);
-    //   const message = res.data.message;
-    //   getAllIvrMedia(activePage, limit);
-    //   setLoader(false);
-    //   setErrorMessage("");
-    //   setMessage(message);
-    //   setBarVariant("success");
-    //   setSnackbarOpen({ ...snackbarOpen, open: true });
-    //   setIsOpen(false);
-    // } catch (error) {
-    //   setLoader(false);
-    //   setErrorMessage(error.message);
-    // }
   };
 
   const handleStatusChange = (body) => {
@@ -244,7 +229,7 @@ const WalletContainer = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     try {
       const response = await axios.post(
-        `http://139.84.169.123/portalforwarding/backend/public/api/ivr-media/${currentType.id}`,
+        `${process.env.REACT_APP_BASE_URL}/ivr-media/${currentType.id}`,
         formData,
         {
           headers: {
@@ -262,30 +247,8 @@ const WalletContainer = () => {
       setIsOpen(false);
     } catch (error) {
       setLoader(false);
-      setErrorMessage(error.response.data.message);
+      setErrorMessage(error?.response?.data?.message);
     }
-    // try {
-    //   setLoader(true);
-    //   const data = {
-    //     id: currentType.id,
-    //     data: {
-    //       media_file: value.media_file,
-    //       name: value.name,
-    //     },
-    //   };
-    //   const res = await updateIvrMedia(data);
-    //   const message = res.data.message;
-    //   getAllIvrMedia(activePage, limit);
-    //   setLoader(false);
-    //   setErrorMessage("");
-    //   setBarVariant("success");
-    //   setMessage(message);
-    //   setSnackbarOpen({ ...snackbarOpen, open: true });
-    //   setIsOpen(false);
-    // } catch (error) {
-    //   setLoader(false);
-    //   setErrorMessage(error.message);
-    // }
   };
 
   const selectModal = () => {
