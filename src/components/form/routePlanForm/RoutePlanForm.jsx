@@ -16,6 +16,7 @@ import {
   TableHead,
   TableRow,
   Tooltip,
+  Typography,
   Zoom,
   styled,
   tableCellClasses,
@@ -197,9 +198,8 @@ const RoutePlanForm = (props) => {
             <Grid item md={6} sm={12}>
               <Stack direction={"column"} spacing={0.5}>
                 <Paper
-                  component="form"
                   sx={{
-                    p: "2px 4px",
+                    p: "2px 2px",
                     display: "flex",
                     alignItems: "center",
                     width: "50%",

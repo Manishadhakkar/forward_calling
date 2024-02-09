@@ -8,7 +8,7 @@ button {
   }
   
   .left_grid {
-    background-image: url("../../../assets//images/Register_banner.svg");
+    background-image: url("../../../../assets//images/Register_banner.svg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;

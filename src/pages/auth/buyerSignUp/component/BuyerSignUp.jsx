@@ -6,22 +6,21 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
-import Loader from "../../../components/Loader/Loader.jsx";
-import { tokens } from "../../../assets/color/theme";
+import Loader from "../../../../components/Loader/Loader.jsx";
+import { tokens } from "../../../../assets/color/theme.js";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  buyerRegisterReq,
+  buyerSignupReq,
   getCountry,
   getState,
   verifyBuyerTokenReq,
-} from "./buyer.signup.request.js";
-import FormTextField from "../../../components/textfield/FormTextField.jsx";
-import FormTextDropdown from "../../../components/dropdown/FormTextDropdown.jsx";
+} from "../service/buyer.signup.request.js";
+import FormTextField from "../../../../components/textfield/FormTextField.jsx";
+import FormTextDropdown from "../../../../components/dropdown/FormTextDropdown.jsx";
 import { Avatar, Button, Link, Typography } from "@mui/material";
 import { MdOutlineLock } from "react-icons/md";
-import FormButton from "../../../components/button/FormButton.jsx";
 const defaultTheme = createTheme();
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -257,39 +256,38 @@ const BuyerSignUp = () => {
 
   const handleRegister = (e) => {
     e.preventDefault();
-    // const queryData = {
-    //   token: companyData.token,
-    //   user_id: companyData.companyData,
-    //   company_id: companyData.company_id,
-    //   company_name: companyName.value,
-    //   name: fullName.value,
-    //   email: userEmail.value,
-    //   mobile: userPhone.value,
-    //   address: userAddress.value,
-    //   country_id: userCountry.value,
-    //   state_id: state.value,
-    //   city: userCity.value,
-    //   zip: parseInt(zipCode.value),
-    // };
-    // setLoader(true);
-    // buyerRegisterReq(queryData)
-    //   .then((res) => {
-    //     setLoader(false);
-    //     console.log(res.data);
-    //     // setMessage(res.data.message);
-    //     // setBarVariant("success");
-    //     // setSnackbarOpen({ ...snackbarOpen, open: true });
-    //     // setTimeout(() => {
-    //     //   navigate("/");
-    //     // }, 1000);
-    //   })
-    //   .catch((err) => {
-    //     setLoader(false);
-    //     console.log(err);
-    //     // setMessage(err.message);
-    //     // setBarVariant("error");
-    //     // setSnackbarOpen({ ...snackbarOpen, open: true });
-    //   });
+    const queryData = {
+      token: companyData.token,
+      user_id: companyData.user_id,
+      company_id: companyData.company_id,
+      company_name: companyName.value,
+      name: fullName.value,
+      email: userEmail.value,
+      mobile: userPhone.value,
+      address: userAddress.value,
+      country_id: userCountry.value,
+      state_id: state.value,
+      city: userCity.value,
+      zip: parseInt(zipCode.value),
+      password: userPassword.value,
+    };
+    setLoader(true);
+    buyerSignupReq(queryData)
+      .then((res) => {
+        setLoader(false);
+        setMessage(res.data.message);
+        setBarVariant("success");
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      })
+      .catch((err) => {
+        setLoader(false);
+        setMessage(err.message);
+        setBarVariant("error");
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+      });
   };
 
   return (
@@ -358,7 +356,7 @@ const BuyerSignUp = () => {
                   {userEmail.value}
                 </Typography>
                 <Box className="signup_right_box">
-                  <Grid container spacing={1}>
+                  <Grid container spacing={1} component="form">
                     <Grid item xs={12} sm={6}>
                       <FormTextField
                         type="textarea"
@@ -473,9 +471,11 @@ const BuyerSignUp = () => {
                     <Button
                       fullWidth
                       size="small"
+                      type="submit"
                       onClick={handleRegister}
                       sx={{ backgroundColor: colors.greenAccent[500] }}
                       variant="contained"
+                      disabled={btnDisable}
                     >
                       {"Sign Up"}
                     </Button>

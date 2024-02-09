@@ -1,0 +1,13 @@
+.css-823zkd-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+  background-color: rgb(43, 41, 41);
+}
+.css-1x51dt5-MuiInputBase-input-MuiInput-input,
+.css-1cyhbc3-MuiButtonBase-root-MuiIconButton-root {
+  color: #ffffff !important;
+}
+.css-1pe4mpk-MuiButtonBase-root-MuiIconButton-root.Mui-disabled {
+  display: none;
+}
+.css-1pe4mpk-MuiButtonBase-root-MuiIconButton-root {
+    color: #ffffff !important;
+}

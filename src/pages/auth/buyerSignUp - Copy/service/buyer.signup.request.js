@@ -1,4 +1,4 @@
-import { axios } from "../../../api/setup.interseptor.js";
+import { axios } from "../../../../api/setup.interseptor.js";
 
 export const getCountry = () => {
   return axios({
@@ -19,7 +19,7 @@ export const verifyBuyerTokenReq = (token) => {
     url: `/verifyBuyerAccountToken/${token}`,
   });
 };
-export const buyerRegisterReq = (body) => {
+export const buyerSignupReq = (body) => {
   return axios({
     method: "POST",
     url: "/buyer",

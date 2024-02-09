@@ -79,8 +79,8 @@ export const SidebarHeader = (props) => {
                 alt="Call Analog"
                 style={{
                   objectFit: "cover",
-                  width: "150px",
-                  height: "100px",
+                  width: "190px",
+                  height: "110px",
                 }}
               />
             </NavLink>

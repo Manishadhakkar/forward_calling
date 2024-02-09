@@ -56,6 +56,7 @@ const DefaultTable = (props) => {
           },
           text: {
             primary: colors.grey[100],
+            secondary: colors.grey[100]
           },
         },
       }),
@@ -119,7 +120,9 @@ const DefaultTable = (props) => {
         positionGlobalFilter="left"
         muiSearchTextFieldProps={{
           placeholder: `Search...`,
-          sx: { minWidth: "50px" },
+          sx: {
+            minWidth: "50px",
+          },
           variant: "standard",
         }}
         muiTableBodyProps={{

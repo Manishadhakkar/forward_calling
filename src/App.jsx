@@ -4,7 +4,6 @@ import "rsuite/dist/rsuite.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Router from "./router/Router";
 import Loader from "./components/Loader/Loader";
-import BuyerSignUp from "./pages/auth/buyerSignUp/BuyerSignUp";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -16,6 +15,11 @@ const App = () => {
 
   const SignInPage = lazy(() => import("./pages/auth/signin/component/auth"));
   const SignUpPage = lazy(() => import("./pages/auth/signup/component/signup"));
+
+  const BuyerSignUpPage = lazy(() =>
+    import("./pages/auth/buyerSignUp/component/BuyerSignUp")
+  );
+
   const ForgotPassword = lazy(() =>
     import("./pages/auth/forget/component/forgotPassword")
   );
@@ -39,7 +43,7 @@ const App = () => {
           <Route exact path="/verify" element={<VerifyPage />} />
           <Route exact path="/forgotpassword" element={<ForgotPassword />} />
           <Route exact path="*" element={<NotFoundPage />} />
-          <Route exact path="/buyersignup/:token" element={<BuyerSignUp />} />
+          <Route exact path="/buyersignup/:token" element={<BuyerSignUpPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
