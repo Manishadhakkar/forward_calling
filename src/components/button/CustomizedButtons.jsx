@@ -16,8 +16,8 @@ const CustomizedButtons = (props) => {
     padding: "10px",
     border: "none",
     lineHeight: 1,
-    backgroundColor: colors.greenAccent[400],
-    color: colors.btn[200],
+    backgroundColor: colors.greenAccent[700],
+    color: colors.grey[100],
     fontFamily: [
       "-apple-system",
       "BlinkMacSystemFont",
@@ -31,7 +31,7 @@ const CustomizedButtons = (props) => {
       '"Segoe UI Symbol"',
     ].join(","),
     "&:hover": {
-      backgroundColor: colors.greenAccent[600],
+      backgroundColor: colors.greenAccent[800],
       border: "none",
     },
   });
@@ -41,8 +41,8 @@ const CustomizedButtons = (props) => {
     padding: "10px",
     border: "none",
     lineHeight: 1,
-    backgroundColor: colors.btn[100],
-    color: colors.btn[200],
+    backgroundColor: colors.redAccent[700],
+    color: colors.grey[100],
     fontFamily: [
       "-apple-system",
       "BlinkMacSystemFont",
@@ -56,7 +56,7 @@ const CustomizedButtons = (props) => {
       '"Segoe UI Symbol"',
     ].join(","),
     "&:hover": {
-      backgroundColor: colors.grey[100],
+      backgroundColor: colors.redAccent[800],
       border: "none",
     },
   });

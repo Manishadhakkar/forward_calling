@@ -1340,6 +1340,13 @@ const UpdateCampaign = () => {
                   size="medium"
                   variant="contained"
                   onClick={() => navigate("/campaigns")}
+                  sx={{
+                    textTransform: "none",
+                    backgroundColor: colors.redAccent[700],
+                    ":hover": {
+                      backgroundColor: colors.redAccent[800],
+                    },
+                  }}
                 >
                   {"Cancel"}
                 </Button>
@@ -1349,7 +1356,13 @@ const UpdateCampaign = () => {
                   onClick={(e) => {
                     handleUpdateCampaign(e);
                   }}
-                  sx={{ backgroundColor: colors.greenAccent[500] }}
+                  sx={{
+                    textTransform: "none",
+                    backgroundColor: colors.greenAccent[700],
+                    ":hover": {
+                      backgroundColor: colors.greenAccent[800],
+                    },
+                  }}
                   variant="contained"
                 >
                   Update

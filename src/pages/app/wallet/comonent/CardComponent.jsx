@@ -210,12 +210,15 @@ const CardComponent = ({ invoice_data }) => {
                 type="submit"
                 size="medium"
                 sx={{
-                  backgroundColor: colors.greenAccent[700],
                   textTransform: "none",
-                  color: theme.palette.mode === "dark" ? "white" : "black",
+                  backgroundColor: colors.greenAccent[700],
+                  ":hover": {
+                    backgroundColor: colors.greenAccent[800],
+                  },
+                  mt: 1,
+                  mb: 1
                 }}
                 variant="contained"
-                className="btn"
               >
                 Validate
               </Button>

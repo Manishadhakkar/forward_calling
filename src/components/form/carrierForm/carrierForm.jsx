@@ -18,10 +18,7 @@ import { MdClose } from "react-icons/md";
 import FormTextField from "../../textfield/FormTextField";
 import FormTextDropdown from "../../dropdown/FormTextDropdown";
 import { tokens } from "../../../assets/color/theme";
-import {
-  getActiveIpRequest,
-  getAllCompanyRequest,
-} from "../../../pages/app/serverIp/service/serverIp.request";
+import { getActiveIpRequest } from "../../../pages/app/serverIp/service/serverIp.request";
 import "../styles.css";
 
 const CarriersForm = (props) => {
@@ -32,7 +29,6 @@ const CarriersForm = (props) => {
     clickedBtn,
     errorMessage,
     setErrorMessage,
-    company_id,
   } = props;
 
   const theme = useTheme();
@@ -44,12 +40,7 @@ const CarriersForm = (props) => {
     error: false,
     success: false,
   });
-  const [companyList, setCompanyList] = useState([]);
-  const [companyId, setCompanyId] = useState({
-    value: initialValue ? initialValue.company_id : "",
-    error: false,
-    success: false,
-  });
+
   const [userName, setUserName] = useState({
     value: initialValue ? initialValue.user_name : "",
     error: false,
@@ -85,22 +76,6 @@ const CarriersForm = (props) => {
       });
   }, []);
 
-  useEffect(() => {
-    getAllCompanyRequest()
-      .then((res) => {
-        const result = res.data?.data?.data?.map((ele) => {
-          return {
-            value: ele.id,
-            label: ele.company_name,
-          };
-        });
-        setCompanyList(result);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
   let disable =
     name.error ||
     name.value === "" ||
@@ -109,10 +84,6 @@ const CarriersForm = (props) => {
     serverIp.value === "" ||
     serverIp.success === false;
 
-  const handleChangeCompany = (value) => {
-    setErrorMessage("");
-    setCompanyId(value);
-  };
   const handleChangeName = (value) => {
     setErrorMessage("");
     setName(value);
@@ -141,8 +112,6 @@ const CarriersForm = (props) => {
       ip_name: serverIp.value,
       user_name: userName.value,
       user_password: userPassword.value,
-      // company_id:
-      //   company_id === "0" ? parseInt(companyId.value) : parseInt(company_id),
     };
     handleFormData(data);
   };
@@ -186,18 +155,6 @@ const CarriersForm = (props) => {
                 CustomErrorLine={"Enter proper name"}
               />
             </Grid>
-            {/* {company_id === "0" && (
-              <Grid item xs={12} md={12}>
-                <FormTextDropdown
-                  Value={companyId.value}
-                  onSelect={handleChangeCompany}
-                  label={"Company *"}
-                  CustomErrorLine={"Choose one"}
-                  Required={true}
-                  Options={companyList}
-                />
-              </Grid>
-            )} */}
             {clickedBtn === "edit" && (
               <Grid item xs={12} md={12}>
                 <FormLabel>Type</FormLabel>
@@ -264,14 +221,31 @@ const CarriersForm = (props) => {
       </CardContent>
 
       <CardActions sx={{ justifyContent: "space-between", m: 1 }}>
-        <Button size="small" variant="contained" onClick={onHandleClose}>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={onHandleClose}
+          sx={{
+            textTransform: "none",
+            backgroundColor: colors.redAccent[700],
+            ":hover": {
+              backgroundColor: colors.redAccent[800],
+            },
+          }}
+        >
           {"Cancel"}
         </Button>
         <Button
           size="small"
           type="submit"
           onClick={(e) => handleSubmitForm(e)}
-          sx={{ backgroundColor: colors.greenAccent[500] }}
+          sx={{
+            textTransform: "none",
+            backgroundColor: colors.greenAccent[700],
+            ":hover": {
+              backgroundColor: colors.greenAccent[800],
+            },
+          }}
           variant="contained"
           disabled={clickedBtn === "add" ? disable : false}
         >

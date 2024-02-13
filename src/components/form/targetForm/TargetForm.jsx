@@ -444,14 +444,31 @@ const TargetForm = (props) => {
         </Box>
       </CardContent>
       <CardActions sx={{ justifyContent: "space-between", mr: 1, ml: 1 }}>
-        <Button size="small" variant="contained" onClick={onHandleClose}>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={onHandleClose}
+          sx={{
+            textTransform: "none",
+            backgroundColor: colors.redAccent[700],
+            ":hover": {
+              backgroundColor: colors.redAccent[800],
+            },
+          }}
+        >
           {"Cancel"}
         </Button>
         <Button
           type="submit"
           size="small"
           onClick={(e) => handleClick(e)}
-          sx={{ backgroundColor: colors.greenAccent[500] }}
+          sx={{
+            textTransform: "none",
+            backgroundColor: colors.greenAccent[700],
+            ":hover": {
+              backgroundColor: colors.greenAccent[800],
+            },
+          }}
           variant="contained"
         >
           {clickedBtn === "add" ? "Save" : "Update"}

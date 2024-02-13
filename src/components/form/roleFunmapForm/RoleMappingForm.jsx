@@ -275,7 +275,18 @@ const RoleMappingForm = (props) => {
             </Box>
           </CardContent>
           <CardActions sx={{ justifyContent: "space-between", m: 1 }}>
-            <Button size="small" variant="contained" onClick={onHandleClose}>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={onHandleClose}
+              sx={{
+                textTransform: "none",
+                backgroundColor: colors.redAccent[700],
+                ":hover": {
+                  backgroundColor: colors.redAccent[800],
+                },
+              }}
+            >
               {"Cancel"}
             </Button>
             <Button
@@ -283,7 +294,13 @@ const RoleMappingForm = (props) => {
               type="submit"
               size="small"
               onClick={(e) => handleSaveData(e)}
-              sx={{ backgroundColor: colors.greenAccent[500] }}
+              sx={{
+                textTransform: "none",
+                backgroundColor: colors.greenAccent[700],
+                ":hover": {
+                  backgroundColor: colors.greenAccent[800],
+                },
+              }}
             >
               {clickedBtn === "add" ? "Add" : "Update"}
             </Button>

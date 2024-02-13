@@ -124,13 +124,27 @@ const UserRoleForm = (props) => {
         </CardContent>
 
         <CardActions sx={{ justifyContent: "space-between", m: 1 }}>
-          <Button size="small" variant="contained" onClick={onHandleClose}>
+          <Button size="small" variant="contained" onClick={onHandleClose}
+           sx={{
+            textTransform: "none",
+            backgroundColor: colors.redAccent[700],
+            ":hover": {
+              backgroundColor: colors.redAccent[800],
+            },
+          }}
+          >
             {"Cancel"}
           </Button>
           <Button
             size="small"
             onClick={handleSubmitForm}
-            sx={{ backgroundColor: colors.greenAccent[500] }}
+            sx={{
+              textTransform: "none",
+              backgroundColor: colors.greenAccent[700],
+              ":hover": {
+                backgroundColor: colors.greenAccent[800],
+              },
+            }}
             variant="contained"
             disabled={disable}
           >

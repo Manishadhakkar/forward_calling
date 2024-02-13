@@ -296,7 +296,6 @@ const MediaForm = (props) => {
                     "& .rs-resume": {
                       display: text.success ? "block" : "none",
                     },
-                    
                   }}
                 >
                   <Speech
@@ -314,14 +313,31 @@ const MediaForm = (props) => {
         </Box>
       </CardContent>
       <CardActions sx={{ justifyContent: "space-between", mr: 1, ml: 1 }}>
-        <Button size="small" variant="contained" onClick={onHandleClose}>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={onHandleClose}
+          sx={{
+            textTransform: "none",
+            backgroundColor: colors.redAccent[700],
+            ":hover": {
+              backgroundColor: colors.redAccent[800],
+            },
+          }}
+        >
           {"Cancel"}
         </Button>
         <Button
           type="submit"
           size="small"
           onClick={handleFormSubmit}
-          sx={{ backgroundColor: colors.greenAccent[500] }}
+          sx={{
+            textTransform: "none",
+            backgroundColor: colors.greenAccent[700],
+            ":hover": {
+              backgroundColor: colors.greenAccent[800],
+            },
+          }}
           variant="contained"
         >
           {clickedBtn === "add" ? "Save" : "Update"}

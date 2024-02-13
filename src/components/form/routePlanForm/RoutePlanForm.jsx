@@ -456,9 +456,7 @@ const RoutePlanForm = (props) => {
         />
         <CardContent color={colors.form[100]}>
           <Box
-            component="form"
             sx={{
-              "& .MuiTextField-root": { mb: 1 },
               "&::-webkit-scrollbar": {
                 width: "6px",
                 borderRadius: "3px",

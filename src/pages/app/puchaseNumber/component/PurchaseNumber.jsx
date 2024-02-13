@@ -40,6 +40,7 @@ import FormTextDropdown from "../../../../components/dropdown/FormTextDropdown";
 import { TiTick } from "react-icons/ti";
 import FormTextField from "../../../../components/textfield/FormTextField";
 import { useNavigate } from "react-router-dom";
+import { startsNoList } from "../../../../utility/config";
 
 const paths = [
   {
@@ -127,18 +128,7 @@ const PurchaseNumber = () => {
     success: false,
   });
 
-  const [startsNoList, setStartNoList] = useState([
-    { id: 1, label: 800, value: 800 },
-    { id: 2, label: 811, value: 811 },
-    { id: 3, label: 822, value: 822 },
-    { id: 4, label: 833, value: 833 },
-    { id: 5, label: 844, value: 844 },
-    { id: 6, label: 855, value: 855 },
-    { id: 7, label: 866, value: 866 },
-    { id: 8, label: 877, value: 877 },
-    { id: 9, label: 888, value: 888 },
-    { id: 10, label: 899, value: 899 },
-  ]);
+
 
   const [selectStartsNo, setSelectStartsNo] = useState({
     value: "",
@@ -403,11 +393,6 @@ const PurchaseNumber = () => {
                   <Button
                     size="small"
                     onClick={(e) => handleSearchForm(e)}
-                    // sx={{
-                    //   backgroundColor: colors.greenAccent[600],
-                    //   width: "100%",
-                    //   textTransform: "none",
-                    // }}
                     variant="contained"
                     type="submit"
                     sx={{
@@ -415,6 +400,9 @@ const PurchaseNumber = () => {
                       textTransform: "none",
                       width: "100%",
                       color: colors.grey[100],
+                      ":hover":{
+                        backgroundColor: colors.greenAccent[800],
+                      }
                     }}
                   >
                     {"Search"}

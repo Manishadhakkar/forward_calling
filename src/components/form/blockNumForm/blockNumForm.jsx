@@ -226,14 +226,31 @@ const BlockNumForm = (props) => {
         </Box>
       </CardContent>
 
-      <CardActions sx={{ justifyContent: "space-between", m: 1 }}>
-        <Button size="small" variant="contained" onClick={onHandleClose}>
+      <CardActions sx={{ justifyContent: "space-between", ml: 1, mr: 1 }}>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={onHandleClose}
+          sx={{
+            textTransform: "none",
+            backgroundColor: colors.redAccent[700],
+            ":hover": {
+              backgroundColor: colors.redAccent[800],
+            },
+          }}
+        >
           {"Cancel"}
         </Button>
         <Button
           size="small"
           onClick={(e) => handleSubmitForm(e)}
-          sx={{ backgroundColor: colors.greenAccent[500] }}
+          sx={{
+            textTransform: "none",
+            backgroundColor: colors.greenAccent[700],
+            ":hover": {
+              backgroundColor: colors.greenAccent[800],
+            },
+          }}
           variant="contained"
         >
           {clickedBtn === "add" ? "Save" : "Update"}
