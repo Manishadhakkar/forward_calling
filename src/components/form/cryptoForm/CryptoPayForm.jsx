@@ -167,7 +167,7 @@ const CryptoPayForm = (props) => {
               >
                 <Img
                   alt="crypto qr scanner"
-                  src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
+                  src="http://139.84.169.123/portalforwarding/backend/storage/app/qrcode/005_file_cc358cf97cd27794cb536cc7d66bea37.jpg"
                 />
               </ButtonBase>
               <Typography variant="h6" mt={1} textAlign={"center"}>

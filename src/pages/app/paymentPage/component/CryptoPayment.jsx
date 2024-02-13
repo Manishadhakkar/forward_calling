@@ -78,6 +78,7 @@ const CryptoPayment = () => {
       currency: invoice_data.invoice_currency,
       item_numbers: concatenateDidNumbers(invoice_data.invoice_items),
     };
+
     paymentBtcQrGenerateReq(req_data)
       .then((res) => {
         console.log(res.data);
@@ -85,11 +86,10 @@ const CryptoPayment = () => {
       .catch((err) => {
         console.log(err);
       });
-    // setIsOpen(true);
   };
 
   const selectModal = () => {
-    return <CryptoPayForm isOpen={isOpen} setIsOpen={setIsOpen} />;
+    return <CryptoPayForm isOpen={true} setIsOpen={setIsOpen} />;
   };
 
   return (
