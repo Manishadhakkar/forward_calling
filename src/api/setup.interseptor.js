@@ -1,5 +1,4 @@
 import axios from "axios";
-import Swal from "sweetalert2";
 
 const user = JSON.parse(localStorage.getItem("user"));
 
@@ -37,14 +36,6 @@ instance.interceptors.response.use(
     if (error?.response?.status === 401) {
       localStorage.clear();
       window.location.href = "/";
-      // Swal.fire({
-      //   icon: "warning",
-      //   title: "Session Expired",
-      //   text: "Login again",
-      // }).then(() => {
-      //   localStorage.clear();
-      //   window.location.href = "/";
-      // });
     }
     const err = {
       url: error?.toJSON().config.baseURL,
