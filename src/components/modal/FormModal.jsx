@@ -12,8 +12,8 @@ const style = {
   bgcolor: "background.paper",
   border: "none",
   boxShadow: 5,
-  p: 1,
-  borderRadius: "10px",
+  p: "0px",
+  borderRadius: "5px",
   width: "50%",
   "@media (max-width: 991px)": {
     width: "90%",
@@ -39,7 +39,7 @@ export const FormModal = (props) => {
         sx={{
           ...style,
           width: modal_width,
-          boxShadow: `0px 0px 8px 0px ${colors.grey[300]}`,
+          boxShadow: `0px 0px 8px 0px ${colors.grey[300]}`
         }}
       >
         <div>{props.children}</div>

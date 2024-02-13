@@ -12,13 +12,14 @@ import {
   Tooltip,
 } from "@mui/material";
 import { MdClose, MdDeleteSweep } from "react-icons/md";
-import Paper from "@mui/material/Paper";
-import { styled } from "@mui/material/styles";
+import FormTextDropdown from "../../dropdown/FormTextDropdown";
+import Speech from "react-speech";
 import FormTextField from "../../textfield/FormTextField";
 import { tokens } from "../../../assets/color/theme";
 import { FaRegPlayCircle } from "react-icons/fa";
 import { FaRegPauseCircle } from "react-icons/fa";
 import "../styles.css";
+import { audioTypeList } from "../../../utility/config";
 
 var a;
 
@@ -41,6 +42,18 @@ const MediaForm = (props) => {
     success: false,
   });
 
+  const [uploadType, setUploadType] = useState({
+    value: initialValue ? initialValue?.uploadType : "Media",
+    error: false,
+    success: false,
+  });
+
+  const [text, setText] = useState({
+    value: initialValue ? initialValue?.text : "",
+    error: false,
+    success: false,
+  });
+
   const [selectFile, setSelectFile] = useState(
     clickedBtn !== "add"
       ? `${process.env.REACT_APP_MEDIA_URL}/${initialValue.media_file}.${initialValue.file_ext}`
@@ -55,6 +68,14 @@ const MediaForm = (props) => {
   const handleChangeName = (value) => {
     setErrorMessage("");
     setName(value);
+  };
+  const handleChangeType = (value) => {
+    setErrorMessage("");
+    setUploadType(value);
+  };
+  const handleChangeText = (value) => {
+    setErrorMessage("");
+    setText(value);
   };
 
   useEffect(() => {
@@ -94,14 +115,23 @@ const MediaForm = (props) => {
     setSelectFile(null);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!audio) {
-      return;
-    }
+
     const formData = new FormData();
     formData.append("name", name.value);
-    formData.append("media_file", audio);
+
+    if (uploadType.value === "Media") {
+      if (audio) {
+        formData.append("media_file", audio);
+      } else {
+        return;
+      }
+    } else {
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=gtx&q=${text.value}&tl=en`;
+      formData.append("media_file", url);
+    }
+
     handleFormData(formData);
   };
 
@@ -155,54 +185,131 @@ const MediaForm = (props) => {
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  {/* <input type="file" onChange={addFile} /> */}
-                  {clickedBtn === "add" && !audio ? (
-                    <input type="file" accept=".mp3, .wav" onChange={addFile} />
-                  ) : clickedBtn === "add" && audio ? (
-                    <>
+              <FormTextDropdown
+                Value={uploadType.value}
+                onSelect={handleChangeType}
+                label={"Media Type *"}
+                CustomErrorLine={"Choose one"}
+                Required={true}
+                Options={audioTypeList}
+              />
+            </Grid>
+            {uploadType.value === "Media" ? (
+              <Grid item xs={12} md={12}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    {/* <input type="file" onChange={addFile} /> */}
+                    {clickedBtn === "add" && !audio ? (
                       <input
                         type="file"
                         accept=".mp3, .wav"
                         onChange={addFile}
                       />
-                    </>
-                  ) : clickedBtn === "edit" && !audio ? (
-                    <input type="file" accept=".mp3, .wav" onChange={addFile} />
-                  ) : (
-                    <>
-                      <span>
-                        {initialValue.media_file}.{initialValue.file_ext}
-                      </span>
-                      <span style={{ marginLeft: 2 }}>
-                        <Tooltip title={"Remove"}>
-                          <IconButton onClick={handleRemove}>
-                            <MdDeleteSweep />
-                          </IconButton>
-                        </Tooltip>
-                      </span>
-                    </>
-                  )}
-                </div>
-                <div>
-                  <IconButton onClick={handleClick} disabled={!audio}>
-                    {buttonName === "Play" ? (
-                      <FaRegPlayCircle />
+                    ) : clickedBtn === "add" && audio ? (
+                      <>
+                        <input
+                          type="file"
+                          accept=".mp3, .wav"
+                          onChange={addFile}
+                        />
+                      </>
+                    ) : clickedBtn === "edit" && !audio ? (
+                      <input
+                        type="file"
+                        accept=".mp3, .wav"
+                        onChange={addFile}
+                      />
                     ) : (
-                      <FaRegPauseCircle />
+                      <>
+                        <span>
+                          {initialValue.media_file}.{initialValue.file_ext}
+                        </span>
+                        <span style={{ marginLeft: 2 }}>
+                          <Tooltip title={"Remove"}>
+                            <IconButton onClick={handleRemove}>
+                              <MdDeleteSweep />
+                            </IconButton>
+                          </Tooltip>
+                        </span>
+                      </>
                     )}
-                  </IconButton>
-                </div>
-              </Box>
-            </Grid>
+                  </div>
+                  <div>
+                    <IconButton onClick={handleClick} disabled={!audio}>
+                      {buttonName === "Play" ? (
+                        <FaRegPlayCircle />
+                      ) : (
+                        <FaRegPauseCircle />
+                      )}
+                    </IconButton>
+                  </div>
+                </Box>
+              </Grid>
+            ) : (
+              <>
+                <Grid item xs={12} md={9}>
+                  <FormTextField
+                    type="textarea"
+                    isMultiline={true}
+                    placeholder={"Enter Text to speech"}
+                    label={"Text"}
+                    Value={text.value}
+                    onChangeText={handleChangeText}
+                    Required={true}
+                    CustomErrorLine={"Enter proper text"}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={3}
+                  sx={{
+                    "& span": {
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    },
+                    marginTop: "4%",
+                    "& button": {
+                      width: "30px",
+                      height: "30px",
+                    },
+                    "& button > svg": {
+                      display: "flex",
+                    },
+                    "& .rs-play": {
+                      display: text.success ? "block" : "none",
+                    },
+                    "& .rs-pause": {
+                      display: text.success ? "block" : "none",
+                    },
+                    "& .rs-stop": {
+                      display: "none",
+                    },
+                    "& .rs-resume": {
+                      display: text.success ? "block" : "none",
+                    },
+                    
+                  }}
+                >
+                  <Speech
+                    stop={true}
+                    pause={true}
+                    resume={true}
+                    text={text.value}
+                    lang={"en-EN"}
+                    voice="Google UK English"
+                  />
+                </Grid>
+              </>
+            )}
           </Grid>
         </Box>
       </CardContent>

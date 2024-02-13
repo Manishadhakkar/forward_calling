@@ -14,3 +14,10 @@ export const createWalletPaymentReq = (body) => {
     data: body,
   });
 };
+export const paymentBtcQrGenerateReq = (body) => {
+  return axios({
+    method: "POST",
+    url: `/payment/crypto-create`,
+    data: body,
+  });
+};

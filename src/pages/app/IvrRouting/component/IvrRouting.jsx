@@ -18,6 +18,12 @@ import { Add, Routing2 } from "iconsax-react";
 import { FormModal as Modal } from "../../../../components/modal/FormModal";
 import Copyright from "../../../../components/footer/Footer";
 import RoutePlanForm from "../../../../components/form/routePlanForm/RoutePlanForm";
+import {
+  createIvrRoutingRequest,
+  getIvrRoutingRequest,
+  updateIvrRouteStatusRequest,
+} from "../service/routing.request";
+import StatusBadge from "../../../../components/chip/StatusBadge";
 
 const paths = [
   {
@@ -56,11 +62,28 @@ const IvrRouting = () => {
         },
         size: 100,
       },
+      {
+        accessorKey: "status",
+        header: "Status",
+        size: 50,
+        enableColumnDragging: false,
+        enableGlobalFilter: false,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        Cell: ({ cell }) => <StatusBadge value={cell.getValue()} />,
+        muiTableHeadCellProps: {
+          align: "center",
+        },
+        muiTableBodyCellProps: {
+          align: "center",
+        },
+      },
     ],
     []
   );
 
   const [rows, setRows] = useState([]);
+  const [routeId, setRouteId] = useState(null);
   const [isLoader, setIsLoader] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState();
@@ -84,6 +107,7 @@ const IvrRouting = () => {
   };
   const handleModalClose = () => {
     setErrorMessage("");
+    setRouteId(null);
     setIsOpen(false);
   };
   const handleClose = (event, reason) => {
@@ -98,15 +122,73 @@ const IvrRouting = () => {
   };
 
   const handleChangeEdit = (ele) => {
-    setClickedBtn("edit");
+    setRouteId(ele.id);
     setCurrentType(ele);
     setIsOpen(true);
+    setClickedBtn("edit");
   };
-  const handleChangeDelete = (ele) => {
-    console.log("Delete");
+
+  const getAllRoutePlan = (activePage, limit) => {
+    setIsLoader(true);
+    getIvrRoutingRequest(activePage, limit)
+      .then((res) => {
+        let getData = res.data.data.length === 0 ? [] : res.data.data.data;
+        setTotal(res.data.data.length === 0 ? 0 : res.data.data?.total);
+        setRows(getData);
+        setIsLoader(false);
+      })
+      .catch(() => {
+        setIsLoader(false);
+      });
   };
-  const handleAddRoutePlan = (value) => {
-    console.log(value);
+
+  useEffect(() => {
+    getAllRoutePlan(activePage, limit);
+  }, [activePage, limit]);
+
+  const handleStatusChange = (ele) => {
+    setIsLoader(true);
+    const data = {
+      id: ele.id,
+      status: ele.status === 1 ? 0 : 1,
+    };
+    updateIvrRouteStatusRequest(data)
+      .then((res) => {
+        getAllRoutePlan(activePage, limit);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setErrorMessage("");
+        setIsOpen(false);
+        setIsLoader(false);
+      })
+      .catch((err) => {
+        setIsLoader(false);
+      });
+  };
+  const handleAddRoutePlan = (formData) => {
+    if (formData.type === "name") {
+      const queryNameData = {
+        name: formData.name,
+      };
+      setIsLoader(true);
+      createIvrRoutingRequest(queryNameData)
+        .then((res) => {
+          setRouteId(res.data?.data?.id);
+          getAllRoutePlan(activePage, limit);
+          setBarVariant("success");
+          setMessage(res.data.message);
+          setSnackbarOpen({ ...snackbarOpen, open: true });
+          setErrorMessage("");
+          setIsLoader(false);
+        })
+        .catch((err) => {
+          setIsLoader(false);
+          setBarVariant("error");
+          setErrorMessage(err.message);
+          setSnackbarOpen({ ...snackbarOpen, open: true });
+        });
+    }
   };
   const handleUpdateRoutePlan = (value) => {
     console.log(value);
@@ -123,6 +205,7 @@ const IvrRouting = () => {
         initialValue={clickedBtn === "edit" ? currentType : {}}
         errorMessage={errorMessage}
         setErrorMessage={setErrorMessage}
+        routeId={routeId}
       />
     );
   };
@@ -201,10 +284,10 @@ const IvrRouting = () => {
             data={rows}
             column={columns}
             handleEditAction={handleChangeEdit}
-            handleDeleteAction={handleChangeDelete}
+            handleStatusAction={handleStatusChange}
             isSearchable={true}
             isEditable={true}
-            isDeletable={true}
+            isStatusChangable={true}
           />
           <Pagination
             style={{
