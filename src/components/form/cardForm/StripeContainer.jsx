@@ -15,10 +15,6 @@ import {
   CardHeader,
   Divider,
   Grid,
-  List,
-  ListItem,
-  ListItemText,
-  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -113,31 +109,6 @@ const StripeContainer = ({ invoice_data }) => {
           <Divider />
           <CardContent color={colors.form[100]}>
             {error && <p className="error_msg">{error}</p>}
-            {/* 
-            </ListItem>
-            <ListItem>
-              <ListItemText primary=" Expiration Date" />
-              <ListItemText>
-                <CardExpiryElement
-                  options={cardElementOptions}
-                  onChange={(e) =>
-                    handleChange({ elementType: "cardExpiry", ...e })
-                  }
-                />
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="CVC" />
-              <ListItemText>
-                <CardCvcElement
-                  options={cardElementOptions}
-                  onChange={(e) =>
-                    handleChange({ elementType: "cardCvc", ...e })
-                  }
-                />
-              </ListItemText>
-            </ListItem> */}
-
             <Grid container spacing={2}>
               <Grid item xs={12} sm={7.6}>
                 <Typography variant="h6">Invoice No.</Typography>
@@ -235,9 +206,11 @@ const StripeContainer = ({ invoice_data }) => {
               type="submit"
               size="medium"
               sx={{
-                backgroundColor: colors.greenAccent[700],
                 textTransform: "none",
-                color: theme.palette.mode === "dark" ? "white" : "black",
+                backgroundColor: colors.greenAccent[700],
+                ":hover": {
+                  backgroundColor: colors.greenAccent[800],
+                },
               }}
               variant="contained"
               className="btn"
@@ -246,29 +219,6 @@ const StripeContainer = ({ invoice_data }) => {
             </Button>
           </CardActions>
         </Card>
-
-        {/* <label>
-        Card Number
-        <CardNumberElement
-          onChange={(e) => handleChange({ elementType: "cardNumber", ...e })}
-        />
-      </label> */}
-        {/* <label>
-        Expiration Date
-        <CardExpiryElement
-          onChange={(e) => handleChange({ elementType: "cardExpiry", ...e })}
-        />
-      </label> */}
-        {/* <label>
-        CVC
-        <CardCvcElement
-          onChange={(e) => handleChange({ elementType: "cardCvc", ...e })}
-        />
-      </label> */}
-        {/* <button type="submit" disabled={!stripe}>
-        Pay
-      </button> */}
-        {/* {error && <p>{error}</p>} */}
       </Box>
     </>
   );

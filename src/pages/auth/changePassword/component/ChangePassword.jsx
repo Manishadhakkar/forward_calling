@@ -216,10 +216,17 @@ const ChangePassword = () => {
             <Grid sm={4} xs={0}></Grid>
             <Grid item xs={12} md={4}>
               <Button
+                fullWidth
                 type="submit"
                 size="small"
                 variant="contained"
-                sx={{ backgroundColor: colors.greenAccent[500] }}
+                sx={{
+                  textTransform: "none",
+                  backgroundColor: colors.greenAccent[700],
+                  ":hover": {
+                    backgroundColor: colors.greenAccent[800],
+                  },
+                }}
                 onClick={handleClickSubmit}
               >
                 Submit

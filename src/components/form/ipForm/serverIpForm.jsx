@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -14,8 +14,6 @@ import { MdClose } from "react-icons/md";
 import FormTextField from "../../textfield/FormTextField";
 import { tokens } from "../../../assets/color/theme";
 import "../styles.css";
-import FormTextDropdown from "../../dropdown/FormTextDropdown";
-import { getAllCompanyRequest } from "../../../pages/app/serverIp/service/serverIp.request";
 
 const ServerIpForm = (props) => {
   const {
@@ -25,17 +23,11 @@ const ServerIpForm = (props) => {
     clickedBtn,
     errorMessage,
     setErrorMessage,
-    company_id,
   } = props;
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [companyList, setCompanyList] = useState([]);
-  const [companyId, setCompanyId] = useState({
-    value: initialValue ? initialValue.company_id : "",
-    error: false,
-    success: false,
-  });
+
   const [ip, setIp] = useState({
     value: initialValue ? initialValue.ip_name : "",
     error: false,
@@ -52,11 +44,6 @@ const ServerIpForm = (props) => {
     success: false,
   });
 
-  let isValueNOTChanged =
-    ip.value === initialValue.ip_name &&
-    name.value === initialValue.name &&
-    prefix.value === initialValue.prefix;
-
   let disable =
     ip.error ||
     ip.value === "" ||
@@ -65,11 +52,6 @@ const ServerIpForm = (props) => {
     name.value === "" ||
     name.success === false ||
     prefix.error;
-
-  const handleChangeCompany = (value) => {
-    setErrorMessage("");
-    setCompanyId(value);
-  };
 
   const handleChangeIp = (value) => {
     setErrorMessage("");
@@ -84,22 +66,6 @@ const ServerIpForm = (props) => {
     setPrefix(value);
   };
 
-  useEffect(() => {
-    getAllCompanyRequest()
-      .then((res) => {
-        const result = res.data?.data?.data?.map((ele) => {
-          return {
-            value: ele.id,
-            label: ele.company_name,
-          };
-        });
-        setCompanyList(result);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
   const handleClick = (e) => {
     e.preventDefault();
     if (!ip.value || !name.value) {
@@ -110,7 +76,6 @@ const ServerIpForm = (props) => {
       ip_name: ip.value,
       name: name.value,
       prefix: prefix.value,
-      // company_id: company_id === "0" ? companyId.value : company_id,
     };
     handleFormData(data);
   };
@@ -136,18 +101,6 @@ const ServerIpForm = (props) => {
         {errorMessage && <span className="error_msg">{errorMessage}</span>}
         <CardContent color={colors.form[100]}>
           <Grid container spacing={1}>
-            {/* {company_id === "0" && (
-              <Grid item xs={12} md={12}>
-                <FormTextDropdown
-                  Value={companyId.value}
-                  onSelect={handleChangeCompany}
-                  label={"Company *"}
-                  CustomErrorLine={"Choose one"}
-                  Required={true}
-                  Options={companyList}
-                />
-              </Grid>
-            )} */}
             <Grid item xs={12} md={12}>
               <FormTextField
                 type="alpha"
@@ -187,14 +140,31 @@ const ServerIpForm = (props) => {
         </CardContent>
 
         <CardActions sx={{ justifyContent: "space-between", m: 1 }}>
-          <Button size="small" variant="contained" onClick={onHandleClose}>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={onHandleClose}
+            sx={{
+              textTransform: "none",
+              backgroundColor: colors.redAccent[700],
+              ":hover": {
+                backgroundColor: colors.redAccent[800],
+              },
+            }}
+          >
             {"Cancel"}
           </Button>
           <Button
             type="submit"
             size="small"
             onClick={(e) => handleClick(e)}
-            sx={{ backgroundColor: colors.greenAccent[500] }}
+            sx={{
+              textTransform: "none",
+              backgroundColor: colors.greenAccent[700],
+              ":hover": {
+                backgroundColor: colors.greenAccent[800],
+              },
+            }}
             variant="contained"
             disabled={clickedBtn === "add" ? disable : false}
           >

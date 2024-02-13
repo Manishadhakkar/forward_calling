@@ -128,8 +128,6 @@ const PurchaseNumber = () => {
     success: false,
   });
 
-
-
   const [selectStartsNo, setSelectStartsNo] = useState({
     value: "",
     error: false,
@@ -400,9 +398,9 @@ const PurchaseNumber = () => {
                       textTransform: "none",
                       width: "100%",
                       color: colors.grey[100],
-                      ":hover":{
+                      ":hover": {
                         backgroundColor: colors.greenAccent[800],
-                      }
+                      },
                     }}
                   >
                     {"Search"}
@@ -439,7 +437,10 @@ const PurchaseNumber = () => {
                                 <Chip
                                   clickable
                                   sx={{
-                                    backgroundColor: colors.greenAccent[800],
+                                    backgroundColor: colors.greenAccent[700],
+                                    ":hover": {
+                                      backgroundColor: colors.greenAccent[800],
+                                    },
                                   }}
                                   label="Add to cart"
                                   size="small"
@@ -532,10 +533,11 @@ const PurchaseNumber = () => {
                         color="success"
                         endIcon={<MdKeyboardArrowRight />}
                         sx={{
-                          backgroundColor: colors.greenAccent[700],
                           textTransform: "none",
-                          color:
-                            theme.palette.mode === "dark" ? "white" : "black",
+                          backgroundColor: colors.greenAccent[700],
+                          ":hover": {
+                            backgroundColor: colors.greenAccent[800],
+                          },
                         }}
                         onClick={(e) => handleCreateInvoice(e)}
                       >

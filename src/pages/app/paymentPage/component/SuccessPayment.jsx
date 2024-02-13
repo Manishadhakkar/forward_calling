@@ -68,11 +68,14 @@ const SuccessPayment = () => {
                 </Typography>
               </Box>
               <Box display={"flex"} mt={2} justifyContent={"center"}>
-                <Button variant="contained" size="medium" onClick={() => navigate("/")}
-                sx={{
-                  textTransform: "none",
-                  backgroundColor: colors.primary[400]
-                }}
+                <Button
+                  variant="contained"
+                  size="medium"
+                  onClick={() => navigate("/")}
+                  sx={{
+                    textTransform: "none",
+                    background: `linear-gradient(to bottom,  ${colors.primary[100]},  ${colors.grey[900]})`,
+                  }}
                 >
                   Back to home
                 </Button>

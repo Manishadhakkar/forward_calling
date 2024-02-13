@@ -20,6 +20,7 @@ import {
   getAllActiveCarriersRequest,
   getAllCountries,
 } from "../../../pages/app/number/service/numbers.request";
+import { typeList } from "../../../utility/config";
 
 const NumberForm = (props) => {
   const {
@@ -50,10 +51,7 @@ const NumberForm = (props) => {
     error: false,
     success: false,
   });
-  const typeList = [
-    { id: 1, label: "Local", value: "Local" },
-    { id: 2, label: "Toll Free", value: "Tollfree" },
-  ];
+
   const [didType, setDidType] = useState({
     value: initialValue ? initialValue.type : "",
     error: false,
@@ -383,31 +381,37 @@ const NumberForm = (props) => {
                   Options={carrierData}
                 />
               </Grid>
-              {/* <Grid item xs={12} md={6}>
-                    <FormTextDropdown
-                      Value={assignUser.value}
-                      onSelect={handleChangeUser}
-                      label={"Assign User"}
-                      CustomErrorLine={"Choose one"}
-                      Required={false}
-                      Options={user_list}
-                    />
-                  </Grid> */}
             </Grid>
           </Box>
         </CardContent>
 
         <CardActions sx={{ justifyContent: "space-between", m: 1 }}>
-          <Button size="small" variant="contained" onClick={onHandleClose}>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={onHandleClose}
+            sx={{
+              textTransform: "none",
+              backgroundColor: colors.redAccent[700],
+              ":hover": {
+                backgroundColor: colors.redAccent[800],
+              },
+            }}
+          >
             {"Cancel"}
           </Button>
           <Button
             size="small"
             onClick={(e) => handleSubmitForm(e)}
-            sx={{ backgroundColor: colors.greenAccent[500] }}
+            sx={{
+              textTransform: "none",
+              backgroundColor: colors.greenAccent[700],
+              ":hover": {
+                backgroundColor: colors.greenAccent[800],
+              },
+            }}
             variant="contained"
             type="submit"
-            // disabled={clickedBtn === "add" ? disable : isValueNOTChanged}
           >
             {clickedBtn === "add" ? "Save" : "Update"}
           </Button>

@@ -20,3 +20,7 @@ export const startsNoList = [
   { id: 9, label: 888, value: 888 },
   { id: 10, label: 899, value: 899 },
 ];
+export const typeList = [
+  { id: 1, label: "Local", value: "Local" },
+  { id: 2, label: "Toll Free", value: "Tollfree" },
+];

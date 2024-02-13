@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -15,8 +15,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { TbHome2 } from "react-icons/tb";
-import MuiAlert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
 import { FormModal as Modal } from "../../../../components/modal/FormModal";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
 import { tokens } from "../../../../assets/color/theme";
@@ -25,7 +23,7 @@ import { MdOutlinePriceChange } from "react-icons/md";
 import { PiHandCoinsFill } from "react-icons/pi";
 import Copyright from "../../../../components/footer/Footer";
 import PaymentStepper from "../../../../components/stepper/PaymentStepper";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import CryptoPayForm from "../../../../components/form/cryptoForm/CryptoPayForm";
 import { paymentBtcQrGenerateReq } from "../service/payment.request";
 import { concatenateDidNumbers } from "../../../../utility/utilty";
@@ -171,9 +169,11 @@ const CryptoPayment = () => {
                 <Button
                   size="medium"
                   sx={{
-                    backgroundColor: colors.greenAccent[700],
                     textTransform: "none",
-                    color: theme.palette.mode === "dark" ? "white" : "black",
+                    backgroundColor: colors.greenAccent[700],
+                    ":hover": {
+                      backgroundColor: colors.greenAccent[800],
+                    },
                   }}
                   variant="contained"
                   onClick={handleClickPay}
@@ -181,16 +181,18 @@ const CryptoPayment = () => {
                   Pay with BTC
                 </Button>
                 {/* <Button
-                size="medium"
-                sx={{
-                  backgroundColor: colors.greenAccent[700],
-                  textTransform: "none",
-                  color: theme.palette.mode === "dark" ? "white" : "black",
-                }}
-                variant="contained"
-              >
-                Pay with Ethereum (ETH)
-              </Button> */}
+                  size="medium"
+                  sx={{
+                    textTransform: "none",
+                    backgroundColor: colors.greenAccent[700],
+                    ":hover": {
+                      backgroundColor: colors.greenAccent[800],
+                    },
+                  }}
+                  variant="contained"
+                >
+                  Pay with Ethereum (ETH)
+                </Button> */}
               </CardActions>
             </Card>
           </Box>

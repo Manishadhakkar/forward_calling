@@ -54,9 +54,11 @@ export default function SplitButton({ options, handleClickBtn }) {
         <Button
           size="medium"
           sx={{
-            backgroundColor: colors.greenAccent[700],
             textTransform: "none",
-            color: theme.palette.mode === "dark" ? "white" : "black",
+            backgroundColor: colors.greenAccent[700],
+            ":hover": {
+              backgroundColor: colors.greenAccent[800],
+            },
           }}
           variant="contained"
           onClick={handleClick}
@@ -67,9 +69,11 @@ export default function SplitButton({ options, handleClickBtn }) {
         <Button
           size="medium"
           sx={{
-            backgroundColor: colors.greenAccent[700],
             textTransform: "none",
-            color: theme.palette.mode === "dark" ? "white" : "black",
+            backgroundColor: colors.greenAccent[700],
+            ":hover": {
+              backgroundColor: colors.greenAccent[800],
+            },
           }}
           variant="contained"
           aria-controls={open ? "split-button-menu" : undefined}
@@ -99,7 +103,12 @@ export default function SplitButton({ options, handleClickBtn }) {
                 placement === "bottom" ? "center top" : "center bottom",
             }}
           >
-            <Paper>
+            <Paper
+            sx={{
+              backgroundColor: colors.grey[900],
+              margin: 1
+            }}
+            >
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" label="Slect" autoFocusItem>
                   {options.map((option) => (

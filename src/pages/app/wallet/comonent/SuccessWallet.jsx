@@ -31,7 +31,7 @@ const SuccessWallet = () => {
               onClick={() => navigate("/")}
               sx={{
                 textTransform: "none",
-                backgroundColor: colors.primary[400],
+                background: `linear-gradient(to bottom,  ${colors.primary[100]},  ${colors.grey[900]})`,
               }}
             >
               Back to home

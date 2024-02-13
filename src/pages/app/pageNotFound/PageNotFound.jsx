@@ -11,7 +11,9 @@ const PageNotFound = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="page-not-found-container">
+    <div
+      className="page-not-found-container"
+    >
       <img src={Notsfound} alt="Page Not Found" className="not-found-image" />
       <Button
         variant="contained"
@@ -19,7 +21,7 @@ const PageNotFound = () => {
         onClick={() => navigate("/")}
         sx={{
           textTransform: "none",
-          backgroundColor: colors.greenAccent[800],
+          background: `linear-gradient(to bottom, #4d2920, #141414)`,
         }}
         className="centered-button"
       >

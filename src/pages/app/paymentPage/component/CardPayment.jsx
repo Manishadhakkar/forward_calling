@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import StripeContainer from "../../../../components/form/cardForm/StripeContainer";
-
 import "./styles.css";
 import { Box, useTheme } from "@mui/material";
 import { TbHome2 } from "react-icons/tb";
@@ -14,7 +13,7 @@ import { MdOutlinePriceChange } from "react-icons/md";
 import { PiHandCoinsFill } from "react-icons/pi";
 import { tokens } from "../../../../assets/color/theme";
 import PaymentStepper from "../../../../components/stepper/PaymentStepper";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const stripePromise = loadStripe(
   "pk_test_51JHZjxG71L2aH3X16DtsCw8NhYxYGQv9IK41nlvjqmtlM3yoha3LqgQcjHvC81fqdknutLgFPf4EJj2UXPMIVRPP00fPbxse74"

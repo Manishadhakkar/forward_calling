@@ -198,10 +198,11 @@ const WalletPayment = ({ type }) => {
                   fullWidth
                   size="medium"
                   sx={{
-                    textDecoration: "none",
-                    backgroundColor: colors.greenAccent[700],
                     textTransform: "none",
-                    color: theme.palette.mode === "dark" ? "white" : "black",
+                    backgroundColor: colors.greenAccent[700],
+                    ":hover": {
+                      backgroundColor: colors.greenAccent[800],
+                    },
                   }}
                   variant="contained"
                   onClick={handleSubmit}
