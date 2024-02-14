@@ -31,15 +31,7 @@ import {
 } from "@mui/material";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
 import { tokens } from "../../../../assets/color/theme";
-import {
-  MdAdd,
-  MdDeleteForever,
-  MdEdit,
-  MdExpandMore,
-  MdRemove,
-  MdSave,
-  MdUpdate,
-} from "react-icons/md";
+import { MdAdd, MdDeleteForever, MdEdit, MdExpandMore } from "react-icons/md";
 import { FcCallTransfer } from "react-icons/fc";
 import {
   assignCampaignTargetReq,
@@ -47,6 +39,7 @@ import {
   getAllActiveNumber,
   getAllIvrListReq,
   getAllIvrReq,
+  getAllRoutesReq,
   getAllTargetReq,
   getCampaignByIdRequest,
   getCompanyTargetAndRemainsReq,
@@ -195,7 +188,7 @@ const ActionCell = ({
         justifyContent="flex-end"
         width={"100%"}
       >
-        {rowData.destination_type === "Ivr" && (
+        {rowData.destination_type !== "Target" && (
           <Fab
             aria-label="add"
             size="small"
@@ -257,15 +250,8 @@ const UpdateCampaign = () => {
   const colors = tokens(theme.palette.mode);
   const [expanded, setExpanded] = useState("panel1");
   const [message, setMessage] = useState("");
-
   const [timer, setTimer] = useState(0);
-
   const [tabValue, setTabValue] = React.useState(0);
-
-  const handleChangeTab = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
   const [searchTargetData, setSearchTargetData] = useState([]);
   const [searchCampaignData, setSearchCampaignData] = useState([]);
   const [ivrList, setIvrList] = useState([]);
@@ -273,11 +259,16 @@ const UpdateCampaign = () => {
   const [searchCampaignParams, setSearchCampaignParams] = useState("");
   const [initialValue, setInitValue] = useState({});
   const [ivrRawData, setIvrRawData] = useState([]);
+  const [ivrRouteData, setIvrRouteData] = useState([]);
   const [ivrRow, setIvrRow] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [clickedBtn, setClickedBtn] = useState("");
   const [currentType, setCurrentType] = useState();
   const [ivtBtnType, setBtnType] = useState(1);
+
+  const handleChangeTab = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
   const handleModalClose = () => {
     setIsOpen(false);
@@ -436,8 +427,29 @@ const UpdateCampaign = () => {
       setIsLoader(false);
       const data =
         res.data.data.length > 0 ? convertIvrArray(res.data.data) : [];
+      console.log(">>>>>>>>>", data);
       setIvrRow(data);
       setIvrRawData(res.data.data);
+    } catch (error) {
+      setIsLoader(false);
+    }
+  };
+
+  const getIvrRoutesList = async () => {
+    try {
+      // setIsLoader(true);
+      const res = await getAllRoutesReq();
+      setIsLoader(false);
+      const fetchData =
+        res.data.data.length > 0
+          ? res.data.data.map((ele) => {
+              return {
+                value: ele.id,
+                label: ele.name,
+              };
+            })
+          : [];
+      setIvrRouteData(fetchData);
     } catch (error) {
       setIsLoader(false);
     }
@@ -446,6 +458,7 @@ const UpdateCampaign = () => {
   useEffect(() => {
     if (expanded === "panel2" && tabValue === 1) {
       getIvrRows();
+      getIvrRoutesList();
     }
   }, [expanded, tabValue]);
 
@@ -870,36 +883,7 @@ const UpdateCampaign = () => {
       return () => clearInterval(intervalId);
     }
   }, [expanded, tabValue]);
-  // const handleChangeDigits = (data, id) => {
-  //   const addDigits = ivrRow?.map((item, index) => {
-  //     if (index + 1 === id) {
-  //       return { ...item, input_digits: data };
-  //     } else {
-  //       return item;
-  //     }
-  //   });
-  //   setIvrRow(addDigits);
-  // };
-  // const handleChangeDestinationType = (data, id) => {
-  //   const addDestination = ivrRow?.map((item, index) => {
-  //     if (index + 1 === id) {
-  //       return { ...item, destination: data };
-  //     } else {
-  //       return item;
-  //     }
-  //   });
-  //   setIvrRow(addDestination);
-  // };
-  // const handleChangeRemainsIvr = (data, id) => {
-  //   const result = ivrRow?.map((item, index) => {
-  //     if (index + 1 === id) {
-  //       return { ...item, destination_id: data };
-  //     } else {
-  //       return item;
-  //     }
-  //   });
-  //   setIvrRow(result);
-  // };
+
   const handleClickSaveSelectIvr = async (event) => {
     event.preventDefault();
     // setIsLoader(true);
@@ -935,6 +919,7 @@ const UpdateCampaign = () => {
         desinationTypeList={desinationTypeList}
         ivrList={ivrList}
         ivrTargets={ivrTargets}
+        ivrRouteData={ivrRouteData}
       />
     );
   };
@@ -1032,7 +1017,7 @@ const UpdateCampaign = () => {
   return (
     <>
       {isLoader && <Loader />}
-      <Modal modal_width={"50%"} isOpen={isOpen}>
+      <Modal modal_width={"70%"} isOpen={isOpen}>
         {selectModal()}
       </Modal>
       <Snackbar
@@ -1944,7 +1929,7 @@ const UpdateCampaign = () => {
                             borderBottom: "none",
                           }}
                         >
-                            <Column flexGrow={1}>
+                          <Column flexGrow={1}>
                             <HeaderCell
                               style={{
                                 color: colors.layoutColor[200],
@@ -1967,7 +1952,7 @@ const UpdateCampaign = () => {
                               dataKey="destination_name"
                             />
                           </Column>
-                        
+
                           <Column width={250}>
                             <HeaderCell
                               style={{
@@ -1990,8 +1975,8 @@ const UpdateCampaign = () => {
                               }}
                             />
                           </Column>
-                        
-                            <Column width={250}>
+
+                          <Column width={250}>
                             <HeaderCell
                               style={{
                                 color: colors.layoutColor[200],

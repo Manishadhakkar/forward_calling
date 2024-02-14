@@ -7,13 +7,14 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  Grid,
   List,
   ListItem,
   ListItemText,
   Typography,
   useTheme,
 } from "@mui/material";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import { TbHome2 } from "react-icons/tb";
 import { FormModal as Modal } from "../../../../components/modal/FormModal";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
@@ -27,6 +28,10 @@ import { useLocation } from "react-router-dom";
 import CryptoPayForm from "../../../../components/form/cryptoForm/CryptoPayForm";
 import { paymentBtcQrGenerateReq } from "../service/payment.request";
 import { concatenateDidNumbers } from "../../../../utility/utilty";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const paths = [
   {
@@ -50,25 +55,32 @@ const CryptoPayment = () => {
   const colors = tokens(theme.palette.mode);
   const location = useLocation();
 
+  const [snackbarOpen, setSnackbarOpen] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "right",
+  });
+  const [barVariant, setBarVariant] = useState("");
+  const { vertical, horizontal, open } = snackbarOpen;
+
   const invoice_data = location?.state;
   const [isOpen, setIsOpen] = useState(false);
-
-  const [errorMessage, setErrorMessage] = useState();
+  const [cryptoData, setcryptoData] = useState({});
   const [message, setMessage] = useState("");
-  const [isLoader, setLoader] = useState(false);
+  const [isLoader, setIsLoader] = useState(false);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen({ ...snackbarOpen, open: false });
+  };
 
   const openAddModal = () => {
-    setErrorMessage("");
     setIsOpen(true);
   };
-  const handleModalClose = () => {
-    setErrorMessage("");
-    setIsOpen(false);
-  };
-
   const handleClickPay = (e) => {
     e.preventDefault();
-    console.log(invoice_data);
     const req_data = {
       invoice_id: invoice_data.id,
       invoice_number: invoice_data.invoice_id,
@@ -76,23 +88,48 @@ const CryptoPayment = () => {
       currency: invoice_data.invoice_currency,
       item_numbers: concatenateDidNumbers(invoice_data.invoice_items),
     };
-
+    setIsLoader(true);
     paymentBtcQrGenerateReq(req_data)
       .then((res) => {
-        console.log(res.data);
+        setcryptoData(res.data);
+        openAddModal();
+        setIsLoader(false);
       })
       .catch((err) => {
-        console.log(err);
+        setMessage(err.message);
+        setBarVariant("error");
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setIsLoader(false);
       });
   };
 
   const selectModal = () => {
-    return <CryptoPayForm isOpen={true} setIsOpen={setIsOpen} />;
+    return (
+      <CryptoPayForm
+        isOpen={true}
+        setIsOpen={setIsOpen}
+        cryptoData={cryptoData}
+      />
+    );
   };
 
   return (
     <>
       {isLoader && <Loader />}
+      <Snackbar
+        open={open}
+        anchorOrigin={{ vertical, horizontal }}
+        autoHideDuration={3000}
+        onClose={handleClose}
+      >
+        <Alert
+          onClose={handleClose}
+          severity={barVariant}
+          sx={{ width: "100%" }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
 
       <Modal modal_width={"50%"} isOpen={isOpen}>
         {selectModal()}

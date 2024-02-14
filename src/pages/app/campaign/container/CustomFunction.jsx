@@ -16,12 +16,11 @@ export const paths = [
     icon: <TbAssembly />,
   },
 ];
-
 export const desinationTypeList = [
   { label: "Ivr", value: "Ivr" },
   { label: "Target", value: "Target" },
+  { label: "Route", value: "Route" },
 ];
-
 export const format_list = [
   { id: 1, label: "(###) #### ### ###", value: "(###) #### ### ###" },
   { id: 2, label: "(##) ### ### ####", value: "(##) ### ### ####" },

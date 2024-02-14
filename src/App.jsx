@@ -42,9 +42,7 @@ const App = () => {
           <Route exact path="/signup" element={<SignUpPage />} />
           <Route exact path="/verify" element={<VerifyPage />} />
           <Route exact path="/forgotpassword" element={<ForgotPassword />} />
-          {/* <Route exact path="*" element={<NotFoundPage />} /> */}
-            <Route exact path="*" element={<Navigate replace to="/" />} />
-          
+          <Route exact path="*" element={<NotFoundPage />} />          
           <Route exact path="/buyersignup/:token" element={<BuyerSignUpPage />} />
         </Routes>
       </Suspense>

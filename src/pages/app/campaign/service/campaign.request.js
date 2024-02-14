@@ -111,6 +111,13 @@ export const getAllIvrReq = (id) => {
   });
 };
 
+export const getAllRoutesReq = (id) => {
+  return axios({
+    method: "GET",
+    url: `/ivr-route/active`,
+  });
+};
+
 export const createIvrReq = (body) => {
   return axios({
     method: "POST",
@@ -130,7 +137,7 @@ export const updateIvrReq = (body) => {
 export const removeIvrReq = (id) => {
   return axios({
     method: "DELETE",
-    url: `/ivr-options/remove/${id}`
+    url: `/ivr-options/remove/${id}`,
   });
 };
 
@@ -139,5 +146,38 @@ export const setCampaignIvrReq = (body) => {
     method: "POST",
     url: `/campaign/ivrAssignToCampaign`,
     data: body,
+  });
+};
+export const getRouteMembersAndRemainsReq = (id) => {
+  return axios({
+    method: "GET",
+    url: `/ivr-route/ivrRouteMemberAndOther/${id}`,
+  });
+};
+export const assignRouteTargetReq = (body) => {
+  return axios({
+    method: "POST",
+    url: "/ivr-route/addMember",
+    data: body,
+  });
+};
+export const removeRouteTargetReq = (id) => {
+  return axios({
+    method: "DELETE",
+    url: `/ivr-route/remove/${id}`,
+  });
+};
+export const updateRouteTargetPriorityReq = (body) => {
+  return axios({
+    method: "PATCH",
+    url: `/ivr-route/priority/${body.id}`,
+    data: body.data,
+  });
+};
+export const updateRouteTargetWeightageReq  = (body) => {
+  return axios({
+    method: "PATCH",
+    url: `/ivr-route/weightage/${body.id}`,
+    data: body.data,
   });
 };

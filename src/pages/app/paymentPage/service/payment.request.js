@@ -21,3 +21,10 @@ export const paymentBtcQrGenerateReq = (body) => {
     data: body,
   });
 };
+export const paymentBTCPaymentStatusReq = (body) => {
+  return axios({
+    method: "POST",
+    url: `/payment/crypto-status`,
+    data: body,
+  });
+};
