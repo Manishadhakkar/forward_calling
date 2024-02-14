@@ -14,3 +14,9 @@
   scrollbar-width: "1px";
   max-height: 75vh;
 }
+.MuiPaper-root-MuiCard-root{
+  overflow: visible !important;
+}
+.css-zczr0-MuiPaper-root-MuiCard-root{
+  overflow: visible !important;
+}

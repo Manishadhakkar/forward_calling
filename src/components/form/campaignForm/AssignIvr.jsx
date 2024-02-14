@@ -39,8 +39,27 @@ import { MdDeleteForever } from "react-icons/md";
 import { FaCircle, FaMobileRetro } from "react-icons/fa6";
 import { SiWebmoney } from "react-icons/si";
 import { FcCallTransfer } from "react-icons/fc";
-import RemoveIcon from "@mui/icons-material/Remove";
-import AddIcon from "@mui/icons-material/Add";
+import Loader from "../../Loader/Loader";
+
+const StyledTableCell = styled(TableCell)(() => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "#080b12",
+    color: "white",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(() => ({
+  background: "#141414",
+  "&:nth-of-type(odd)": {
+    background: `linear-gradient(to bottom, #2a1814, #1f191f)`,
+  },
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
 
 const AssignIvrForm = (props) => {
   const {
@@ -56,57 +75,8 @@ const AssignIvrForm = (props) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: colors.primary[900],
-      color: theme.palette.common.white,
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-    },
-  }));
-
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    background: colors.grey[900],
-    "&:nth-of-type(odd)": {
-      background: `linear-gradient(to bottom, ${colors.tableRow[100]}, ${colors.tableRow[200]})`,
-    },
-    "&:last-child td, &:last-child th": {
-      border: 0,
-    },
-  }));
-
-  const StyledInput = styled("input")(
-    ({ theme }) => `
-    font-size: 0.75rem;
-    font-family: inherit;
-    font-weight: 200;
-    line-height: 0.5;
-    color:  "#C7D0DD";
-    background:  "#1C2025";
-    border: 1px solid  "#434D5B";
-    box-shadow: 0px 2px 4px rgba(0,0,0, 0.5);
-    border-radius: 8px;
-    margin: 0 5px;
-    padding: 5px 6px;
-    outline: 0;
-    min-width: 0;
-    width: 2.5rem;
-    text-align: center;
-    &:hover {
-      border-color: "#3399ff";
-    }
-    &:focus {
-      border-color: "#3399ff";
-      box-shadow: 0 0 0 3px ${"#0059B2"};
-    }
-    &:focus-visible {
-      outline: 0;
-    }
-  `
-  );
-
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [input_digit, setInput_digit] = useState({
     value: initialValue ? initialValue.input_digit : "",
@@ -153,6 +123,7 @@ const AssignIvrForm = (props) => {
   useEffect(() => {
     if (destination_type.value === "Route" && destination_id.success === true) {
       const routeId = destination_id.value;
+      setIsLoading(true);
       getRouteMembersAndRemainsReq(routeId)
         .then((res) => {
           const targetList = res.data.data.AllTargets?.map((ele) => ({
@@ -173,6 +144,8 @@ const AssignIvrForm = (props) => {
             weightage: ele.weightage,
             priority: ele.priority,
           }));
+          setIsLoading(false);
+
           setAllRouteData(
             assignTargetList !== undefined ? assignTargetList : []
           );
@@ -180,6 +153,7 @@ const AssignIvrForm = (props) => {
         })
         .catch((err) => {
           console.log(err);
+          setIsLoading(false);
         });
     }
   }, [destination_type.value, destination_id.value, timer]);
@@ -245,146 +219,6 @@ const AssignIvrForm = (props) => {
         setMessage(err.message);
       });
   };
-  const handleDecrementPriority = async (row) => {
-    if (row.priority === 0) {
-      return;
-    }
-    try {
-      const reqData = {
-        id: row.id,
-        data: {
-          priority: parseInt(row.priority) - 1,
-        },
-      };
-      const res = await updateRouteTargetPriorityReq(reqData);
-      setTimer((prevTimer) => prevTimer + 1);
-      setMessage(res.data.message);
-    } catch (err) {
-      setMessage(err.message);
-    } finally {
-    }
-  };
-  const handleIncrementPriority = async (row) => {
-    try {
-      const reqData = {
-        id: row.id,
-        data: {
-          priority: parseInt(row.priority) + 1,
-        },
-      };
-      const res = await updateRouteTargetPriorityReq(reqData);
-      setTimer((prevTimer) => prevTimer + 1);
-      setMessage(res.data.message);
-    } catch (err) {
-      setMessage(err.message);
-    } finally {
-    }
-  };
-  const handleChangePriority = async (e, row) => {
-    if (e.target.value === "") {
-      setSearchRouteTargetData((prevData) =>
-        prevData.map((item) =>
-          item.id === row.id
-            ? { ...item, priority: parseInt(e.target.value) }
-            : item
-        )
-      );
-    } else {
-      if (e.target.value !== row.priority) {
-        setSearchRouteTargetData((prevData) =>
-          prevData.map((item) =>
-            item.id === row.id
-              ? { ...item, priority: parseInt(e.target.value) }
-              : item
-          )
-        );
-        try {
-          const reqData = {
-            id: row.id,
-            data: {
-              priority: parseInt(e.target.value),
-            },
-          };
-          const res = await updateRouteTargetPriorityReq(reqData);
-          setTimer((prevTimer) => prevTimer + 1);
-          setMessage(res.data.message);
-        } catch (err) {
-          setMessage(err.message);
-        } finally {
-        }
-      }
-    }
-  };
-  const handleDecrementWeightage = async (row) => {
-    if (row.weightage === 0) {
-      return;
-    }
-    try {
-      const reqData = {
-        id: row.id,
-        data: {
-          weightage: parseInt(row.weightage) - 1,
-        },
-      };
-      const res = await updateRouteTargetWeightageReq(reqData);
-      setTimer((prevTimer) => prevTimer + 1);
-      setMessage(res.data.message);
-    } catch (err) {
-      setMessage(err.message);
-    } finally {
-    }
-  };
-  const handleIncrementWeightage = async (row) => {
-    try {
-      const reqData = {
-        id: row.id,
-        data: {
-          weightage: parseInt(row.weightage) + 1,
-        },
-      };
-      const res = await updateRouteTargetWeightageReq(reqData);
-      setTimer((prevTimer) => prevTimer + 1);
-      setMessage(res.data.message);
-    } catch (err) {
-      setMessage(err.message);
-    } finally {
-    }
-  };
-  const handleUpdateWeightage = async (e, row) => {
-    if (e.target.value === "") {
-      setSearchRouteTargetData((prevData) =>
-        prevData.map((item) =>
-          item.id === row.id
-            ? { ...item, weightage: parseInt(e.target.value) }
-            : item
-        )
-      );
-    } else {
-      if (e.target.value !== row.weightage) {
-        setSearchRouteTargetData((prevData) =>
-          prevData.map((item) =>
-            item.id === row.id
-              ? { ...item, weightage: parseInt(e.target.value) }
-              : item
-          )
-        );
-        try {
-          const reqData = {
-            id: row.id,
-            data: {
-              weightage: parseInt(e.target.value),
-            },
-          };
-          const res = await updateRouteTargetWeightageReq(reqData);
-          setTimer((prevTimer) => prevTimer + 1);
-          setMessage(res.data.message);
-        } catch (err) {
-          setMessage(err.message);
-        } finally {
-        }
-      }
-    }
-  };
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -397,7 +231,8 @@ const AssignIvrForm = (props) => {
   };
 
   return (
-    <>
+    <Box className={"formResponsiveHeight"}>
+      {isLoading && <Loader />}
       <Card
         sx={{
           boxShadow: "none",
@@ -431,7 +266,6 @@ const AssignIvrForm = (props) => {
                 borderRadius: "3px",
               },
             }}
-            className={"formResponsiveHeight"}
             noValidate={true}
           >
             <Grid container spacing={1}>
@@ -751,7 +585,7 @@ const AssignIvrForm = (props) => {
                                     </Tooltip>
                                   </StyledTableCell>
                                   <StyledTableCell align="center">
-                                  <Tooltip
+                                    <Tooltip
                                       TransitionComponent={Zoom}
                                       title={row.priority}
                                     >
@@ -759,7 +593,7 @@ const AssignIvrForm = (props) => {
                                     </Tooltip>
                                   </StyledTableCell>
                                   <StyledTableCell align="center">
-                                  <Tooltip
+                                    <Tooltip
                                       TransitionComponent={Zoom}
                                       title={row.weightage}
                                     >
@@ -856,7 +690,7 @@ const AssignIvrForm = (props) => {
           </Button>
         </CardActions>
       </Card>
-    </>
+    </Box>
   );
 };
 
