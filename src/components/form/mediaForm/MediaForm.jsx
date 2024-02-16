@@ -9,9 +9,9 @@ import {
   Grid,
   IconButton,
   useTheme,
-  Tooltip,
+  Typography,
 } from "@mui/material";
-import { MdClose, MdDeleteSweep } from "react-icons/md";
+import { MdClose } from "react-icons/md";
 import FormTextDropdown from "../../dropdown/FormTextDropdown";
 import Speech from "react-speech";
 import FormTextField from "../../textfield/FormTextField";
@@ -20,6 +20,8 @@ import { FaRegPlayCircle } from "react-icons/fa";
 import { FaRegPauseCircle } from "react-icons/fa";
 import "../styles.css";
 import { audioTypeList } from "../../../utility/config";
+import AudioPlayer from "react-h5-audio-player";
+import "react-h5-audio-player/lib/styles.css";
 
 var a;
 
@@ -41,9 +43,8 @@ const MediaForm = (props) => {
     error: false,
     success: false,
   });
-
   const [uploadType, setUploadType] = useState({
-    value: initialValue ? initialValue?.uploadType : "Media",
+    value: "file",
     error: false,
     success: false,
   });
@@ -59,6 +60,8 @@ const MediaForm = (props) => {
       ? `${process.env.REACT_APP_MEDIA_URL}/${initialValue.media_file}.${initialValue.file_ext}`
       : " "
   );
+
+  const [isChangeAudio, setChangeAudio] = useState(false);
 
   const [buttonName, setButtonName] = useState("Play");
   const [audio, setAudio] = useState(
@@ -110,26 +113,41 @@ const MediaForm = (props) => {
     }
   };
 
-  const handleRemove = () => {
+  const onHandleReset = (e) => {
+    e.preventDefault();
     setAudio("");
     setSelectFile(null);
+    setChangeAudio(true);
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("name", name.value);
 
-    if (uploadType.value === "Media") {
-      if (audio) {
-        formData.append("media_file", audio);
+    formData.append("name", name.value);
+    formData.append("type", uploadType.value);
+    if (clickedBtn === "add") {
+      if (uploadType.value === "file") {
+        if (audio) {
+          formData.append("media_file", audio);
+        } else {
+          return;
+        }
       } else {
-        return;
+        formData.append("input_text", text.value);
       }
     } else {
-      const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=gtx&q=${text.value}&tl=en`;
-      formData.append("media_file", url);
+      formData.append("isChangeAudio", isChangeAudio);
+      if (uploadType.value === "file") {
+        if (audio) {
+          formData.append("media_file", audio);
+        } else {
+          return;
+        }
+      } else {
+        formData.append("input_text", text.value);
+      }
     }
 
     handleFormData(formData);
@@ -184,17 +202,32 @@ const MediaForm = (props) => {
                 CustomErrorLine={"Enter proper name"}
               />
             </Grid>
-            <Grid item xs={12} md={12}>
-              <FormTextDropdown
-                Value={uploadType.value}
-                onSelect={handleChangeType}
-                label={"Media Type *"}
-                CustomErrorLine={"Choose one"}
-                Required={true}
-                Options={audioTypeList}
-              />
-            </Grid>
-            {uploadType.value === "Media" ? (
+            {clickedBtn === "add" && (
+              <Grid item xs={12} md={12}>
+                <FormTextDropdown
+                  Value={uploadType.value}
+                  onSelect={handleChangeType}
+                  label={"Media Type *"}
+                  CustomErrorLine={"Choose one"}
+                  Required={true}
+                  Options={audioTypeList}
+                />
+              </Grid>
+            )}
+            {clickedBtn === "edit" && !audio && (
+              <Grid item xs={12} md={12}>
+                <FormTextDropdown
+                  Value={uploadType.value}
+                  onSelect={handleChangeType}
+                  label={"Media Type *"}
+                  CustomErrorLine={"Choose one"}
+                  Required={true}
+                  Options={audioTypeList}
+                />
+              </Grid>
+            )}
+
+            {clickedBtn === "edit" && uploadType.value === "file" && !audio && (
               <Grid item xs={12} md={12}>
                 <Box
                   sx={{
@@ -205,41 +238,7 @@ const MediaForm = (props) => {
                   }}
                 >
                   <div>
-                    {/* <input type="file" onChange={addFile} /> */}
-                    {clickedBtn === "add" && !audio ? (
-                      <input
-                        type="file"
-                        accept=".mp3, .wav"
-                        onChange={addFile}
-                      />
-                    ) : clickedBtn === "add" && audio ? (
-                      <>
-                        <input
-                          type="file"
-                          accept=".mp3, .wav"
-                          onChange={addFile}
-                        />
-                      </>
-                    ) : clickedBtn === "edit" && !audio ? (
-                      <input
-                        type="file"
-                        accept=".mp3, .wav"
-                        onChange={addFile}
-                      />
-                    ) : (
-                      <>
-                        <span>
-                          {initialValue.media_file}.{initialValue.file_ext}
-                        </span>
-                        <span style={{ marginLeft: 2 }}>
-                          <Tooltip title={"Remove"}>
-                            <IconButton onClick={handleRemove}>
-                              <MdDeleteSweep />
-                            </IconButton>
-                          </Tooltip>
-                        </span>
-                      </>
-                    )}
+                    <input type="file" accept=".mp3, .wav" onChange={addFile} />
                   </div>
                   <div>
                     <IconButton onClick={handleClick} disabled={!audio}>
@@ -252,7 +251,8 @@ const MediaForm = (props) => {
                   </div>
                 </Box>
               </Grid>
-            ) : (
+            )}
+            {clickedBtn === "edit" && uploadType.value === "text" && !audio && (
               <>
                 <Grid item xs={12} md={9}>
                   <FormTextField
@@ -309,6 +309,119 @@ const MediaForm = (props) => {
                 </Grid>
               </>
             )}
+
+            {clickedBtn === "add" && uploadType.value === "file" && (
+              <Grid item xs={12} md={12}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <input type="file" accept=".mp3, .wav" onChange={addFile} />
+                  </div>
+                  <div>
+                    <IconButton onClick={handleClick} disabled={!audio}>
+                      {buttonName === "Play" ? (
+                        <FaRegPlayCircle />
+                      ) : (
+                        <FaRegPauseCircle />
+                      )}
+                    </IconButton>
+                  </div>
+                </Box>
+              </Grid>
+            )}
+            {clickedBtn === "add" && uploadType.value === "text" && (
+              <>
+                <Grid item xs={12} md={9}>
+                  <FormTextField
+                    type="textarea"
+                    isMultiline={true}
+                    placeholder={"Enter Text to speech"}
+                    label={"Text"}
+                    Value={text.value}
+                    onChangeText={handleChangeText}
+                    Required={true}
+                    CustomErrorLine={"Enter proper text"}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={3}
+                  sx={{
+                    "& span": {
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    },
+                    marginTop: "4%",
+                    "& button": {
+                      width: "30px",
+                      height: "30px",
+                    },
+                    "& button > svg": {
+                      display: "flex",
+                    },
+                    "& .rs-play": {
+                      display: text.success ? "block" : "none",
+                    },
+                    "& .rs-pause": {
+                      display: text.success ? "block" : "none",
+                    },
+                    "& .rs-stop": {
+                      display: "none",
+                    },
+                    "& .rs-resume": {
+                      display: text.success ? "block" : "none",
+                    },
+                  }}
+                >
+                  <Speech
+                    stop={true}
+                    pause={true}
+                    resume={true}
+                    text={text.value}
+                    lang="en-GB"
+                    voice="Google UK English Female"
+                  />
+                </Grid>
+              </>
+            )}
+            {clickedBtn === "edit" && audio && (
+              <Grid
+                item
+                xs={12}
+                md={12}
+                sx={{
+                  "& .rhap_time": {
+                    color: colors.grey[100],
+                  },
+                  ":hover .rhap_container": {
+                    border: `1px solid ${colors.grey[300]}`,
+                  },
+                }}
+              >
+                <Typography variant="subtitle2" mb={0.5} component="div">
+                  Media
+                </Typography>
+                <AudioPlayer
+                  src={`${process.env.REACT_APP_MEDIA_URL}/${initialValue.media_file}.${initialValue.file_ext}`}
+                  volume={0.5}
+                  loop={false}
+                  style={{
+                    border: `1px solid #525252`,
+                    borderRadius: "5px",
+                    backgroundColor: "inherit",
+                    width: "100%",
+                  }}
+                />
+              </Grid>
+            )}
           </Grid>
         </Box>
       </CardContent>
@@ -327,6 +440,23 @@ const MediaForm = (props) => {
         >
           {"Cancel"}
         </Button>
+        {clickedBtn === "edit" && (
+          <Button
+            size="small"
+            variant="contained"
+            onClick={onHandleReset}
+            disabled={!audio}
+            sx={{
+              textTransform: "none",
+              backgroundColor: colors.grey[400],
+              ":hover": {
+                backgroundColor: colors.grey[500],
+              },
+            }}
+          >
+            {"Reset"}
+          </Button>
+        )}
         <Button
           type="submit"
           size="small"

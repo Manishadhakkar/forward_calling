@@ -50,10 +50,21 @@ const DefaultTable = (props) => {
   const tableTheme = useMemo(
     () =>
       createTheme({
+        components: {
+          MuiTableCell: {
+            styleOverrides: {
+              body: {
+                backgroundColor: "yellow"
+              }
+            }
+          }
+        },
         palette: {
+
           background: {
             default: colors.primary[300],
           },
+          
           text: {
             primary: colors.grey[100],
             secondary: colors.grey[100]

@@ -4,8 +4,8 @@ export const ivrList = [
 ];
 
 export const audioTypeList = [
-  { value: "Media", label: "Media" },
-  { value: "Text-to-speech", label: "Text-to-speech" },
+  { value: "file", label: "Media file" },
+  { value: "text", label: "Text-to-speech" },
 ];
 
 export const startsNoList = [

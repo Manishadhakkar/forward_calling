@@ -225,7 +225,6 @@ const WalletContainer = () => {
 
   const handleUpdateMedia = async (formData) => {
     formData.append("_method", "PUT");
-
     const user = JSON.parse(localStorage.getItem("user"));
     try {
       const response = await axios.post(

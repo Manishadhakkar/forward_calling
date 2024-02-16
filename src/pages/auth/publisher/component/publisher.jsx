@@ -263,7 +263,7 @@ const AuthPublisher = () => {
               <Typography variant="h5">{"Manage Publisher"}</Typography>
             </div>
             <div style={{ zIndex: 1 }}>
-              {isAuthorizedFunc(CREATE_USER) && (
+              {/* {isAuthorizedFunc(CREATE_USER) && (
                 <Fab
                   aria-label="add"
                   size="small"
@@ -280,7 +280,7 @@ const AuthPublisher = () => {
                     <Add />
                   </Tooltip>
                 </Fab>
-              )}
+              )} */}
             </div>
           </Box>
 
