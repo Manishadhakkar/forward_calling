@@ -283,7 +283,6 @@ const AuthPublisher = () => {
               )} */}
             </div>
           </Box>
-
           <Box>
             <DefaultTable
               data={rows}
