@@ -14,7 +14,11 @@ import {
 import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import { AiOutlineMenu, AiOutlineMenuUnfold } from "react-icons/ai";
+import {
+  AiOutlineMenu,
+  AiOutlineMenuFold,
+  AiOutlineMenuUnfold,
+} from "react-icons/ai";
 import { useProSidebar } from "react-pro-sidebar";
 import { FiMoreVertical } from "react-icons/fi";
 import {
@@ -293,11 +297,11 @@ const Topbar = () => {
           top: 0,
           zIndex: 999,
           background: `linear-gradient(to bottom, ${colors.primary[100]}, ${colors.primary[200]})`,
-          borderBottom: `1px solid ${colors.grey[800]}`
+          borderBottom: `1px solid ${colors.grey[800]}`,
         }}
       >
         <Toolbar>
-          {broken && (
+          {/* {broken && (
             <>
               <IconButton
                 sx={{ margin: "0 6 0 2" }}
@@ -306,8 +310,8 @@ const Topbar = () => {
                 <AiOutlineMenu />
               </IconButton>
             </>
-          )}
-          {collapsed && !broken && (
+          )} */}
+          {/* {collapsed && !broken && (
             <IconButton
               size="small"
               sx={{ ml: 0 }}
@@ -315,7 +319,14 @@ const Topbar = () => {
             >
               <AiOutlineMenuUnfold />
             </IconButton>
-          )}
+          )} */}
+          <IconButton
+            size="small"
+            sx={{ ml: 0 }}
+            onClick={() => collapseSidebar()}
+          >
+            {collapsed ? <AiOutlineMenuUnfold /> : <AiOutlineMenuFold />}
+          </IconButton>
           {roleData !== 1 &&
             roleData !== 2 &&
             roleData !== 3 &&
@@ -327,7 +338,10 @@ const Topbar = () => {
                     edge="end"
                     sx={{ cursor: "not-allowed" }}
                   >
-                    <CallCalling color={colors.greenAccent[500]} variant="Bold" />
+                    <CallCalling
+                      color={colors.greenAccent[500]}
+                      variant="Bold"
+                    />
                   </IconButton>
                 }
                 title={liveCalls}

@@ -116,7 +116,7 @@ const MediaForm = (props) => {
   const onHandleReset = (e) => {
     e.preventDefault();
     setAudio("");
-    setSelectFile(null);
+    setSelectFile("");
     setChangeAudio(true);
   };
 
@@ -137,6 +137,7 @@ const MediaForm = (props) => {
       } else {
         formData.append("input_text", text.value);
       }
+      handleFormData(formData);
     } else {
       formData.append("isChangeAudio", isChangeAudio);
       if (uploadType.value === "file") {
@@ -148,9 +149,8 @@ const MediaForm = (props) => {
       } else {
         formData.append("input_text", text.value);
       }
+      handleFormData(formData);
     }
-
-    handleFormData(formData);
   };
 
   return (
@@ -214,7 +214,7 @@ const MediaForm = (props) => {
                 />
               </Grid>
             )}
-            {clickedBtn === "edit" && !audio && (
+            {clickedBtn === "edit" && isChangeAudio && (
               <Grid item xs={12} md={12}>
                 <FormTextDropdown
                   Value={uploadType.value}
@@ -225,89 +225,6 @@ const MediaForm = (props) => {
                   Options={audioTypeList}
                 />
               </Grid>
-            )}
-
-            {clickedBtn === "edit" && uploadType.value === "file" && !audio && (
-              <Grid item xs={12} md={12}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    alignItems: "center",
-                  }}
-                >
-                  <div>
-                    <input type="file" accept=".mp3, .wav" onChange={addFile} />
-                  </div>
-                  <div>
-                    <IconButton onClick={handleClick} disabled={!audio}>
-                      {buttonName === "Play" ? (
-                        <FaRegPlayCircle />
-                      ) : (
-                        <FaRegPauseCircle />
-                      )}
-                    </IconButton>
-                  </div>
-                </Box>
-              </Grid>
-            )}
-            {clickedBtn === "edit" && uploadType.value === "text" && !audio && (
-              <>
-                <Grid item xs={12} md={9}>
-                  <FormTextField
-                    type="textarea"
-                    isMultiline={true}
-                    placeholder={"Enter Text to speech"}
-                    label={"Text"}
-                    Value={text.value}
-                    onChangeText={handleChangeText}
-                    Required={true}
-                    CustomErrorLine={"Enter proper text"}
-                  />
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  md={3}
-                  sx={{
-                    "& span": {
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    },
-                    marginTop: "4%",
-                    "& button": {
-                      width: "30px",
-                      height: "30px",
-                    },
-                    "& button > svg": {
-                      display: "flex",
-                    },
-                    "& .rs-play": {
-                      display: text.success ? "block" : "none",
-                    },
-                    "& .rs-pause": {
-                      display: text.success ? "block" : "none",
-                    },
-                    "& .rs-stop": {
-                      display: "none",
-                    },
-                    "& .rs-resume": {
-                      display: text.success ? "block" : "none",
-                    },
-                  }}
-                >
-                  <Speech
-                    stop={true}
-                    pause={true}
-                    resume={true}
-                    text={text.value}
-                    lang={"en-EN"}
-                    voice="Google UK English"
-                  />
-                </Grid>
-              </>
             )}
 
             {clickedBtn === "add" && uploadType.value === "file" && (
@@ -392,7 +309,8 @@ const MediaForm = (props) => {
                 </Grid>
               </>
             )}
-            {clickedBtn === "edit" && audio && (
+
+            {clickedBtn === "edit" && audio && !isChangeAudio && (
               <Grid
                 item
                 xs={12}
@@ -422,6 +340,98 @@ const MediaForm = (props) => {
                 />
               </Grid>
             )}
+
+            {clickedBtn === "edit" &&
+              isChangeAudio &&
+              uploadType.value === "file" && (
+                <Grid item xs={12} md={12}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div>
+                      <input
+                        type="file"
+                        accept=".mp3, .wav"
+                        onChange={addFile}
+                      />
+                    </div>
+                    <div>
+                      <IconButton onClick={handleClick} disabled={!audio}>
+                        {buttonName === "Play" ? (
+                          <FaRegPlayCircle />
+                        ) : (
+                          <FaRegPauseCircle />
+                        )}
+                      </IconButton>
+                    </div>
+                  </Box>
+                </Grid>
+              )}
+
+            {clickedBtn === "edit" &&
+              isChangeAudio &&
+              uploadType.value === "text" && (
+                <>
+                  <Grid item xs={12} md={9}>
+                    <FormTextField
+                      type="textarea"
+                      isMultiline={true}
+                      placeholder={"Enter Text to speech"}
+                      label={"Text"}
+                      Value={text.value}
+                      onChangeText={handleChangeText}
+                      Required={true}
+                      CustomErrorLine={"Enter proper text"}
+                    />
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    md={3}
+                    sx={{
+                      "& span": {
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      },
+                      marginTop: "4%",
+                      "& button": {
+                        width: "30px",
+                        height: "30px",
+                      },
+                      "& button > svg": {
+                        display: "flex",
+                      },
+                      "& .rs-play": {
+                        display: text.success ? "block" : "none",
+                      },
+                      "& .rs-pause": {
+                        display: text.success ? "block" : "none",
+                      },
+                      "& .rs-stop": {
+                        display: "none",
+                      },
+                      "& .rs-resume": {
+                        display: text.success ? "block" : "none",
+                      },
+                    }}
+                  >
+                    <Speech
+                      stop={true}
+                      pause={true}
+                      resume={true}
+                      text={text.value}
+                      lang={"en-EN"}
+                      voice="Google UK English Female"
+                    />
+                  </Grid>
+                </>
+              )}
           </Grid>
         </Box>
       </CardContent>

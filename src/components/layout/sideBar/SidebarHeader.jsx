@@ -20,8 +20,8 @@ const StyledSidebarHeader = styled.div`
 `;
 
 const StyledLogo = styled.div`
-  width: 30px;
-  min-width: 25px;
+width: 35px;
+  min-width: 35px;
   height: 35px;
   min-height: 35px;
   display: flex;
@@ -31,13 +31,13 @@ const StyledLogo = styled.div`
   color: white;
   font-size: 24px;
   font-weight: 700;
+  margin-right: 10px;
+  margin-left: 4px;
 `;
 
-export const SidebarHeader = (props) => {
+export const SidebarHeader = ({children, rtl, isBroken, ...rest}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { children, rtl, isBroken, ...rest } = props;
-
   const { collapseSidebar, toggleSidebar, collapsed } = useProSidebar();
 
   return (
@@ -86,14 +86,14 @@ export const SidebarHeader = (props) => {
             </NavLink>
           )}
         </div>
-        <div>
+        {/* <div>
           <IconButton
             size="small"
             onClick={isBroken ? () => toggleSidebar() : () => collapseSidebar()}
           >
-            {!collapsed && <AiOutlineMenuFold />}
+           <AiOutlineMenuFold />
           </IconButton>
-        </div>
+        </div> */}
       </div>
     </StyledSidebarHeader>
   );

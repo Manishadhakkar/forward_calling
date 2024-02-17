@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { MaterialReactTable } from "material-react-table";
+import { FaPersonCirclePlus } from "react-icons/fa6";
 import {
   Box,
   IconButton,
@@ -32,6 +33,7 @@ const DefaultTable = (props) => {
     handleStatusAction,
     handlePlayPause,
     handleAssignChangable,
+    handleAssignBuyer,
     handleViewChange,
     handleDownloadClick,
     isEditable = false,
@@ -42,6 +44,8 @@ const DefaultTable = (props) => {
     isView = false,
     isDownload = false,
     isEditing = true,
+    isAssignBuyer = false,
+
   } = props;
 
   const theme = useTheme();
@@ -106,6 +110,10 @@ const DefaultTable = (props) => {
   const handleChangeAssign = (ele) => {
     handleAssignChangable(ele);
   };
+
+  const handleChangeAssignBuyer = (ele) =>{
+    handleAssignBuyer(ele)
+  }
 
   const handleChangeView = (ele) => {
     handleViewChange(ele);
@@ -222,6 +230,13 @@ const DefaultTable = (props) => {
               <Tooltip arrow placement="top" title={"Assign to"}>
                 <IconButton onClick={() => handleChangeAssign(row.original)}>
                   <MdAssignmentInd />
+                </IconButton>
+              </Tooltip>
+            )}
+            {isAssignBuyer && (
+              <Tooltip arrow placement="top" title={"Assign buyer"}>
+                <IconButton onClick={() => handleChangeAssignBuyer(row.original)}>
+                  <FaPersonCirclePlus color={colors.green[400]} />
                 </IconButton>
               </Tooltip>
             )}

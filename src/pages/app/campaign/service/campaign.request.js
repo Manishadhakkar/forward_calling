@@ -53,10 +53,25 @@ export const getAllCompanyRequest = () => {
   });
 };
 
+export const getAllBuyerRequest = () => {
+  return axios({
+    method: "GET",
+    url: `/buyer/active`,
+  });
+};
+
 export const assignCompanyReq = (body) => {
   return axios({
     method: "POST",
     url: `"/campaign/assignTo"`,
+    data: body,
+  });
+};
+
+export const assignBuyerReq = (body) => {
+  return axios({
+    method: "POST",
+    url: `"/campaign/assignBuyer"`,
     data: body,
   });
 };

@@ -125,6 +125,16 @@ const MyProSidebar = () => {
     setUrl(location.pathname);
   }, [location]);
 
+  const [open, setOpen] = useState();
+
+  const handleOpenSubMenu = (key) => {
+    if (open === key) {
+      setOpen(undefined);
+    } else {
+      setOpen(key);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -177,7 +187,6 @@ const MyProSidebar = () => {
               overflowY: "auto",
             }}
           >
-            <Box>
               <Menu>
                 <Tooltip
                   title={collapsed && "Dashboard"}
@@ -189,8 +198,10 @@ const MyProSidebar = () => {
                     active={url === "/" ? true : false}
                     icon={<TbHome2 size="23" />}
                     component={<Link to={"/"} />}
+                    open={open === "dashboard"}
+                    onClick={() => handleOpenSubMenu("dashboard")}
                   >
-                    <Typography>{"Dashboard"}</Typography>
+                    Dashboard
                   </MenuItem>
                 </Tooltip>
                 {isAuthorizedFunc(GET_CAMPAIGN) && (
@@ -204,8 +215,10 @@ const MyProSidebar = () => {
                       active={is_campaign_active}
                       icon={<TbBrandCampaignmonitor size="23" />}
                       component={<Link to={"/campaigns"} />}
+                      open={open === "campaigns"}
+                      onClick={() => handleOpenSubMenu("campaigns")}
                     >
-                      <Typography>{"Campaigns"}</Typography>
+                      Campaigns
                     </MenuItem>
                   </Tooltip>
                 )}
@@ -220,8 +233,10 @@ const MyProSidebar = () => {
                       active={url === "/targets" ? true : false}
                       icon={<TbTargetArrow size="25" />}
                       component={<Link to={"/targets"} />}
+                      open={open === "targets"}
+                      onClick={() => handleOpenSubMenu("targets")}
                     >
-                      <Typography>{"Targets"}</Typography>
+                      Targets
                     </MenuItem>
                   </Tooltip>
                 )}
@@ -236,8 +251,10 @@ const MyProSidebar = () => {
                       active={url === "/carriers" ? true : false}
                       icon={<GiCarrier size="25" />}
                       component={<Link to={"/carriers"} />}
+                      open={open === "carriers"}
+                      onClick={() => handleOpenSubMenu("carriers")}
                     >
-                      <Typography>{"Carriers"}</Typography>
+                      Carriers
                     </MenuItem>
                   </Tooltip>
                 )}
@@ -252,8 +269,10 @@ const MyProSidebar = () => {
                       active={url === "/serverip" ? true : false}
                       icon={<IoServerOutline size="25" />}
                       component={<Link to={"/serverip"} />}
+                      open={open === "serverip"}
+                      onClick={() => handleOpenSubMenu("serverip")}
                     >
-                      <Typography>{"Server IP"}</Typography>
+                      Server IP
                     </MenuItem>
                   </Tooltip>
                 )}
@@ -270,8 +289,9 @@ const MyProSidebar = () => {
                       <SubMenu
                         label="Numbers"
                         active={is_number_active}
-                        defaultOpen={is_number_active}
                         icon={<HiOutlineHashtag size="25" />}
+                        open={open === "numbers"}
+                        onClick={() => handleOpenSubMenu("numbers")}
                       >
                         {isAuthorizedFunc(GET_ALL_SEARCH_NUMBER) && (
                           <MenuItem
@@ -317,25 +337,13 @@ const MyProSidebar = () => {
                       active={url === "/did-numbers" ? true : false}
                       icon={<HiOutlineHashtag size="25" />}
                       component={<Link to={"/did-numbers"} />}
+                      open={open === "did-numbers"}
+                      onClick={() => handleOpenSubMenu("did-numbers")}
                     >
-                      <Typography>{"DID Number"}</Typography>
+                      DID Number
                     </MenuItem>
                   </Tooltip>
                 )}
-                {/* <Tooltip
-                  title={collapsed && "Group"}
-                  placement="right"
-                  arrow
-                  TransitionComponent={Zoom}
-                >
-                  <MenuItem
-                    active={url === "/group" ? true : false}
-                    icon={<SiGroupme size="25" />}
-                    component={<Link to={"/group"} />}
-                  >
-                    <Typography>{"Group"}</Typography>
-                  </MenuItem>
-                </Tooltip> */}
                 {roleData !== 1 && (
                   <Tooltip
                     title={collapsed && "Block Numbers"}
@@ -348,8 +356,10 @@ const MyProSidebar = () => {
                         active={url === "/block-number" ? true : false}
                         icon={<MdAppBlocking size="25" />}
                         component={<Link to={"/block-number"} />}
+                        open={open === "block-number"}
+                        onClick={() => handleOpenSubMenu("block-number")}
                       >
-                        <Typography>{"Block Numbers"}</Typography>
+                        Block Numbers
                       </MenuItem>
                     )}
                   </Tooltip>
@@ -365,8 +375,9 @@ const MyProSidebar = () => {
                       isAuthorizedFunc(GET_WALLET_RECHARGE)) && (
                       <SubMenu
                         label="Wallet"
+                        open={open === "wallet"}
                         active={is_wallet_active}
-                        defaultOpen={is_wallet_active}
+                        onClick={() => handleOpenSubMenu("wallet")}
                         icon={<SlWallet size="25" variant="Outline" />}
                       >
                         {isAuthorizedFunc(GET_WALLET_RECHARGE) && (
@@ -407,8 +418,9 @@ const MyProSidebar = () => {
                   >
                     <SubMenu
                       label="Report"
+                      open={open === "report"}
+                      onClick={() => handleOpenSubMenu("report")}
                       active={is_report_active}
-                      defaultOpen={is_report_active}
                       icon={<BiSolidReport size="25" variant="Outline" />}
                     >
                       <MenuItem
@@ -445,7 +457,8 @@ const MyProSidebar = () => {
                       <SubMenu
                         label="IVR"
                         active={is_ivr_active}
-                        defaultOpen={is_ivr_active}
+                        open={open === "ivr"}
+                        onClick={() => handleOpenSubMenu("ivr")}
                         icon={<MdOutlineAltRoute size="25" variant="Outline" />}
                       >
                         {isAuthorizedFunc(GET_IVR_MEDIA) && (
@@ -494,7 +507,8 @@ const MyProSidebar = () => {
                     <SubMenu
                       label="Access"
                       active={is_access_active}
-                      defaultOpen={is_access_active}
+                      open={open === "access"}
+                      onClick={() => handleOpenSubMenu("access")}
                       icon={<Aave size="25" variant="Outline" />}
                     >
                       {isAuthorizedFunc(GET_USER) && (
@@ -547,7 +561,8 @@ const MyProSidebar = () => {
                     <SubMenu
                       label="Authorization"
                       active={is_authorized_active}
-                      defaultOpen={is_authorized_active}
+                      open={open === "auth"}
+                      onClick={() => handleOpenSubMenu("auth")}
                       icon={<Setting4 size="25" variant="Outline" />}
                     >
                       {isAuthorizedFunc(GET_ROLE) && (
@@ -574,7 +589,6 @@ const MyProSidebar = () => {
                   </Tooltip>
                 )}
               </Menu>
-            </Box>
           </div>
         </div>
       </Sidebar>
