@@ -2,19 +2,15 @@ import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { FormControl, FormHelperText, useTheme } from "@mui/material";
-import { tokens } from "../../assets/color/theme";
 
 export default function FreeSolo(props) {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-
   const {
     label,
     Options,
     Value,
     CustomErrorLine,
     Required,
-    disable,
     onSelect,
   } = props;
 

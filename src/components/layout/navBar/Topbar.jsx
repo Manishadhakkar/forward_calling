@@ -14,11 +14,7 @@ import {
 import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import {
-  AiOutlineMenu,
-  AiOutlineMenuFold,
-  AiOutlineMenuUnfold,
-} from "react-icons/ai";
+import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { FiMoreVertical } from "react-icons/fi";
 import {
   CallCalling,
@@ -298,25 +294,6 @@ const Topbar = ({ collapsed, setCollapsed }) => {
         }}
       >
         <Toolbar>
-          {/* {broken && (
-            <>
-              <IconButton
-                sx={{ margin: "0 6 0 2" }}
-                onClick={() => toggleSidebar()}
-              >
-                <AiOutlineMenu />
-              </IconButton>
-            </>
-          )} */}
-          {/* {collapsed && !broken && (
-            <IconButton
-              size="small"
-              sx={{ ml: 0 }}
-              onClick={() => collapseSidebar()}
-            >
-              <AiOutlineMenuUnfold />
-            </IconButton>
-          )} */}
           <IconButton
             size="small"
             sx={{ ml: 0 }}
@@ -392,25 +369,6 @@ const Topbar = ({ collapsed, setCollapsed }) => {
                   </Typography>
                 </>
               )}
-            {/* <Tooltip
-                    title={
-                      theme.palette.mode === "dark" ? "Light Mode" : "Dark Mode"
-                    }
-                    placement="bottom"
-                    arrow
-                  >
-                    <IconButton
-                      onClick={handleChangeMode}
-                      sx={{ padding: 2 }}
-                      size="medium"
-                    >
-                      {theme.palette.mode === "dark" ? (
-                        <Sun1 size="20" />
-                      ) : (
-                        <Moon size="20" />
-                      )}
-                    </IconButton>
-                  </Tooltip> */}
             <Tooltip title="Message" placement="bottom" arrow>
               <IconButton
                 sx={{ padding: 2 }}
@@ -462,45 +420,14 @@ const Topbar = ({ collapsed, setCollapsed }) => {
               </Typography>
               <Divider />
               {roleData !== (1 || 2 || 3) && (
-                <>
-                  <MenuItem onClick={handleAccount}>
-                    <Typography textAlign="center">Account</Typography>
-                  </MenuItem>
-
-                  <MenuItem onClick={handleSwitchAccount}>
-                    <Typography textAlign="center">Switch</Typography>
-                  </MenuItem>
-
-                  {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
-                    <InputLabel htmlFor="grouped-native-select">
-                      Switch
-                    </InputLabel>
-                    <Select
-                      native
-                      defaultValue=""
-                      id="grouped-native-select"
-                      label="Grouping"
-                      size="small"
-                    >
-                      <optgroup label="Company 1">
-                        <option value={1}>Admin</option>
-                      </optgroup>
-                      <optgroup label="Company 2">
-                        <option value={2}>Publisher</option>
-                        <option value={3}>Buyer</option>
-                      </optgroup>
-                      <optgroup label="Company 3">
-                        <option value={3}>Buyer</option>
-                      </optgroup>
-                      <optgroup label="Company 4">
-                        <option value={3}>Buyer</option>
-                      </optgroup>
-                      <optgroup label="Company 5">
-                        <option value={2}>Publisher</option>
-                      </optgroup>
-                    </Select>
-                  </FormControl> */}
-                </>
+                <MenuItem onClick={handleAccount}>
+                  <Typography textAlign="center">Account</Typography>
+                </MenuItem>
+              )}
+              {roleData !== (1 || 2 || 3) && (
+                <MenuItem onClick={handleSwitchAccount}>
+                  <Typography textAlign="center">Switch</Typography>
+                </MenuItem>
               )}
               <MenuItem onClick={handleSettingPassword}>
                 <Typography textAlign="center">Change Password</Typography>
@@ -510,7 +437,8 @@ const Topbar = ({ collapsed, setCollapsed }) => {
               </MenuItem>
             </Menu>
           </Box>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
+
+           <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
               aria-label="show more"

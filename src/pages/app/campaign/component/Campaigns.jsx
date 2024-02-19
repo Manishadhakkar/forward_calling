@@ -83,26 +83,11 @@ const Campaign = () => {
       {
         accessorKey: "name",
         header: "Name",
-        size: 100,
+        size: 150,
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
-        muiTableHeadCellProps: {
-          align: "left",
-        },
-        muiTableBodyCellProps: {
-          align: "left",
-        },
-      },
-      {
-        accessorKey: "description",
-        header: "Description",
-        enableColumnDragging: false,
-        enableGlobalFilter: true,
-        enableColumnFilter: false,
-        enableColumnActions: false,
-        size: 100,
         muiTableHeadCellProps: {
           align: "left",
         },
@@ -117,7 +102,7 @@ const Campaign = () => {
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
-        size: 100,
+        size: 50,
         muiTableHeadCellProps: {
           align: "left",
         },
@@ -142,9 +127,24 @@ const Campaign = () => {
         },
       },
       {
+        accessorKey: "users.name",
+        header: "Assign to",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        size: 150,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
         accessorKey: "status",
         header: "Status",
-        size: 100,
+        size: 50,
         enableColumnDragging: false,
         enableGlobalFilter: false,
         enableColumnFilter: false,

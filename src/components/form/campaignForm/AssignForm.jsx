@@ -56,15 +56,15 @@ const AssignForm = ({
     } else {
       getAllBuyerRequest()
         .then((res) => {
-          console.log(">>>>>>>>",res)
-          // const result = res.data?.data?.data?.map((ele) => {
-          //   return {
-          //     value: ele.id,
-          //     label: ele.company_name,
-          //   };
-          // });
-          // setCompanyList(result);
-          // setIsLoader(false);
+          console.log(res.data)
+          const result = res.data?.map((ele) => {
+            return {
+              value: ele.company_id,
+              label: ele.name,
+            };
+          });
+          setCompanyList(result);
+          setIsLoader(false);
         })
         .catch((err) => {
           setIsLoader(false);

@@ -111,20 +111,23 @@ const TopDrawer = ({ isOpen, setIsOpen, data }) => {
               }}
               avatar={<Avatar {...stringAvatar({ selectRole })} />}
               action={
-                  <IconButton aria-label="switch" size="medium">
-                    <Button
-                      onClick={handleClickSubmit}
-                      style={{
-                        color: colors.grey[900],
-                        backgroundColor: colors.greenAccent[400],
-                      }}
-                      appearance="primary"
-                      size="sm"
-                      endIcon={<PiUserSwitchDuotone />}
-                    >
-                      Switch
-                    </Button>
-                  </IconButton>
+                <IconButton
+                  aria-label="switch"
+                  size="medium"
+                  onClick={handleClickSubmit}
+                >
+                  <Button
+                    style={{
+                      color: colors.grey[900],
+                      backgroundColor: colors.greenAccent[400],
+                    }}
+                    appearance="primary"
+                    size="sm"
+                    endIcon={<PiUserSwitchDuotone />}
+                  >
+                    Switch
+                  </Button>
+                </IconButton>
               }
               title={"Switch Account"}
               subheader={

@@ -56,7 +56,7 @@ export const getAllCompanyRequest = () => {
 export const getAllBuyerRequest = () => {
   return axios({
     method: "GET",
-    url: `/buyer/active`,
+    url: `/buyer/getAllActiveBuyer`,
   });
 };
 
@@ -71,7 +71,7 @@ export const assignCompanyReq = (body) => {
 export const assignBuyerReq = (body) => {
   return axios({
     method: "POST",
-    url: `"/campaign/assignBuyer"`,
+    url: "/campaign/assignToBuyer",
     data: body,
   });
 };

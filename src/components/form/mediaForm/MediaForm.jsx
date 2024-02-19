@@ -139,17 +139,35 @@ const MediaForm = (props) => {
       }
       handleFormData(formData);
     } else {
-      formData.append("isChangeAudio", isChangeAudio);
-      if (uploadType.value === "file") {
-        if (audio) {
-          formData.append("media_file", audio);
+      if (isChangeAudio) {
+        formData.append("isChangeAudio", isChangeAudio);
+        if (uploadType.value === "file") {
+          if (audio) {
+            formData.append("media_file", audio);
+          } else {
+            return;
+          }
         } else {
-          return;
+          formData.append("input_text", text.value);
         }
+        handleFormData(formData);
       } else {
-        formData.append("input_text", text.value);
+        formData.append("isChangeAudio", isChangeAudio);
+        console.log(uploadType.value);
+        if (uploadType.value === "file") {
+          if (audio) {
+            const file = initialValue.media_file;
+            const ext = initialValue.file_ext;
+            formData.append("media_file", file);
+            formData.append("file_ext", ext);
+          } else {
+            return;
+          }
+        } else {
+          formData.append("input_text", text.value);
+        }
+        handleFormData(formData);
       }
-      handleFormData(formData);
     }
   };
 
