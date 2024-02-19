@@ -4,7 +4,6 @@ import {
   Menu,
   Sidebar,
   MenuItem,
-  useProSidebar,
   SubMenu,
 } from "react-pro-sidebar";
 import { tokens } from "../../../assets/color/theme";
@@ -68,14 +67,14 @@ import {
 import { FaFileInvoice, FaShopLock } from "react-icons/fa6";
 import { GoNumber } from "react-icons/go";
 
-const MyProSidebar = () => {
+const MyProSidebar = ({collapsed}) => {
+  
   const userData = JSON.parse(localStorage.getItem("user"));
   const roleData = userData?.user_data?.roles[0]?.role_id;
 
   const theme = useTheme();
   const location = useLocation();
   const colors = tokens(theme.palette.mode);
-  const { broken, collapsed } = useProSidebar();
   const [url, setUrl] = useState("");
 
   let is_campaign_active =
@@ -169,7 +168,7 @@ const MyProSidebar = () => {
         },
       }}
     >
-      <Sidebar breakPoint="md">
+      <Sidebar breakPoint="md" collapsed={collapsed}>
         <div
           style={{
             display: "flex",
@@ -179,7 +178,7 @@ const MyProSidebar = () => {
             borderRight: `1px solid ${colors.grey[800]}`,
           }}
         >
-          <SidebarHeader rtl={true} isBroken={broken} />
+          <SidebarHeader rtl={true} collapsed={collapsed} />
           <div
             style={{
               flex: 1,

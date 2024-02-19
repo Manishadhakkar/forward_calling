@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import "./App.css";
 import "rsuite/dist/rsuite.css";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Router from "./router/Router";
 import Loader from "./components/Loader/Loader";
 
@@ -42,8 +42,12 @@ const App = () => {
           <Route exact path="/signup" element={<SignUpPage />} />
           <Route exact path="/verify" element={<VerifyPage />} />
           <Route exact path="/forgotpassword" element={<ForgotPassword />} />
-          <Route exact path="*" element={<NotFoundPage />} />          
-          <Route exact path="/buyersignup/:token" element={<BuyerSignUpPage />} />
+          <Route exact path="*" element={<NotFoundPage />} />
+          <Route
+            exact
+            path="/buyersignup/:token"
+            element={<BuyerSignUpPage />}
+          />
         </Routes>
       </Suspense>
     </BrowserRouter>

@@ -19,7 +19,6 @@ import {
   AiOutlineMenuFold,
   AiOutlineMenuUnfold,
 } from "react-icons/ai";
-import { useProSidebar } from "react-pro-sidebar";
 import { FiMoreVertical } from "react-icons/fi";
 import {
   CallCalling,
@@ -53,7 +52,7 @@ import {
   GET_COUNT_LIVE_CALLS,
 } from "../../../utility/constant";
 
-const Topbar = () => {
+const Topbar = ({ collapsed, setCollapsed }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
@@ -63,8 +62,6 @@ const Topbar = () => {
   const roleData = userData?.user_data?.roles[0]?.role_id;
   const user_details = userData?.user_data;
   const currency_symbol = userData?.user_data?.country?.currency_symbol;
-
-  const { toggleSidebar, collapseSidebar, broken, collapsed } = useProSidebar();
 
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(false);
@@ -323,7 +320,7 @@ const Topbar = () => {
           <IconButton
             size="small"
             sx={{ ml: 0 }}
-            onClick={() => collapseSidebar()}
+            onClick={() => setCollapsed(!collapsed)}
           >
             {collapsed ? <AiOutlineMenuUnfold /> : <AiOutlineMenuFold />}
           </IconButton>

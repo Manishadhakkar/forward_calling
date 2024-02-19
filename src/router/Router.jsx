@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { ColorModeContext, tokens, useMode } from "../assets/color/theme";
 import PrivateRoutes from "./PrivateRoutes";
@@ -82,9 +82,9 @@ const NumberListPage = lazy(() =>
   import("../pages/app/puchaseNumber/component/Number")
 );
 
-const IvrRoutingPage = lazy(()=> 
+const IvrRoutingPage = lazy(() =>
   import("../pages/app/IvrRouting/component/IvrRouting")
-)
+);
 
 const NumberInvoicePage = lazy(() =>
   import("../pages/app/puchaseNumber/component/NumberInvoice")
@@ -134,19 +134,21 @@ const Router = () => {
   const [theme, colorMode] = useMode();
   const colors = tokens(theme.palette.mode);
 
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
     <>
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <MyProSidebarProvider>
+          <MyProSidebarProvider collapsed={collapsed}>
             <main
               style={{
                 width: "100%",
-                backgroundColor: colors.primary[200]
+                backgroundColor: colors.primary[200],
               }}
             >
-              <Topbar />
+              <Topbar collapsed={collapsed} setCollapsed={setCollapsed} />
               <Suspense fallback={<Loader />}>
                 <Routes>
                   <Route element={<PrivateRoutes />}>
@@ -207,7 +209,6 @@ const Router = () => {
                       element={<PurchaseNumberPage />}
                     />
                     <Route path="/numbers" element={<NumberListPage />} />
-
 
                     <Route
                       path="/purchase-number/invoice-report"
