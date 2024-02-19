@@ -15,6 +15,7 @@ import DefaultTable from "../../../../components/tables/DefaultTable";
 import Copyright from "../../../../components/footer/Footer";
 import Loader from "../../../../components/Loader/Loader";
 import {
+  assignBuyerReq,
   assignCompanyReq,
   createCampRequest,
   getAllCampaignRequest,
@@ -82,26 +83,11 @@ const Campaign = () => {
       {
         accessorKey: "name",
         header: "Name",
-        size: 100,
+        size: 150,
         enableColumnDragging: false,
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
-        muiTableHeadCellProps: {
-          align: "left",
-        },
-        muiTableBodyCellProps: {
-          align: "left",
-        },
-      },
-      {
-        accessorKey: "description",
-        header: "Description",
-        enableColumnDragging: false,
-        enableGlobalFilter: true,
-        enableColumnFilter: false,
-        enableColumnActions: false,
-        size: 100,
         muiTableHeadCellProps: {
           align: "left",
         },
@@ -116,7 +102,7 @@ const Campaign = () => {
         enableGlobalFilter: true,
         enableColumnFilter: false,
         enableColumnActions: false,
-        size: 100,
+        size: 50,
         muiTableHeadCellProps: {
           align: "left",
         },
@@ -141,9 +127,24 @@ const Campaign = () => {
         },
       },
       {
+        accessorKey: "users.name",
+        header: "Assign to",
+        enableColumnDragging: false,
+        enableGlobalFilter: true,
+        enableColumnFilter: false,
+        enableColumnActions: false,
+        size: 150,
+        muiTableHeadCellProps: {
+          align: "left",
+        },
+        muiTableBodyCellProps: {
+          align: "left",
+        },
+      },
+      {
         accessorKey: "status",
         header: "Status",
-        size: 100,
+        size: 50,
         enableColumnDragging: false,
         enableGlobalFilter: false,
         enableColumnFilter: false,
@@ -485,7 +486,24 @@ const Campaign = () => {
       });
   };
 
-  const handleUpdateCampaign = (value) => {
+  const handleAssignBuyer = (value) => {
+    setLoader(true);
+    assignBuyerReq(value)
+      .then((res) => {
+        getAllCampaigns(activePage, limit);
+        setLoader(false);
+        setBarVariant("success");
+        setMessage(res.data.message);
+        setSnackbarOpen({ ...snackbarOpen, open: true });
+        setIsOpen(false);
+      })
+      .catch((err) => {
+        setLoader(false);
+        setErrorMessage(err.message);
+      });
+  };
+
+    const handleUpdateCampaign = (value) => {
     setLoader(true);
     const reqData = {
       id: currentType.id,
@@ -514,6 +532,12 @@ const Campaign = () => {
     handleSelectBtn("assign");
   };
 
+  const handleChangeAssignBuyer = (data) => {
+    setCampaignId(data.id);
+    openAddModal();
+    handleSelectBtn("assignBuyer");
+  };
+
   const selectModal = () => {
     if (clickedBtn === "add") {
       return (
@@ -530,7 +554,7 @@ const Campaign = () => {
           company_id={company_id}
         />
       );
-    } else {
+    } else if (clickedBtn === "assign") {
       return (
         <AssignForm
           errorMessage={errorMessage}
@@ -540,6 +564,17 @@ const Campaign = () => {
           handleFormData={handleAssignCompany}
           clickedBtn={clickedBtn}
           initialValue={currentType}
+        />
+      );
+    } else if (clickedBtn === "assignBuyer") {
+      return (
+        <AssignForm
+          errorMessage={errorMessage}
+          setErrorMessage={setErrorMessage}
+          campaignId={campaignId}
+          onHandleClose={handleModalClose}
+          handleFormData={handleAssignBuyer}
+          clickedBtn={clickedBtn}
         />
       );
     }
@@ -631,6 +666,8 @@ const Campaign = () => {
               isStatusChangable={isAuthorizedFunc(STATUS_CAMPAIGN)}
               isAssignable={company_id === "0" ? true : false}
               handleAssignChangable={handleChangeAssignTo}
+              handleAssignBuyer={handleChangeAssignBuyer}
+              isAssignBuyer={true}
               isEditing={
                 isAuthorizedFunc(UPDATE_CAMPAIGN) ||
                 isAuthorizedFunc(STATUS_CAMPAIGN)

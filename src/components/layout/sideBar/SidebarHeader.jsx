@@ -1,8 +1,6 @@
-import React from "react";
+import React, { createContext, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useProSidebar } from "react-pro-sidebar";
-import { IconButton, useTheme } from "@mui/material";
-import { AiOutlineMenuFold } from "react-icons/ai";
+import { useTheme } from "@mui/material";
 import styled from "@emotion/styled";
 import CallLogo from "../../../assets/images/CallLogo.png";
 import { tokens } from "../../../assets/color/theme";
@@ -20,8 +18,8 @@ const StyledSidebarHeader = styled.div`
 `;
 
 const StyledLogo = styled.div`
-  width: 30px;
-  min-width: 25px;
+  width: 35px;
+  min-width: 35px;
   height: 35px;
   min-height: 35px;
   display: flex;
@@ -31,70 +29,72 @@ const StyledLogo = styled.div`
   color: white;
   font-size: 24px;
   font-weight: 700;
+  margin-right: 10px;
+  margin-left: 4px;
 `;
 
-export const SidebarHeader = (props) => {
+export const SidebarHeader = ({ collapsed, ...rest }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { children, rtl, isBroken, ...rest } = props;
 
-  const { collapseSidebar, toggleSidebar, collapsed } = useProSidebar();
+  const SidebarContext = createContext({});
+  const [sidebarBackgroundColor, setSidebarBackgroundColor] =
+    useState(undefined);
 
   return (
-    <StyledSidebarHeader
-      style={{
-        background: `linear-gradient(to right, ${colors.primary[100]}, ${colors.primary[200]})`,
+    <SidebarContext.Provider
+      value={{
+        sidebarBackgroundColor,
+        setSidebarBackgroundColor,
       }}
-      {...rest}
     >
-      <div
+      <StyledSidebarHeader
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingRight: "5px",
+          background: `linear-gradient(to right, ${colors.primary[100]}, ${colors.primary[200]})`,
         }}
+        {...rest}
       >
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
             alignItems: "center",
-            height: "65px",
-            paddingTop: 2,
+            justifyContent: "space-between",
+            paddingRight: "5px",
           }}
         >
-          {collapsed && (
-            <StyledLogo>
-              <NavLink to="/" style={{ textDecoration: "none" }}>
-                T
-              </NavLink>
-            </StyledLogo>
-          )}
-
-          {!collapsed && (
-            <NavLink to="/" style={{ textDecoration: "none" }}>
-              <img
-                src={CallLogo}
-                alt="Call Analog"
-                style={{
-                  objectFit: "cover",
-                  width: "190px",
-                  height: "110px",
-                }}
-              />
-            </NavLink>
-          )}
-        </div>
-        <div>
-          <IconButton
-            size="small"
-            onClick={isBroken ? () => toggleSidebar() : () => collapseSidebar()}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              height: "65px",
+              paddingTop: 2,
+            }}
           >
-            {!collapsed && <AiOutlineMenuFold />}
-          </IconButton>
+            {collapsed && (
+              <StyledLogo>
+                <NavLink to="/" style={{ textDecoration: "none" }}>
+                  T
+                </NavLink>
+              </StyledLogo>
+            )}
+
+            {!collapsed && (
+              <NavLink to="/" style={{ textDecoration: "none" }}>
+                <img
+                  src={CallLogo}
+                  alt="Call Analog"
+                  style={{
+                    objectFit: "cover",
+                    width: "100%",
+                    height: "110px",
+                  }}
+                />
+              </NavLink>
+            )}
+          </div>
         </div>
-      </div>
-    </StyledSidebarHeader>
+      </StyledSidebarHeader>
+    </SidebarContext.Provider>
   );
 };

@@ -1,35 +1,31 @@
 import React, { useState, createContext, useContext } from "react";
-import { ProSidebarProvider } from "react-pro-sidebar";
 import MyProSidebar from "./MyProSidebar";
-import { useTheme } from "@mui/material";
-import { tokens } from "../../../assets/color/theme";
 
 const SidebarContext = createContext({});
 
-export const MyProSidebarProvider = ({ children }) => {
+export const MyProSidebarProvider = ({ collapsed,children }) => {
+
   const [sidebarBackgroundColor, setSidebarBackgroundColor] =
     useState(undefined);
 
   return (
-    <ProSidebarProvider>
-      <SidebarContext.Provider
-        value={{
-          sidebarBackgroundColor,
-          setSidebarBackgroundColor,
+    <SidebarContext.Provider
+      value={{
+        sidebarBackgroundColor,
+        setSidebarBackgroundColor,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          color: "white",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            color: "white",
-          }}
-        >
-          <MyProSidebar />
-          {children}
-        </div>
-      </SidebarContext.Provider>
-    </ProSidebarProvider>
+        <MyProSidebar collapsed={collapsed} />
+        {children}
+      </div>
+    </SidebarContext.Provider>
   );
 };
 

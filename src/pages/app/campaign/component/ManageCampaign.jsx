@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "@emotion/react";
+import parse from "autosuggest-highlight/parse";
+import match from "autosuggest-highlight/match";
 import {
   Accordion,
   AccordionDetails,
@@ -28,6 +30,8 @@ import {
   Alert,
   Fab,
   Stack,
+  Autocomplete,
+  TextField,
 } from "@mui/material";
 import Breadcrumb from "../../../../components/breadcrumb/BreadCrumb";
 import { tokens } from "../../../../assets/color/theme";
@@ -55,7 +59,6 @@ import Loader from "../../../../components/Loader/Loader";
 import { PiCopySimpleThin } from "react-icons/pi";
 import FormTextDropdown from "../../../../components/dropdown/FormTextDropdown";
 import FormTextField from "../../../../components/textfield/FormTextField";
-import NumberDropdown from "../../../../components/dropdown/SearchableDropdown";
 import SwitchCall from "../../../../components/chip/SwichCall";
 import { useLocation, useNavigate } from "react-router-dom";
 import { SiWebmoney } from "react-icons/si";
@@ -80,6 +83,7 @@ import { Table as IVRTable } from "rsuite";
 import { FormModal as Modal } from "../../../../components/modal/FormModal";
 import { convertIvrArray } from "../../../../utility/utilty";
 import AssignIvrForm from "../../../../components/form/campaignForm/AssignIvr";
+import CampaignSwitch from "../../../../components/chip/CampaignSwitch";
 
 const { Column, HeaderCell, Cell } = IVRTable;
 
@@ -303,11 +307,7 @@ const UpdateCampaign = () => {
     success: false,
   });
   const [tfnList, setTFNList] = useState([]);
-  const [tfnNo, setTFNNo] = useState({
-    value: "",
-    error: false,
-    success: false,
-  });
+  const [tfnNo, setTFNNo] = useState(null);
   const [callsType, setCallsType] = useState({
     value: null,
     error: false,
@@ -535,7 +535,11 @@ const UpdateCampaign = () => {
         setDescription({ value: data?.description });
         setNumberFormat({ value: data?.did_number_format });
         setTimeout({ value: data?.connection_timeout });
-        setTFNNo({ value: data?.number?.did_number });
+        setTFNNo(
+          data?.number === null
+            ? ""
+            : { value: data?.number.id, label: data?.number.did_number }
+        );
         setIsRecording(data.recording !== 1 ? false : true);
         setCallsType({ value: data?.route_previously_connected_calls });
         setIsStrict(data.strict !== 1 ? false : true);
@@ -543,7 +547,7 @@ const UpdateCampaign = () => {
           data.anonymous_duplicate_call !== 1 ? false : true
         );
         setIsWaiting(data.call_waiting !== 1 ? false : true);
-        setIsSilent(data.trim_silence);
+        setIsSilent(data.trim_silence !== 1 ? false : true);
         setDialAttempt(data.dial_attempt_target);
         setCampaignIvr({ value: data?.ivr_id, success: true });
       } catch (error) {
@@ -771,7 +775,7 @@ const UpdateCampaign = () => {
   };
   const handleUpdateCampaign = async (e) => {
     e.preventDefault();
-    const did_value = tfnList.find((ele) => ele.label == tfnNo.value);
+    const did_value = tfnList.find((ele) => ele?.label == tfnNo.label);
     const data = {
       data: {
         name: name.value,
@@ -789,9 +793,8 @@ const UpdateCampaign = () => {
       },
       id: initialValue.id,
     };
-
     try {
-      // setIsLoader(true);
+      setIsLoader(true);
       const res = await updateCampaignRequest(data);
       getCampaignData(campaign_id);
       setBarVariant("success");
@@ -1155,15 +1158,62 @@ const UpdateCampaign = () => {
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <NumberDropdown
-                      format_type={numberFormat.value}
-                      Value={tfnNo.value}
-                      Options={tfnList}
-                      onSelect={handleChangeTFN}
-                      label={"TFN Number"}
-                      CustomErrorLine={"Choose one"}
-                      Required={false}
-                      disable={false}
+                    <Autocomplete
+                      id="highlights-demo"
+                      size="small"
+                      options={tfnList}
+                      getOptionLabel={(option) =>
+                        option ? option.label.toString() : ""
+                      }
+                      value={tfnNo}
+                      onChange={(event, newValue) => {
+                        setTFNNo(newValue);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Highlights"
+                          margin="normal"
+                          value={tfnNo ? tfnNo.label : ""}
+                        />
+                      )}
+                      renderOption={(
+                        props,
+                        option,
+                        { inputValue, selected }
+                      ) => {
+                        const matches = match(
+                          option.label.toString(),
+                          inputValue,
+                          {
+                            insideWords: true,
+                          }
+                        );
+                        const parts = parse(option.label.toString(), matches);
+
+                        return (
+                          <li
+                            {...props}
+                            onClick={() => {
+                              setTFNNo(option);
+                            }}
+                          >
+                            <div>
+                              {parts.map((part, index) => (
+                                <span
+                                  key={index}
+                                  style={{
+                                    fontWeight: part.highlight ? 700 : 400,
+                                  }}
+                                  data-selected={selected && part.highlight}
+                                >
+                                  {part.text}
+                                </span>
+                              ))}
+                            </div>
+                          </li>
+                        );
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
@@ -1199,7 +1249,7 @@ const UpdateCampaign = () => {
                     </InputLabel>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    <SwitchCall
+                    <CampaignSwitch
                       isChecked={isRecording}
                       handleSwitch={handleChangeRecord}
                     />
@@ -1215,7 +1265,7 @@ const UpdateCampaign = () => {
                         </InputLabel>
                       </Grid>
                       <Grid item xs={6} md={3}>
-                        <SwitchCall
+                        <CampaignSwitch
                           isChecked={isStrict}
                           handleSwitch={handleChangeStrict}
                         />
@@ -1231,12 +1281,11 @@ const UpdateCampaign = () => {
                     </InputLabel>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    <SwitchCall
+                    <CampaignSwitch
                       isChecked={isDuplicatesCalls}
                       handleSwitch={handleChangeDuplicateCalls}
                     />
                   </Grid>
-
                   {isRecording === true && (
                     <>
                       <Grid item xs={6} md={3}>
@@ -1248,7 +1297,7 @@ const UpdateCampaign = () => {
                         </InputLabel>
                       </Grid>
                       <Grid item xs={6} md={3}>
-                        <SwitchCall
+                        <CampaignSwitch
                           isChecked={isWaiting}
                           handleSwitch={handleChangeWaitCall}
                         />
@@ -1266,7 +1315,7 @@ const UpdateCampaign = () => {
                         </InputLabel>
                       </Grid>
                       <Grid item xs={6} md={3}>
-                        <SwitchCall
+                        <CampaignSwitch
                           isChecked={isSilent}
                           handleSwitch={handleChangeSilentCall}
                         />
@@ -1295,11 +1344,11 @@ const UpdateCampaign = () => {
                         <RemoveIcon fontSize="small" />
                       </StyledButton>
                       <StyledInput
-                        value={dialAttempt}
+                        value={dialAttempt === null ? "" : dialAttempt}
                         onChange={(e) => handleChangeAttempt(e)}
                         type="number"
                         min="0"
-                        max={999}
+                        max="10"
                         onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"
                       />
                       <StyledButton
@@ -1369,16 +1418,21 @@ const UpdateCampaign = () => {
               <AccordionDetails>
                 <Box sx={{ width: "100%" }}>
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                    <Tabs value={tabValue} onChange={handleChangeTab}>
+                    <Tabs
+                      value={tabValue}
+                      onChange={handleChangeTab}
+                    >
                       <Tab
-                        sx={{
+                         sx={{
                           "&.Mui-selected": {
-                            color: colors.greenAccent[900],
-                            backgroundColor: colors.primary[100],
-                            fontWeight: 400,
+                            color: colors.primary[300],
+                            backgroundColor: colors.greenAccent[600],
+                            fontWeight: 500,
                           },
-                          backgroundColor: colors.primary[700],
+                          backgroundColor: colors.greenAccent[400],
+                          color: colors.primary[300],
                           textTransform: "none",
+                          fontSize: 15
                         }}
                         label="Set Target"
                         {...a11yProps(0)}
@@ -1386,12 +1440,14 @@ const UpdateCampaign = () => {
                       <Tab
                         sx={{
                           "&.Mui-selected": {
-                            color: colors.greenAccent[900],
-                            backgroundColor: colors.primary[100],
-                            fontWeight: 400,
+                            color: colors.primary[300],
+                            backgroundColor: colors.greenAccent[600],
+                            fontWeight: 500,
                           },
-                          backgroundColor: colors.primary[700],
+                          backgroundColor: colors.greenAccent[400],
+                          color: colors.primary[300],
                           textTransform: "none",
+                          fontSize: 15
                         }}
                         label="Set Ivr"
                         {...a11yProps(1)}

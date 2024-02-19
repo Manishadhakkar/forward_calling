@@ -1,5 +1,5 @@
 import {
-    Button,
+  Button,
   Card,
   CardActions,
   CardContent,
@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { tokens } from "../../../assets/color/theme";
-import { getAllCompanyRequest } from "../../../pages/app/campaign/service/campaign.request";
+import { getAllBuyerRequest, getAllCompanyRequest } from "../../../pages/app/campaign/service/campaign.request";
 import Loader from "../../Loader/Loader";
 import FormTextDropdown from "../../dropdown/FormTextDropdown";
 import { MdClose } from "react-icons/md";
@@ -22,7 +22,7 @@ const AssignForm = ({
   setErrorMessage,
   campaignId,
   clickedBtn,
-  initialValue
+  initialValue,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -37,20 +37,39 @@ const AssignForm = ({
 
   useEffect(() => {
     setIsLoader(true);
-    getAllCompanyRequest()
-      .then((res) => {
-        const result = res.data?.data?.data?.map((ele) => {
-          return {
-            value: ele.id,
-            label: ele.company_name,
-          };
+
+    if (clickedBtn === "assign") {
+      getAllCompanyRequest()
+        .then((res) => {
+          const result = res.data?.data?.data?.map((ele) => {
+            return {
+              value: ele.id,
+              label: ele.company_name,
+            };
+          });
+          setCompanyList(result);
+          setIsLoader(false);
+        })
+        .catch((err) => {
+          setIsLoader(false);
         });
-        setCompanyList(result);
-        setIsLoader(false);
-      })
-      .catch((err) => {
-        setIsLoader(false);
-      });
+    } else {
+      getAllBuyerRequest()
+        .then((res) => {
+          console.log(res.data)
+          const result = res.data?.map((ele) => {
+            return {
+              value: ele.company_id,
+              label: ele.name,
+            };
+          });
+          setCompanyList(result);
+          setIsLoader(false);
+        })
+        .catch((err) => {
+          setIsLoader(false);
+        });
+    }
   }, []);
 
   const handleChangeCompany = (value) => {
@@ -61,8 +80,8 @@ const AssignForm = ({
   const handleSubmitForm = (e) => {
     e.preventDefault();
     const data = {
-        company_id: companyId.value,
-        campaign_id: campaignId
+      company_id: companyId.value,
+      campaign_id: campaignId,
     };
     handleFormData(data);
   };
@@ -84,7 +103,9 @@ const AssignForm = ({
               <MdClose color={colors.form[100]} />
             </IconButton>
           }
-          title={"Assign to"}
+          title={
+            clickedBtn === "assign" ? "Assign to campaign" : "Assign to Buyer"
+          }
         />
         {errorMessage && <span className="error_msg">{errorMessage}</span>}
         <CardContent
@@ -96,7 +117,7 @@ const AssignForm = ({
               <FormTextDropdown
                 Value={companyId.value}
                 onSelect={handleChangeCompany}
-                label={"Company *"}
+                label={clickedBtn === "assign" ? "Company *" : "Buyer Company"}
                 CustomErrorLine={"Choose one"}
                 Required={true}
                 Options={companyList}
